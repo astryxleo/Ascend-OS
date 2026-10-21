@@ -14,8 +14,10 @@ export default function AnalyticsPanel({supabase,userId}:Props){
  const [error,setError]=useState('');
  const [goal,setGoal]=useState(120);
  const requestId=useRef(0);
+ const loadedUserId=useRef(userId);
  const load=useCallback(async()=>{
   const request=++requestId.current;
+  if(loadedUserId.current!==userId){loadedUserId.current=userId;setRows([]);}
   if(!supabase||!userId){setRows([]);setError('Sign in to see your analytics.');setLoading(false);return;}
   setLoading(true);setError('');
   try {
