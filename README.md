@@ -36,4 +36,5 @@ The database helper verifies either a verified JWT email matching `astryxleo@gma
 - Operator search/airdrop/broadcast/vehicle management forms and audit views.
 - Storage bucket setup and per-user object policies.
 - Automated tests, accessibility audit, and deployment verification.
+- Confirm GitHub Actions build status; no successful build result has been observed yet.
 - CI workflow is committed; build status still needs to be confirmed from GitHub Actions.
