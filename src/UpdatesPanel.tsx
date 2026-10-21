@@ -19,7 +19,7 @@ const kindMeta: Record<string, {label:string; icon: typeof Info}> = {
   maintenance: {label:'SYSTEM NOTICE',icon:Wrench},
 };
 
-export default function UpdatesPanel({supabase,setNotice}:{supabase:SupabaseClient|null;setNotice:(message:string)=>void}) {
+export default function UpdatesPanel({supabase}:{supabase:SupabaseClient|null}) {
   const [items,setItems]=useState<Broadcast[]>([]);
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState('');
