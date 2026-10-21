@@ -59,6 +59,16 @@ function App() {
       if (!cancelled && !error && data) setProfile(data);
       const {data:wallet} = await supabase!.from('wallets').select('coins').eq('user_id',session.user.id).maybeSingle();
       if (!cancelled && wallet) setCoins(wallet.coins);
+      const {data:activeRun} = await supabase!.from('focus_session_runs').select('id,mode,target_minutes,started_at').eq('user_id',session.user.id).is('completed_at',null).order('started_at',{ascending:false}).limit(1).maybeSingle();
+      if (!cancelled && activeRun) {
+        const elapsedSeconds = Math.max(0,Math.floor((Date.now()-new Date(activeRun.started_at).getTime())/1000));
+        const remaining = Math.max(0,activeRun.target_minutes*60-elapsedSeconds);
+        setFocusRunId(activeRun.id);
+        setFocusMode(activeRun.mode==='pomodoro'?'Pomodoro':activeRun.mode==='deep_sprint'?'Deep Sprint':activeRun.mode==='extreme_grind'?'Extreme Grind':'Pomodoro');
+        setFocusSeconds(remaining);
+        if (remaining===0) { setFocusCompleted(true); setFocusRunning(false); }
+        else setFocusRunning(true);
+      }
       const {data:taskRows} = await supabase!.from('planner_tasks').select('*').eq('user_id',session.user.id).eq('study_day',studyDay()).order('created_at');
       if (!cancelled && taskRows) setTasks(taskRows as Task[]);
       const {count} = await supabase!.from('chapter_progress').select('*',{count:'exact',head:true}).eq('user_id',session.user.id).eq('completed',true);
