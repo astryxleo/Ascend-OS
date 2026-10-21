@@ -34,8 +34,8 @@ export default function Onboarding({ supabase, profile, userId, onSaved }: Props
   const [username, setUsername] = useState(profile.username || '');
   const [grade, setGrade] = useState(profile.class_grade || '12');
   const [stream, setStream] = useState(profile.stream || 'PCM');
-  const [school, setSchool] = useState(profile.school_target || '');
-  const [target, setTarget] = useState('JEE');
+  const [school, setSchool] = useState((profile.school_target || '').split(' · ')[0] || '');
+  const [target, setTarget] = useState((profile.school_target || '').split(' · ').slice(1).join(' · ') || 'JEE');
   const [avatar, setAvatar] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -47,7 +47,8 @@ export default function Onboarding({ supabase, profile, userId, onSaved }: Props
     setUsername(profile.username || '');
     setGrade(profile.class_grade || '12');
     setStream(profile.stream || 'PCM');
-    setSchool(profile.school_target || '');
+    setSchool((profile.school_target || '').split(' · ')[0] || '');
+    setTarget((profile.school_target || '').split(' · ').slice(1).join(' · ') || 'JEE');
     setAvatar(null);
     setError('');
     setBusy(false);
