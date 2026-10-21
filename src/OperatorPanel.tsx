@@ -50,7 +50,9 @@ export default function OperatorPanel({
   const [publish, setPublish] = useState(true);
   const [busy, setBusy] = useState(false);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [vehicleLoadError, setVehicleLoadError] = useState('');
   const [walletTransactions, setWalletTransactions] = useState<WalletTransaction[]>([]);
+  const [walletAuditError, setWalletAuditError] = useState('');
   const [walletAuditQuery, setWalletAuditQuery] = useState('');
   const [vehicleQuery, setVehicleQuery] = useState('');
   const [vehicleId, setVehicleId] = useState('');
@@ -234,10 +236,19 @@ export default function OperatorPanel({
     setBusy(true);
     try {
       const { data, error } = await supabase.from('vehicles').select('id,name,maker,tier,rarity,price_coins,price_cash,stock_limit,stock_sold,is_available,is_limited,is_operator_drop,top_speed_kmh,zero_to_100,horsepower').order('created_at', { ascending: false });
-      if (error) setNotice('Marketplace catalog failed to load: ' + error.message);
-      else setVehicles((data ?? []) as Vehicle[]);
+      if (error) {
+        setVehicles([]);
+        setVehicleLoadError(error.message);
+        setNotice('Marketplace catalog failed to load: ' + error.message);
+      } else {
+        setVehicleLoadError('');
+        setVehicles((data ?? []) as Vehicle[]);
+      }
     } catch (error) {
-      setNotice('Marketplace catalog failed to load: ' + (error instanceof Error ? error.message : 'Unexpected error.'));
+      const message = error instanceof Error ? error.message : 'Unexpected error.';
+      setVehicles([]);
+      setVehicleLoadError(message);
+      setNotice('Marketplace catalog failed to load: ' + message);
     } finally { setBusy(false); }
   }
 
@@ -286,9 +297,20 @@ export default function OperatorPanel({
     setBusy(true);
     try {
       const { data, error } = await supabase.rpc('operator_wallet_audit', { p_limit: 100 });
-      if (error) setNotice('Wallet audit history failed to load: ' + error.message);
-      else setWalletTransactions((data ?? []) as WalletTransaction[]);
-    } catch (error) { setNotice('Wallet audit history failed to load: ' + (error instanceof Error ? error.message : 'Unexpected error.')); }
+      if (error) {
+        setWalletTransactions([]);
+        setWalletAuditError(error.message);
+        setNotice('Wallet audit history failed to load: ' + error.message);
+      } else {
+        setWalletAuditError('');
+        setWalletTransactions((data ?? []) as WalletTransaction[]);
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unexpected error.';
+      setWalletTransactions([]);
+      setWalletAuditError(message);
+      setNotice('Wallet audit history failed to load: ' + message);
+    }
     finally { setBusy(false); }
   }
   useEffect(() => { if (tab === 'Wallet audit') void loadWalletAudit(); }, [tab, supabase]);
@@ -410,8 +432,9 @@ export default function OperatorPanel({
           <div className="operator-warning"><ShieldCheck size={18} /><div><b>Wallet audit ledger</b><span>Read-only view of the latest 100 currency transactions.</span></div></div>
           <div className="operator-search"><input value={walletAuditQuery} onChange={event => setWalletAuditQuery(event.target.value)} placeholder="Filter by user, reason, source or currency…" aria-label="Filter wallet audit history" /><button type="button" onClick={() => void loadWalletAudit()} disabled={busy}><RefreshCw size={14}/> Refresh</button></div>
           <div className="operator-broadcast-list"><h3>Recent transactions · {visibleWalletTransactions.length}</h3>
+            {walletAuditError && <p className="operator-help" role="alert">Could not load wallet history: {walletAuditError}. Use Refresh to try again.</p>}
             {visibleWalletTransactions.map(row => <article key={row.id}><div><b>{row.full_name ? row.full_name + (row.username ? ' · @' + row.username : '') : 'Account ' + row.user_id.slice(0, 8)}</b><p>{row.reason}</p><small>{row.currency.toUpperCase()} · {row.source} · {new Date(row.created_at).toLocaleString()} · {row.created_by ? 'Recorded by ' + row.created_by.slice(0, 8) : 'System recorded'}</small></div><strong style={{whiteSpace:'nowrap'}}>{row.amount > 0 ? '+' : ''}{Number(row.amount).toLocaleString()} {row.currency}</strong></article>)}
-            {!busy && visibleWalletTransactions.length === 0 && <p className="operator-help">No transactions match this filter.</p>}
+            {!busy && !walletAuditError && visibleWalletTransactions.length === 0 && <p className="operator-help">No transactions match this filter.</p>}
           </div>
         </>
       )}
@@ -443,11 +466,12 @@ export default function OperatorPanel({
           <div className="operator-search"><input value={vehicleQuery} onChange={event => setVehicleQuery(event.target.value)} placeholder="Filter by name, maker or ID…" aria-label="Filter marketplace catalog" /></div>
           <div className="operator-broadcast-list">
             <h3>Catalog inventory · {visibleVehicles.length} vehicles</h3>
+            {vehicleLoadError && <p className="operator-help" role="alert">Could not load the catalog: {vehicleLoadError}. Use Refresh catalog to try again.</p>}
             {visibleVehicles.map(vehicle => <article key={vehicle.id}>
               <div><b>{vehicle.name} <small>· {vehicle.maker}</small></b><p>{vehicle.id} · {vehicle.tier} · {vehicle.rarity}</p><small>◈ {Number(vehicle.price_coins).toLocaleString()} coins · {vehicle.price_cash.toLocaleString()} cash · {vehicle.stock_limit === null ? 'Unlimited stock' : Math.max(0, vehicle.stock_limit - vehicle.stock_sold) + ' remaining'} · {vehicle.is_available ? 'Available' : 'Hidden'}</small></div>
               <button type="button" disabled={busy} onClick={() => selectVehicle(vehicle)}>Edit</button>
             </article>)}
-            {visibleVehicles.length === 0 && <p className="operator-help">No vehicles match this filter.</p>}
+            {visibleVehicles.length === 0 && !vehicleLoadError && <p className="operator-help">No vehicles match this filter.</p>}
           </div>
         </>
       )}
