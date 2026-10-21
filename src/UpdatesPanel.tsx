@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { Bell, CalendarClock, Info, Megaphone, RefreshCw, ShieldAlert, Wrench } from 'lucide-react';
 
@@ -24,9 +24,11 @@ export default function UpdatesPanel({supabase}:{supabase:SupabaseClient|null}) 
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState('');
   const [refreshing,setRefreshing]=useState(false);
+  const requestId=useRef(0);
 
   const load=useCallback(async (quiet=false)=>{
-    if(!supabase){setError('Connect Supabase to load workspace updates.');setLoading(false);return;}
+    const request=++requestId.current;
+    if(!supabase){setError('Connect Supabase to load workspace updates.');setLoading(false);setRefreshing(false);return;}
     if(quiet)setRefreshing(true);else setLoading(true);
     setError('');
     try {
@@ -39,13 +41,14 @@ export default function UpdatesPanel({supabase}:{supabase:SupabaseClient|null}) 
         .order('starts_at',{ascending:false})
         .limit(50);
       if(queryError)throw queryError;
+      if(request!==requestId.current)return;
       setItems((data??[]) as Broadcast[]);
     } catch(reason) {
-      setError(reason instanceof Error?reason.message:'Could not load updates.');
-    } finally {setLoading(false);setRefreshing(false);}
+      if(request===requestId.current)setError(reason instanceof Error?reason.message:'Could not load updates.');
+    } finally {if(request===requestId.current){setLoading(false);setRefreshing(false);}}
   },[supabase]);
 
-  useEffect(()=>{void load();},[load]);
+  useEffect(()=>{void load();return()=>{requestId.current+=1}},[load]);
   useEffect(()=>{
     if(!supabase)return;
     const channel=supabase.channel('lumen-live-updates')
