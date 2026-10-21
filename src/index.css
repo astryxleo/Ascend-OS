@@ -100,3 +100,34 @@
 .duel-error button{background:transparent;border:1px solid #8a4141;border-radius:7px;color:inherit;padding:7px 10px;cursor:pointer}
 @media(max-width:760px){.duel-create{grid-template-columns:1fr 1fr}.duel-create label:first-child{grid-column:1/-1}.duel-create .primary-btn{grid-column:1/-1}.duel-list{grid-template-columns:1fr}}
 @media(max-width:420px){.duel-create{grid-template-columns:1fr}.duel-create label:first-child,.duel-create .primary-btn{grid-column:auto}.duel-card{padding:13px}.duel-card-top{align-items:flex-start;flex-direction:column}}
+
+
+/* Achievement progression */
+.achievements-panel{display:flex;flex-direction:column;gap:18px}
+.achievements-intro{margin:-8px 0 0;color:#a2a3b0;font-size:13px;line-height:1.7}
+.achievement-summary{display:flex;align-items:center;gap:16px;padding:20px;border:1px solid #5b4b2d;border-radius:16px;background:radial-gradient(ellipse at 0 0,#8e6c2a26,transparent 55%),linear-gradient(130deg,#17150f,#0d0e12)}
+.achievement-summary-icon{width:54px;height:54px;flex:0 0 auto;display:grid;place-items:center;border-radius:15px;background:#c8a45e18;border:1px solid #c8a45e55;color:#e8ca80}
+.achievement-summary-copy{flex:1;min-width:0;display:grid;gap:8px}
+.achievement-summary-copy>span,.achievement-xp>span{font-size:9px;letter-spacing:.14em;color:#b8a477;font-weight:900}
+.achievement-summary-copy>b,.achievement-xp>b{font-size:25px;color:#f4e5bc;font-variant-numeric:tabular-nums}
+.achievement-xp{padding-left:18px;border-left:1px solid #3a3325;display:grid;gap:7px}
+.achievement-xp>b{font-size:20px}
+.achievement-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.achievement-stats>div{display:grid;grid-template-columns:22px 1fr;align-items:center;gap:7px 9px;padding:15px;border:1px solid #292a32;border-radius:12px;background:#101116}
+.achievement-stats svg{color:#c8a45e;grid-row:span 2}
+.achievement-stats span{font-size:11px;color:#a3a4b0}
+.achievement-stats b{font-size:15px;color:#f1f1f5}
+.achievement-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.achievement-card{display:flex;flex-direction:column;min-width:0;padding:16px;border:1px solid #30313a;border-radius:14px;background:linear-gradient(145deg,#15161c,#0d0e12);gap:9px}
+.achievement-card.unlocked{border-color:#746039;background:radial-gradient(ellipse at 0 0,#b58d3a15,transparent 65%),linear-gradient(145deg,#17160f,#0d0e12)}
+.achievement-card-top{display:flex;align-items:center;justify-content:space-between}
+.achievement-icon{width:42px;height:42px;display:grid;place-items:center;border:1px solid #3a3b45;border-radius:12px;color:#8e909e;background:#1a1b22}
+.achievement-card.unlocked .achievement-icon{color:#e7c777;border-color:#7a6338;background:#3a2c13}
+.achievement-check{color:#8fe0b5}.achievement-lock{color:#777986}
+.achievement-rarity{font-size:9px;text-transform:uppercase;letter-spacing:.13em;font-weight:900;color:#b6a16e}
+.achievement-card h3{margin:0;font-size:14px;color:#f0f0f4}
+.achievement-card p{margin:0;min-height:34px;font-size:11px;line-height:1.6;color:#9c9daa}
+.achievement-progress-copy{display:flex;justify-content:space-between;gap:8px;margin-top:auto;font-size:10px;color:#a6a7b3}
+.achievement-progress-copy b{color:#d9bd78}
+@media(max-width:900px){.achievement-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.achievement-summary{padding:14px;gap:10px}.achievement-summary-icon{width:42px;height:42px}.achievement-summary-copy>b{font-size:20px}.achievement-xp{padding-left:10px}.achievement-xp>b{font-size:16px}.achievement-stats{gap:7px}.achievement-stats>div{padding:10px;grid-template-columns:1fr;gap:6px}.achievement-stats svg{grid-row:auto}.achievement-stats span{font-size:10px}.achievement-stats b{font-size:13px}.achievement-grid{grid-template-columns:1fr}.achievement-card p{min-height:0}}
