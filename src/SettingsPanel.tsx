@@ -62,12 +62,14 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
     const file = event.target.files?.[0] ?? null;
     if (file && !file.type.startsWith('image/')) {
       setAvatarFile(null);
+      setAvatarPreview(profile?.avatar_url ?? '');
       event.target.value = '';
       setError('Choose an image file.');
       return;
     }
     if (file && file.size > 12 * 1024 * 1024) {
       setAvatarFile(null);
+      setAvatarPreview(profile?.avatar_url ?? '');
       event.target.value = '';
       setError('Choose an image smaller than 12 MB.');
       return;
