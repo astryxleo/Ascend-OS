@@ -10,8 +10,10 @@ export default function AchievementsPanel({supabase,userId}:Props){
  const [loading,setLoading]=useState(true);
  const [error,setError]=useState('');
  const requestId=useRef(0);
+ const loadedUserId=useRef(userId);
  const load=useCallback(async()=>{
   const request=++requestId.current;
+  if(loadedUserId.current!==userId){loadedUserId.current=userId;setRows([]);}
   if(!supabase||!userId){setRows([]);setError('Sign in to view achievements.');setLoading(false);return;}
   setLoading(true);setError('');
   try {
