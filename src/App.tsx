@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js';
 import Onboarding from './Onboarding';
 import Garage from './Garage';
@@ -33,6 +33,8 @@ const nav = [
 function studyDay() { const d = new Date(Date.now() - 4 * 60 * 60 * 1000); return d.toLocaleDateString('en-CA'); }
 function App() {
   const [session,setSession] = useState<Session|null>(null);
+  const activeUserIdRef = useRef<string | null>(null);
+  activeUserIdRef.current = session?.user.id ?? null;
   const [authReady,setAuthReady] = useState(!supabase);
   const [authMode,setAuthMode] = useState<'magic'|'google'>('magic');
   const [email,setEmail] = useState('');
@@ -146,6 +148,7 @@ function App() {
     if (!supabase) { setNotice('Supabase is not configured yet.'); return; }
     try {
       const {data,error} = await supabase.from('planner_tasks').insert(row).select('*').single();
+      if (activeUserIdRef.current !== row.user_id) return;
       if (error) { setNotice('Could not add task: '+error.message); return; }
       setTasks(old=>[...old,data as Task]); setTaskTitle(''); setNewTaskOpen(false); setNotice('Task added to your study board.');
     } catch (error) {
@@ -157,6 +160,7 @@ function App() {
     const completed = !task.completed;
     try {
       const {error} = await supabase.from('planner_tasks').update({completed,completed_at:completed?new Date().toISOString():null}).eq('id',task.id).eq('user_id',session!.user.id);
+      if (activeUserIdRef.current !== session!.user.id) return;
       if (error) { setNotice('Could not update task: '+error.message); return; }
       setTasks(old=>old.map(t=>t.id===task.id?{...t,completed}:t));
       if (completed) setNotice('Task complete. Keep your momentum.');
