@@ -103,7 +103,7 @@ function App() {
     })().catch(() => { if (!cancelled) setProfileLoaded(true); });
     return () => { cancelled = true; };
   },[session?.user?.id]);
-  useEffect(()=>{if(!supabase||!session?.user.id){setTasks([]);return;}let alive=true;supabase.from('planner_tasks').select('*').eq('user_id',session.user.id).eq('study_day',plannerDay).order('created_at').then(({data,error})=>{if(!alive)return;if(error)setNotice('Could not load planner history: '+error.message);else setTasks((data??[]) as Task[]);});return()=>{alive=false};},[session?.user?.id,plannerDay]);
+  useEffect(()=>{if(!supabase||!session?.user.id){setTasks([]);return;}let alive=true;setTasks([]);(async()=>{try{const {data,error}=await supabase.from('planner_tasks').select('*').eq('user_id',session.user.id).eq('study_day',plannerDay).order('created_at');if(!alive)return;if(error){setNotice('Could not load planner history: '+error.message);return;}setTasks((data??[]) as Task[]);}catch{if(alive)setNotice('Could not load planner history because of a network error. Please retry by changing the study day.');}})();return()=>{alive=false};},[session?.user?.id,plannerDay]);
   useEffect(() => {
     if (!focusRunning) return;
     const id = window.setInterval(() => setFocusSeconds(s => {
@@ -137,17 +137,25 @@ function App() {
     e.preventDefault(); if (!taskTitle.trim()) return;
     const row = {user_id:session!.user.id,title:taskTitle.trim(),subject:taskSubject,priority:taskPriority,estimated_minutes:25,study_day:plannerDay,completed:false};
     if (!supabase) { setNotice('Supabase is not configured yet.'); return; }
-    const {data,error} = await supabase.from('planner_tasks').insert(row).select('*').single();
-    if (error) { setNotice(error.message); return; }
-    setTasks(old=>[...old,data as Task]); setTaskTitle(''); setNewTaskOpen(false); setNotice('Task added to your study board.');
+    try {
+      const {data,error} = await supabase.from('planner_tasks').insert(row).select('*').single();
+      if (error) { setNotice('Could not add task: '+error.message); return; }
+      setTasks(old=>[...old,data as Task]); setTaskTitle(''); setNewTaskOpen(false); setNotice('Task added to your study board.');
+    } catch (error) {
+      setNotice('Could not add task because of a network error. Please try again.');
+    }
   }
   async function toggleTask(task:Task) {
     if (!supabase) return;
     const completed = !task.completed;
-    const {error} = await supabase.from('planner_tasks').update({completed,completed_at:completed?new Date().toISOString():null}).eq('id',task.id).eq('user_id',session!.user.id);
-    if (error) { setNotice(error.message); return; }
-    setTasks(old=>old.map(t=>t.id===task.id?{...t,completed}:t));
-    if (completed) setNotice('Task complete. Keep your momentum.');
+    try {
+      const {error} = await supabase.from('planner_tasks').update({completed,completed_at:completed?new Date().toISOString():null}).eq('id',task.id).eq('user_id',session!.user.id);
+      if (error) { setNotice('Could not update task: '+error.message); return; }
+      setTasks(old=>old.map(t=>t.id===task.id?{...t,completed}:t));
+      if (completed) setNotice('Task complete. Keep your momentum.');
+    } catch {
+      setNotice('Could not update task because of a network error. Please try again.');
+    }
   }
   async function signOut() { await supabase?.auth.signOut(); setTasks([]); setProfile(null); setFocusRunning(false); setFocusRunId(null); setFocusCompleted(false); }
   async function startFocus() {
