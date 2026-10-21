@@ -10,6 +10,8 @@ type Props = {
 };
 
 async function compressImage(file: File): Promise<Blob> {
+  if (!file.type.startsWith('image/')) throw new Error('Choose an image file.');
+  if (file.size > 12 * 1024 * 1024) throw new Error('Choose an image smaller than 12 MB.');
   const img = await new Promise<HTMLImageElement>((resolve, reject) => {
     const url = URL.createObjectURL(file);
     const element = new Image();
@@ -38,6 +40,21 @@ export default function Onboarding({ supabase, profile, userId, onSaved }: Props
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
+  function chooseAvatar(file: File | null) {
+    if (file && !file.type.startsWith('image/')) {
+      setAvatar(null);
+      setError('Choose an image file.');
+      return;
+    }
+    if (file && file.size > 12 * 1024 * 1024) {
+      setAvatar(null);
+      setError('Choose an image smaller than 12 MB.');
+      return;
+    }
+    setAvatar(file);
+    setError('');
+  }
+
   async function save(event: FormEvent) {
     event.preventDefault();
     if (!/^[a-zA-Z0-9_]{3,24}$/.test(username)) {
@@ -53,7 +70,6 @@ export default function Onboarding({ supabase, profile, userId, onSaved }: Props
     try {
       let avatarUrl = profile.avatar_url || null;
       if (avatar) {
-        if (!avatar.type.startsWith('image/')) throw new Error('Choose an image file.');
         const blob = await compressImage(avatar);
         const path = userId + '/avatar-' + Date.now() + '.webp';
         const { error: uploadError } = await supabase.storage.from('lumen-avatars').upload(path, blob, { contentType: 'image/webp', upsert: true });
@@ -86,7 +102,7 @@ export default function Onboarding({ supabase, profile, userId, onSaved }: Props
       </div>
       <label className="field-label">SCHOOL / TARGET INSTITUTION<input value={school} onChange={e => setSchool(e.target.value)} required maxLength={120} placeholder="School or institution" /></label>
       <label className="field-label">TARGET EXAM<select value={target} onChange={e => setTarget(e.target.value)}><option>JEE</option><option>NEET</option><option>CUET</option><option>Board Exams</option><option>Other</option></select></label>
-      <label className="field-label">AVATAR (OPTIONAL)<input type="file" accept="image/png,image/jpeg,image/webp,image/avif" onChange={e => setAvatar(e.target.files?.[0] || null)} /></label>
+      <label className="field-label">AVATAR (OPTIONAL)<input type="file" accept="image/png,image/jpeg,image/webp,image/avif" onChange={e => { chooseAvatar(e.target.files?.[0] || null); e.target.value = ''; }} /></label>
       {error && <div className="auth-message">{error}</div>}
       <button className="auth-submit" disabled={busy}>{busy ? 'Saving profile…' : 'Build my workspace'} <ArrowUpRight size={16} /></button>
     </form>
