@@ -8,5 +8,12 @@
   "background_color": "#070709",
   "theme_color": "#070709",
   "orientation": "portrait-primary",
-  "icons": []
+  "icons": [
+    {
+      "src": "/lumen-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }
