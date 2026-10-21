@@ -3,6 +3,7 @@ import { createClient, type Session, type SupabaseClient } from '@supabase/supab
 import Onboarding from './Onboarding';
 import Garage from './Garage';
 import OperatorPanel from './OperatorPanel';
+import SettingsPanel from './SettingsPanel';
 import { Activity, ArrowUpRight, BookOpen, CarFront, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, Sparkles, Target, Trophy, Wallet, X } from 'lucide-react';
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
@@ -165,7 +166,7 @@ function App() {
       <div className="workspace-label">WORKSPACE <ChevronDown size={12}/></div>
       <div className="nav-list">{nav.map(item=><button key={item.label} className={`nav-item ${activeNav===item.label?'active':''}`} onClick={()=>{setActiveNav(item.label);setMobileNav(false);}}><item.icon size={17}/><span>{item.label}</span>{item.label==='Focus room'&&<span className="nav-dot"/>}</button>)}</div>
       {isOperator&&<><div className="workspace-label operator-label">OPERATOR</div><button className={`nav-item ${activeNav==='Control center'?'active':''}`} onClick={()=>{setActiveNav('Control center');setMobileNav(false);}}><ShieldCheck size={17}/><span>Control center</span><span className="operator-chip">ROOT</span></button></>}
-      <div className="sidebar-bottom"><div className="streak-card"><div className="streak-icon"><Flame size={17}/></div><div><b>Build your streak</b><span>One session at a time.</span></div><ArrowUpRight size={15}/></div><button className="nav-item" onClick={()=>setActiveNav('Settings')}><Settings2 size={17}/><span>Settings</span></button><div className="user-card"><div className="avatar">{(profile?.full_name||session.user.email||'L').slice(0,1).toUpperCase()}</div><div className="user-meta"><b>{profile?.full_name||session.user.user_metadata?.full_name||'Student'}</b><span>{isOperator?'OPERATOR ACCESS':'CLASS XII · STUDENT'}</span></div><button className="icon-btn" title="Sign out" onClick={signOut}><LogOut size={16}/></button></div></div>
+      <div className="sidebar-bottom"><div className="streak-card"><div className="streak-icon"><Flame size={17}/></div><div><b>Build your streak</b><span>One session at a time.</span></div><ArrowUpRight size={15}/></div><button className="nav-item" onClick={()=>setActiveNav('Settings')}><Settings2 size={17}/><span>Settings</span></button><div className="user-card"><div className="avatar">{profile?.avatar_url?<img src={profile.avatar_url} alt="" />:(profile?.full_name||session.user.email||'L').slice(0,1).toUpperCase()}</div><div className="user-meta"><b>{profile?.full_name||session.user.user_metadata?.full_name||'Student'}</b><span>{isOperator?'OPERATOR ACCESS':'CLASS XII · STUDENT'}</span></div><button className="icon-btn" title="Sign out" onClick={signOut}><LogOut size={16}/></button></div></div>
     </aside>
     {mobileNav&&<button className="scrim" onClick={()=>setMobileNav(false)} aria-label="Close menu"/>}
     <main className="main-area">
@@ -181,7 +182,7 @@ function App() {
         {activeNav==='Garage'&&<Garage supabase={supabase} userId={session?.user.id??null} coins={coins} setCoins={setCoins} setNotice={setNotice}/>}
         {activeNav==='Leaderboard'&&<Placeholder icon={Trophy} title="The leaderboard" text="Compete on focus, consistency and syllabus mastery." detail="Public profiles and duels will be enabled after privacy controls."/>}
         {activeNav==='Control center'&&isOperator&&<OperatorPanel supabase={supabase} setNotice={setNotice}/>}
-        {activeNav==='Settings'&&<Placeholder icon={Settings2} title="Your preferences" text="Personalize your Lumen workspace." detail="Profile editing and avatar uploads are queued for the next module."/>}
+        {activeNav==='Settings'&&<SettingsPanel supabase={supabase} profile={profile} userId={session.user.id} onSaved={setProfile} setNotice={setNotice}/ >}
         <footer className="footer"><span>◈ LUMEN <i>STUDY OS</i></span><span>BUILT FOR THE LONG GAME <span className="footer-dot">●</span></span></footer>
       </div>
     </main>
