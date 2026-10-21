@@ -127,8 +127,9 @@ function App() {
         if (remaining===0) { setFocusCompleted(true); setFocusRunning(false); }
         else setFocusRunning(true);
       }
-      const {count} = await supabase!.from('chapter_progress').select('*',{count:'exact',head:true}).eq('user_id',session.user.id).eq('completed',true);
-      if (!cancelled && count !== null) setCompletedSteps(count);
+      const {count,countError} = await supabase!.from('chapter_progress').select('*',{count:'exact',head:true}).eq('user_id',session.user.id).eq('completed',true);
+      if (!cancelled && countError) setNotice('Could not load your syllabus progress total: ' + countError.message);
+      if (!cancelled && !countError && count !== null) setCompletedSteps(count);
       if (!cancelled) setProfileLoaded(true);
     })().catch(() => { if (!cancelled) { setNotice('Could not load your workspace because of a network error. Please reload and try again.'); setProfileLoaded(true); } });
     return () => { cancelled = true; };
