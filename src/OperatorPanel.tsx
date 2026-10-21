@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { Activity, RefreshCw, Search, Send, ShieldCheck, Wallet, Users, CarFront } from 'lucide-react';
 
@@ -66,9 +66,11 @@ export default function OperatorPanel({
   const [vehicleLimited, setVehicleLimited] = useState(false);
   const [vehicleDrop, setVehicleDrop] = useState(false);
   const [vehicleAvailable, setVehicleAvailable] = useState(true);
+  const usersRequestId = useRef(0);
 
   async function refresh() {
     if (!supabase) return;
+    const usersRequest = ++usersRequestId.current;
     setBusy(true);
     try {
       const [s, u, b] = await Promise.all([
@@ -79,11 +81,11 @@ export default function OperatorPanel({
       if (s.error) setNotice('Dashboard stats failed: ' + s.error.message);
       else setStats((s.data ?? {}) as Stats);
 
-      if (u.error) {
+      if (usersRequest === usersRequestId.current && u.error) {
         setUsers([]);
         setUsersLoadError(u.error.message);
         setNotice('User list refresh failed: ' + u.error.message);
-      } else {
+      } else if (usersRequest === usersRequestId.current) {
         setUsersLoadError('');
         const nextUsers = (u.data ?? []) as UserRow[];
         setUsers(nextUsers);
@@ -112,9 +114,11 @@ export default function OperatorPanel({
   async function searchUsers(event: FormEvent) {
     event.preventDefault();
     if (!supabase) return;
+    const usersRequest = ++usersRequestId.current;
     setBusy(true);
     try {
       const { data, error } = await supabase.rpc('operator_search_users', { p_query: query });
+      if (usersRequest !== usersRequestId.current) return;
       if (error) {
         setUsers([]);
         setUsersLoadError(error.message);
@@ -130,6 +134,7 @@ export default function OperatorPanel({
           : (nextUsers[0]?.user_id ?? ''),
       );
     } catch (error) {
+      if (usersRequest !== usersRequestId.current) return;
       const message = error instanceof Error ? error.message : 'Unexpected error.';
       setUsers([]);
       setUsersLoadError(message);
