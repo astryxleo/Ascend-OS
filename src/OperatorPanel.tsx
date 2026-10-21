@@ -49,6 +49,7 @@ export default function OperatorPanel({
   const [kind, setKind] = useState('info');
   const [publish, setPublish] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [searchingUsers, setSearchingUsers] = useState(false);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [vehicleLoadError, setVehicleLoadError] = useState('');
   const [walletTransactions, setWalletTransactions] = useState<WalletTransaction[]>([]);
@@ -120,7 +121,7 @@ export default function OperatorPanel({
     event.preventDefault();
     if (!supabase) return;
     const usersRequest = ++usersRequestId.current;
-    setBusy(true);
+    setSearchingUsers(true);
     try {
       const { data, error } = await supabase.rpc('operator_search_users', { p_query: query });
       if (usersRequest !== usersRequestId.current) return;
@@ -145,7 +146,7 @@ export default function OperatorPanel({
       setUsersLoadError(message);
       setNotice('User search failed: ' + message);
     } finally {
-      setBusy(false);
+      if (usersRequest === usersRequestId.current) setSearchingUsers(false);
     }
   }
 
@@ -395,7 +396,7 @@ export default function OperatorPanel({
         <>
           <form className="operator-search" onSubmit={searchUsers}>
             <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search username, name or email…" />
-            <button disabled={busy}><Search size={14} /> Search</button>
+            <button disabled={searchingUsers}><Search size={14} /> {searchingUsers ? 'Searching…' : 'Search'}</button>
           </form>
           <div className="operator-user-list">
             {usersLoadError && <p className="operator-help" role="alert">Could not load users: {usersLoadError}. Try searching again or use Refresh.</p>}
