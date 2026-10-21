@@ -22,7 +22,7 @@ export default function AchievementsPanel({supabase,userId}:Props){
    if(request!==requestId.current)return;
    setRows((data??[]) as FocusRow[]);
   } catch(reason) {
-   if(request===requestId.current)setError(reason instanceof Error?reason.message:'Could not load achievements. Check your connection and retry.');
+   if(request===requestId.current){setRows([]);setError(reason instanceof Error?reason.message:'Could not load achievements. Check your connection and retry.');}
   } finally {if(request===requestId.current)setLoading(false);}
  },[supabase,userId]);
  useEffect(()=>{void load();return()=>{requestId.current+=1}},[load]);
