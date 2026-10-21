@@ -182,7 +182,18 @@ function App() {
       if (activeUserIdRef.current === actorId) setNotice('Could not update task because of a network error. Please try again.');
     }
   }
-  async function signOut() { await supabase?.auth.signOut(); setTasks([]); setProfile(null); setFocusRunning(false); setFocusRunId(null); setFocusCompleted(false); }
+  async function signOut() {
+    if (!supabase) return;
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) { setNotice('Could not sign out: ' + error.message); return; }
+      activeUserIdRef.current = null;
+      setSession(null);
+      setNotice('Signed out successfully.');
+    } catch (error) {
+      setNotice('Could not sign out: ' + (error instanceof Error ? error.message : 'Unexpected error.'));
+    }
+  }
   async function startFocus() {
     if (!supabase || !session || focusSaving) return;
     const actorId = session.user.id;
