@@ -15,6 +15,7 @@ type UserRow = {
   completed_steps: number;
 };
 type Stats = Record<string, number>;
+type WalletTransaction = { id: string; user_id: string; currency: string; amount: number; reason: string; source: string; created_by: string | null; created_at: string };
 type Vehicle = { id: string; name: string; maker: string; tier: string; rarity: string; price_coins: number; price_cash: number; stock_limit: number | null; stock_sold: number; is_available: boolean; is_limited: boolean; is_operator_drop: boolean; top_speed_kmh: number | null; zero_to_100: number | null; horsepower: number | null };
 type Broadcast = {
   id: string;
@@ -48,6 +49,8 @@ export default function OperatorPanel({
   const [publish, setPublish] = useState(true);
   const [busy, setBusy] = useState(false);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [walletTransactions, setWalletTransactions] = useState<WalletTransaction[]>([]);
+  const [walletAuditQuery, setWalletAuditQuery] = useState('');
   const [vehicleQuery, setVehicleQuery] = useState('');
   const [vehicleId, setVehicleId] = useState('');
   const [vehicleName, setVehicleName] = useState('');
@@ -268,7 +271,23 @@ export default function OperatorPanel({
   }
 
   const visibleVehicles = vehicles.filter(v => (v.name + ' ' + v.maker + ' ' + v.id).toLowerCase().includes(vehicleQuery.toLowerCase()));
-  const tabs = ['Overview', 'Users', 'Wallet', 'Broadcasts', 'Marketplace'];
+  async function loadWalletAudit() {
+    if (!supabase) return;
+    setBusy(true);
+    try {
+      const { data, error } = await supabase.from('wallet_transactions').select('id,user_id,currency,amount,reason,source,created_by,created_at').order('created_at', { ascending: false }).limit(100);
+      if (error) setNotice('Wallet audit history failed to load: ' + error.message);
+      else setWalletTransactions((data ?? []) as WalletTransaction[]);
+    } catch (error) { setNotice('Wallet audit history failed to load: ' + (error instanceof Error ? error.message : 'Unexpected error.')); }
+    finally { setBusy(false); }
+  }
+  useEffect(() => { if (tab === 'Wallet audit') void loadWalletAudit(); }, [tab, supabase]);
+  const visibleWalletTransactions = walletTransactions.filter(row => {
+    const user = users.find(item => item.user_id === row.user_id);
+    return [row.reason, row.source, row.currency, row.user_id, user?.username ?? '', user?.full_name ?? ''].join(' ').toLowerCase().includes(walletAuditQuery.toLowerCase());
+  });
+
+  const tabs = ['Overview', 'Users', 'Wallet', 'Wallet audit', 'Broadcasts', 'Marketplace'];
 
   return (
     <section className="panel operator-panel">
@@ -318,6 +337,7 @@ export default function OperatorPanel({
           <div className="operator-grid">
             <button onClick={() => setTab('Users')}><Users /><b>User inspector</b><span>Progress & readiness</span></button>
             <button onClick={() => setTab('Wallet')}><Wallet /><b>Reward terminal</b><span>Audited wallet changes</span></button>
+            <button onClick={() => setTab('Wallet audit')}><Activity /><b>Wallet audit log</b><span>Latest currency ledger entries</span></button>
             <button onClick={() => setTab('Broadcasts')}><Activity /><b>Global broadcast</b><span>System-wide alerts</span></button>
             <button onClick={() => setTab('Marketplace')}><CarFront /><b>Marketplace</b><span>Manage dealership inventory</span></button>
           </div>
@@ -373,6 +393,17 @@ export default function OperatorPanel({
           <label>Reason <input value={reason} onChange={(event) => setReason(event.target.value)} minLength={3} maxLength={240} required /></label>
           <button className="operator-primary" disabled={busy || !target}><Wallet size={14} /> Apply adjustment</button>
         </form>
+      )}
+
+      {tab === 'Wallet audit' && (
+        <>
+          <div className="operator-warning"><ShieldCheck size={18} /><div><b>Wallet audit ledger</b><span>Read-only view of the latest 100 currency transactions.</span></div></div>
+          <div className="operator-search"><input value={walletAuditQuery} onChange={event => setWalletAuditQuery(event.target.value)} placeholder="Filter by user, reason, source or currency…" aria-label="Filter wallet audit history" /><button type="button" onClick={() => void loadWalletAudit()} disabled={busy}><RefreshCw size={14}/> Refresh</button></div>
+          <div className="operator-broadcast-list"><h3>Recent transactions · {visibleWalletTransactions.length}</h3>
+            {visibleWalletTransactions.map(row => { const user = users.find(item => item.user_id === row.user_id); return <article key={row.id}><div><b>{user ? user.full_name + ' · @' + user.username : 'Account ' + row.user_id.slice(0, 8)}</b><p>{row.reason}</p><small>{row.currency.toUpperCase()} · {row.source} · {new Date(row.created_at).toLocaleString()} · {row.created_by ? 'Recorded by ' + row.created_by.slice(0, 8) : 'System recorded'}</small></div><strong style={{whiteSpace:'nowrap'}}>{row.amount > 0 ? '+' : ''}{Number(row.amount).toLocaleString()} {row.currency}</strong></article>; })}
+            {!busy && visibleWalletTransactions.length === 0 && <p className="operator-help">No transactions match this filter.</p>}
+          </div>
+        </>
       )}
 
       {tab === 'Marketplace' && (
