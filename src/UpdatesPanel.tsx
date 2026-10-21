@@ -28,7 +28,7 @@ export default function UpdatesPanel({supabase}:{supabase:SupabaseClient|null}) 
 
   const load=useCallback(async (quiet=false)=>{
     const request=++requestId.current;
-    if(!supabase){setError('Connect Supabase to load workspace updates.');setLoading(false);setRefreshing(false);return;}
+    if(!supabase){setItems([]);setError('Connect Supabase to load workspace updates.');setLoading(false);setRefreshing(false);return;}
     if(quiet)setRefreshing(true);else setLoading(true);
     setError('');
     try {
@@ -65,7 +65,8 @@ export default function UpdatesPanel({supabase}:{supabase:SupabaseClient|null}) 
     <p className="updates-intro">Announcements, exam notices and service updates published by the Lumen operator.</p>
     {error&&<div className="updates-error" role="alert"><span>{error}</span><button onClick={()=>void load(true)}>Try again</button></div>}
     {loading?<div className="updates-empty"><span className="updates-loader"/><b>Loading the latest signal…</b></div>:
-      !error&&items.length===0?<div className="updates-empty"><div className="updates-empty-icon"><Bell size={21}/></div><b>You're all caught up.</b><span>New announcements will appear here when published.</span></div>:
+      error?null:
+      items.length===0?<div className="updates-empty"><div className="updates-empty-icon"><Bell size={21}/></div><b>You're all caught up.</b><span>New announcements will appear here when published.</span></div>:
       <div className="updates-list">{items.map(item=>{
         const meta=kindMeta[item.kind]??kindMeta.info;const Icon=meta.icon;
         return <article className={'update-card update-'+item.kind} key={item.id}>
