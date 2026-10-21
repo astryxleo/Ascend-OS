@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js';
+import Onboarding from './Onboarding';
 import { Activity, ArrowUpRight, BookOpen, CarFront, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Search, Settings2, ShieldCheck, Sparkles, Target, Trophy, Wallet, X } from 'lucide-react';
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
@@ -26,6 +27,7 @@ function App() {
   const [authMessage,setAuthMessage] = useState('');
   const [authBusy,setAuthBusy] = useState(false);
   const [profile,setProfile] = useState<any>(null);
+  const [profileLoaded,setProfileLoaded] = useState(false);
   const [tasks,setTasks] = useState<Task[]>([]);
   const [taskTitle,setTaskTitle] = useState('');
   const [taskSubject,setTaskSubject] = useState(subjects[0]);
@@ -47,7 +49,7 @@ function App() {
     return () => subscription.unsubscribe();
   },[]);
   useEffect(() => {
-    if (!supabase || !session?.user) { setProfile(null); return; }
+    if (!supabase || !session?.user) { setProfile(null); setProfileLoaded(false); return; }
     let cancelled = false;
     (async () => {
       const {data,error} = await supabase!.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
@@ -58,7 +60,8 @@ function App() {
       if (!cancelled && taskRows) setTasks(taskRows as Task[]);
       const {count} = await supabase!.from('chapter_progress').select('*',{count:'exact',head:true}).eq('user_id',session.user.id).eq('completed',true);
       if (!cancelled && count !== null) setCompletedSteps(count);
-    })();
+      if (!cancelled) setProfileLoaded(true);
+    })().catch(() => { if (!cancelled) setProfileLoaded(true); });
     return () => { cancelled = true; };
   },[session?.user?.id]);
   useEffect(() => {
@@ -109,6 +112,8 @@ function App() {
   async function signOut() { await supabase?.auth.signOut(); setTasks([]); setProfile(null); }
   if (!authReady) return <div className="boot"><div className="brand-mark">L</div><span>INITIALIZING LUMEN</span></div>;
   if (!session) return <AuthScreen email={email} setEmail={setEmail} authMode={authMode} setAuthMode={setAuthMode} signIn={signIn} busy={authBusy} message={authMessage} />;
+  if (session && supabase && !profileLoaded) return <div className="boot"><div className="brand-mark">L</div><span>LOADING YOUR WORKSPACE</span></div>;
+  if (session && supabase && profile && !profile.school_target) return <Onboarding supabase={supabase} profile={profile} userId={session.user.id} onSaved={(next) => { setProfile(next); setNotice('Welcome to Lumen. Your workspace is ready.'); }} />;
   const isOperator = profile?.role === 'operator' || (session.user.email === 'astryxleo@gmail.com' && session.user.email_confirmed_at);
   return <div className="app-shell">
     <aside className={`sidebar ${mobileNav?'sidebar-open':''}`}>
