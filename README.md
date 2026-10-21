@@ -1,21 +1,37 @@
-# LUMEN — Ascend OS
+# LUMEN — Luxury Study OS
 
-**An ultra-luxury study operating system for Leo & Ri.**
+A responsive Class XII study dashboard built with React, TypeScript, Vite, Supabase Auth, and PostgreSQL.
 
-LUMEN combines a premium desktop-like workspace with a Class XII syllabus tracker, planner, focus sessions, achievements, analytics, exams, and a hypercar-inspired study economy.
+## Current implementation
+- Premium obsidian / titanium / gold UI with responsive sidebar.
+- Supabase magic-link and Google OAuth sign-in entry points.
+- Account-scoped profile, wallet, chapter progress and daily planner reads.
+- Persisted planner task creation and completion.
+- Focus timer modes and initial Operator Control Center shell.
+- SQL foundation for profiles, wallets, syllabus progress, focus sessions, planner tasks, exams, vehicles, wallet audit, broadcasts, and activity events.
 
-## Current build
-The initial runnable frontend is a self-contained responsive web app in `index.html`. It includes interactive navigation, profile switching, planner task completion/creation, a focus timer, syllabus progress, and local browser persistence for tasks and profile. Dashboard metrics and sample progress are illustrative demo data until a secured backend is connected.
+Some screens are intentionally labeled as the next module; do not treat mock graphs, the local focus timer, or placeholder screens as production features.
 
-## Run locally
-Open `index.html` in a modern browser, or serve this repository with any static web server.
+## Local development
+1. Install Node.js 20+.
+2. Copy `.env.example` to `.env.local`.
+3. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` using the Supabase project settings. Publishable/anon keys may be exposed to the browser; never use a service-role key here.
+4. In Supabase Auth, enable Google OAuth and configure provider credentials and redirect URLs. Configure email magic links and allowed redirect URLs for localhost and your deployed domain.
+5. Run `npm install`, then `npm run dev`.
 
-## Planned production architecture
-- TanStack Start + React + TypeScript
-- Tailwind CSS v4, Lucide, charts and toast notifications
-- PostgreSQL/Supabase-compatible schema with RLS and server-validated mutations
-- Secure OAuth identity mapping and protected admin-only vehicle image management
-- Server-side AI Study Kit, caching, offline fallback, installable PWA
+## Database
+The initial schema migration is in `supabase/migrations/202610210001_lumen_core_schema.sql`. It has been applied to the connected Supabase project during initial setup. Do not run the initial schema again on the same project; use migration-aware deployment for future changes.
 
-## Security note
-Do not commit credentials, service-role keys, or AI gateway secrets. The current frontend demo must not be treated as production authentication or a trusted source for XP, balances, purchases, or role authorization. Those operations require server-side validation and database policies.
+## Operator security
+The database helper verifies either a verified JWT email matching `astryxleo@gmail.com` or an operator role in the profile table. The client only hides/shows the operator navigation; every sensitive operation must still be guarded by database RLS or server-side authorization. Verify the intended Google account is actually verified before using operator tools.
+
+## Not production-complete yet
+- OAuth provider configuration and redirect URL verification.
+- Full NCERT chapter/exercise seed data.
+- Secure focus-session settlement and server-calculated XP/coins.
+- Wallet purchases, atomic inventory checks, and rewards anti-abuse controls.
+- AI Study Kit Edge Function and caching.
+- Exam CRUD and analytics, public profiles/duels, and realtime broadcasts.
+- Operator search/airdrop/broadcast/vehicle management forms and audit views.
+- Storage bucket setup and per-user object policies.
+- Automated tests, accessibility audit, and deployment verification.
