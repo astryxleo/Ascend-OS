@@ -340,8 +340,9 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
   // Never show the previous account's syllabus/progress while a new account loads.
   setSteps([]);
   setProgress({});
+  setCompletedSteps(0);
   setLoading(true);
-  if(!supabase||!userId){setLoading(false);setSteps([]);setProgress({});return;}
+  if(!supabase||!userId){setLoading(false);setSteps([]);setProgress({});setCompletedSteps(0);return;}
   let alive=true;
   (async()=>{
    setLoading(true);
