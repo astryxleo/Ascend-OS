@@ -333,6 +333,8 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
  const [selectedSubject,setSelectedSubject]=useState('mathematics');
  const [expanded,setExpanded]=useState<Record<string,boolean>>({});
  const [loading,setLoading]=useState(true);
+ const [loadError,setLoadError]=useState<string|null>(null);
+ const [reloadKey,setReloadKey]=useState(0);
  const [saving,setSaving]=useState<string|null>(null);
  const progressCountRequestRef=useRef(0);
  const [filter,setFilter]=useState<'all'|'incomplete'|'complete'>('all');
@@ -345,6 +347,7 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
   progressCountRequestRef.current+=1;
   setCompletedSteps(0);
   setLoading(true);
+  setLoadError(null);
   if(!supabase||!userId){setLoading(false);setSteps([]);setProgress({});setCompletedSteps(0);return;}
   let alive=true;
   (async()=>{
@@ -355,19 +358,23 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
      supabase.from('chapter_progress').select('subject_id,chapter_id,step_id,completed').eq('user_id',userId)
     ]);
     if(!alive)return;
-    if(catalog.error){setNotice('Could not load syllabus: '+catalog.error.message);setSteps([]);}
+    let loadProblem:string|null=null;
+    if(catalog.error){loadProblem='Could not load syllabus: '+catalog.error.message;setSteps([]);}
     else setSteps((catalog.data??[]) as SyllabusStep[]);
     if(owned.error){
      setProgress({});
      setCompletedSteps(0);
-     setNotice('Could not load saved progress: '+owned.error.message);
+     loadProblem=[loadProblem,'Could not load saved progress: '+owned.error.message].filter(Boolean).join(' ');
     } else {const ownedRows=(owned.data??[]) as SyllabusProgress[];const map:Record<string,boolean>={};ownedRows.forEach(p=>{map[p.step_id]=p.completed});setProgress(map);setCompletedSteps(ownedRows.filter(p=>p.completed).length);}
+    if(loadProblem){setLoadError(loadProblem);setNotice(loadProblem);}else setLoadError(null);
    } catch(reason) {
     if(alive){
      setSteps([]);
      setProgress({});
      setCompletedSteps(0);
-     setNotice('Could not load syllabus because of a network error. Reopen Syllabus to retry.');
+     const message='Could not load syllabus because of a network error. Please retry.';
+     setLoadError(message);
+     setNotice(message);
     }
    } finally {
     if(alive)setLoading(false);
@@ -385,7 +392,7 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
    });
   }).subscribe();
   return()=>{alive=false;void supabase.removeChannel(channel);};
- },[supabase,userId,setCompletedSteps,setNotice]);
+ },[supabase,userId,reloadKey,setCompletedSteps,setNotice]);
  const visibleSteps=steps.filter(s=>s.subject_id===selectedSubject);
  const chapters=Array.from(new Map(visibleSteps.map(s=>[s.chapter_id,{id:s.chapter_id,title:s.chapter_title}])).values()).filter(ch=>ch.title.toLowerCase().includes(search.toLowerCase())||visibleSteps.some(s=>s.chapter_id===ch.id&&s.step_title.toLowerCase().includes(search.toLowerCase())));
  async function toggle(step:SyllabusStep){
@@ -417,7 +424,7 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
   <div className="syllabus-overview"><div><span>OVERALL CHECKPOINTS</span><b>{completedSteps}<small> / {steps.length}</small></b></div><div className="syllabus-progress-track"><i style={{width:(steps.length?Math.min(100,completedSteps/steps.length*100):0)+'%'}}/></div><span>{steps.length?Math.round(completedSteps/steps.length*100):0}% overall completion</span></div>
   <div className="syllabus-grid">{subjects.map((s,i)=>{const sid=['mathematics','physics','chemistry','english-core','computer-science','physical-education'][i];const own=steps.filter(x=>x.subject_id===sid);const done=own.filter(x=>progress[x.id]).length;return <button className={'syllabus-tile '+(selectedSubject===sid?'active':'')} key={sid} onClick={()=>setSelectedSubject(sid)}><div className={'subject-icon subject-'+i}>{['∑','ϟ','⚗','Aa','Py','◈'][i]}</div><b>{s}</b><span>{own.length?Math.round(done/own.length*100)+'% mastered': 'Curriculum loading'}</span><small>{done} / {own.length} checkpoints</small></button>})}</div>
   <div className="syllabus-tools"><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search chapters or checkpoints…" aria-label="Search syllabus"/><div className="syllabus-filters">{(['all','incomplete','complete'] as const).map(f=><button key={f} className={filter===f?'chosen':''} onClick={()=>setFilter(f)}>{f==='all'?'All':f==='incomplete'?'To do':'Completed'}</button>)}</div></div>
-  {loading?<div className="syllabus-empty">Loading your curriculum…</div>:!steps.length?<div className="syllabus-empty">No published syllabus checkpoints are available yet.</div>:chapters.map(ch=>{const items=visibleSteps.filter(s=>s.chapter_id===ch.id&&(s.step_title.toLowerCase().includes(search.toLowerCase())||ch.title.toLowerCase().includes(search.toLowerCase()))).filter(s=>filter==='all'||(filter==='complete'?!!progress[s.id]:!progress[s.id]));const total=visibleSteps.filter(s=>s.chapter_id===ch.id).length;const done=visibleSteps.filter(s=>s.chapter_id===ch.id&&progress[s.id]).length;if(!items.length)return null;const open=expanded[ch.id]??(search.length>0);return <div className="syllabus-chapter" key={ch.id}><button className="syllabus-chapter-head" onClick={()=>setExpanded(p=>({...p,[ch.id]:!open}))}><span><b>{ch.title}</b><small>{done}/{total} checkpoints complete</small></span><span className="chapter-progress"><i style={{width:(total?done/total*100:0)+'%'}}/></span><span className="chapter-chevron">{open?'−':'+'}</span></button>{open&&<div className="syllabus-step-list">{items.map(step=><label className={'syllabus-step '+(progress[step.id]?'is-done':'')} key={step.id}><input type="checkbox" checked={!!progress[step.id]} disabled={saving!==null} onChange={()=>void toggle(step)}/><span>{step.step_title}</span>{saving===step.id?<small>Saving…</small>:progress[step.id]?<small>DONE</small>:null}</label>)}</div>}</div>})}
+  {loading?<div className="syllabus-empty">Loading your curriculum…</div>:loadError?<div className="syllabus-empty" role="alert">{loadError} <button type="button" onClick={()=>setReloadKey(value=>value+1)}>Retry</button></div>:!steps.length?<div className="syllabus-empty">No published syllabus checkpoints are available yet.</div>:chapters.map(ch=>{const items=visibleSteps.filter(s=>s.chapter_id===ch.id&&(s.step_title.toLowerCase().includes(search.toLowerCase())||ch.title.toLowerCase().includes(search.toLowerCase()))).filter(s=>filter==='all'||(filter==='complete'?!!progress[s.id]:!progress[s.id]));const total=visibleSteps.filter(s=>s.chapter_id===ch.id).length;const done=visibleSteps.filter(s=>s.chapter_id===ch.id&&progress[s.id]).length;if(!items.length)return null;const open=expanded[ch.id]??(search.length>0);return <div className="syllabus-chapter" key={ch.id}><button className="syllabus-chapter-head" onClick={()=>setExpanded(p=>({...p,[ch.id]:!open}))}><span><b>{ch.title}</b><small>{done}/{total} checkpoints complete</small></span><span className="chapter-progress"><i style={{width:(total?done/total*100:0)+'%'}}/></span><span className="chapter-chevron">{open?'−':'+'}</span></button>{open&&<div className="syllabus-step-list">{items.map(step=><label className={'syllabus-step '+(progress[step.id]?'is-done':'')} key={step.id}><input type="checkbox" checked={!!progress[step.id]} disabled={saving!==null} onChange={()=>void toggle(step)}/><span>{step.step_title}</span>{saving===step.id?<small>Saving…</small>:progress[step.id]?<small>DONE</small>:null}</label>)}</div>}</div>})}
  </section>;
 }
 type ExamRow={id:string;name:string;subject:string;exam_date:string;max_marks:number|null;obtained_marks:number|null};
