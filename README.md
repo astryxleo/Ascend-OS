@@ -39,3 +39,12 @@ The database helper verifies either a verified JWT email matching `astryxleo@gma
 - Run `npm run build` locally or confirm the GitHub Actions build before treating the latest frontend as production-verified.
 - Confirm GitHub Actions build status; no successful build result has been observed yet.
 - CI workflow is committed; build status still needs to be confirmed from GitHub Actions.
+
+
+## Latest implementation milestone
+- Interactive syllabus atlas: 57 chapter groups and 468 trackable checkpoints across six subjects, with per-user progress and search/filter controls.
+- Planner day history with date navigation and the 4 AM IST study-day boundary.
+- Exam command center with persistent exams, countdowns, marks entry and score summaries.
+- Garage/dealership: 30 seeded vehicles across five tiers, search/filter/sort, collection and favorites.
+- Secure `purchase_vehicle` database RPC atomically checks availability, stock, duplicate ownership and wallet balance before recording the purchase.
+- Production build and end-to-end browser verification are still pending.
