@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { BookOpen, Clock3, Crown, Medal, RefreshCw, ShieldCheck, Trophy, Users } from 'lucide-react';
 
@@ -29,21 +29,28 @@ export default function LeaderboardPanel({supabase,userId}:{supabase:SupabaseCli
   const [refreshing,setRefreshing]=useState(false);
   const [error,setError]=useState('');
   const [period,setPeriod]=useState<'all'|'focus'|'syllabus'>('all');
+  const requestId=useRef(0);
 
   const load=useCallback(async(quiet=false)=>{
-    if(!supabase){setError('Connect Supabase to load the leaderboard.');setLoading(false);return;}
+    const request=++requestId.current;
+    if(!supabase){setError('Connect Supabase to load the leaderboard.');setLoading(false);setRefreshing(false);return;}
     if(quiet)setRefreshing(true);else setLoading(true);
     setError('');
     try{
       const {data,error:rpcError}=await supabase.rpc('get_public_leaderboard',{p_limit:100});
       if(rpcError)throw rpcError;
-      setEntries((data??[]) as Entry[]);
+      if(request===requestId.current)setEntries((data??[]) as Entry[]);
     }catch(reason){
-      setError(reason instanceof Error?reason.message:'Could not load the leaderboard.');
-    }finally{setLoading(false);setRefreshing(false);}
+      if(request===requestId.current)setError(reason instanceof Error?reason.message:'Could not load the leaderboard.');
+    }finally{
+      if(request===requestId.current){setLoading(false);setRefreshing(false);}
+    }
   },[supabase]);
 
-  useEffect(()=>{void load();},[load]);
+  useEffect(()=>{
+    void load();
+    return()=>{requestId.current+=1;};
+  },[load]);
   useEffect(()=>{
     if(!supabase)return;
     const channel=supabase.channel('lumen-leaderboard-refresh')
