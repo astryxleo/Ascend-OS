@@ -69,6 +69,7 @@ function App() {
     supabase.auth.getSession().then(({data,error}) => {
       if (!authEventSeen) {
         if (error) setAuthMessage('Could not restore your session: ' + error.message);
+        activeUserIdRef.current = data.session?.user.id ?? null;
         setSession(data.session);
       }
       setAuthReady(true);
@@ -78,6 +79,8 @@ function App() {
     });
     const {data:{subscription}} = supabase.auth.onAuthStateChange((_event,next) => {
       authEventSeen = true;
+      // Invalidate in-flight account-scoped actions synchronously, before React rerenders.
+      activeUserIdRef.current = next?.user.id ?? null;
       setSession(next);
       setAuthReady(true);
     });
