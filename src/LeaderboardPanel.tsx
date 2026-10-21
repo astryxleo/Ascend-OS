@@ -90,8 +90,8 @@ export default function LeaderboardPanel({supabase,userId}:{supabase:SupabaseCli
             <div className="leaderboard-avatar">{entry.avatar_url?<img src={entry.avatar_url} alt=""/>:initials(entry.display_name)}</div>
             <Icon size={18}/>
             <b title={entry.display_name}>{entry.display_name}</b>
-            <strong>{entry.focus_minutes.toLocaleString('en-IN')} <small>min</small></strong>
-            <span className="leaderboard-podium-meta">{entry.completed_steps} checkpoints</span>
+            <strong>{period==='syllabus'?entry.completed_steps.toLocaleString('en-IN'):entry.focus_minutes.toLocaleString('en-IN')} <small>{period==='syllabus'?'checkpoints':'min focused'}</small></strong>
+            <span className="leaderboard-podium-meta">{period==='focus'?entry.completed_steps+' checkpoints':period==='syllabus'?entry.focus_minutes.toLocaleString('en-IN')+' focus min':entry.completed_sessions+' sessions'}</span>
           </article>;
         })}</div>
         <div className="leaderboard-table-wrap"><table className="leaderboard-table">
