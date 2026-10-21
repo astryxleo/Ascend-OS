@@ -65,8 +65,23 @@ function App() {
     return () => subscription.unsubscribe();
   },[]);
   useEffect(() => {
-    if (!supabase || !session?.user) { setProfile(null); setProfileLoaded(false); return; }
     let cancelled = false;
+    // Clear account-scoped UI immediately on sign-out or account switch. Never
+    // let the previous account's wallet or active timer flash in the new workspace.
+    setProfile(null);
+    setProfileLoaded(false);
+    setCoins(0);
+    setCompletedSteps(0);
+    setFocusRunId(null);
+    setFocusRunning(false);
+    setFocusCompleted(false);
+    setFocusSaving(false);
+    setFocusMode('Pomodoro');
+    setFocusSeconds(25 * 60);
+    if (!supabase || !session?.user) {
+      setTasks([]);
+      return () => { cancelled = true; };
+    }
     (async () => {
       const {data,error} = await supabase!.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
       if (!cancelled && !error && data) setProfile(data);
