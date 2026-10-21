@@ -91,7 +91,8 @@ export default function DuelsPanel({supabase,userId,setNotice}:Props) {
       !error&&duels.length===0?<div className="duel-empty"><div className="leaderboard-empty-icon"><Users size={22}/></div><b>Your arena is quiet—for now.</b><span>Send a challenge to start the first study duel.</span></div>:
       <div className="duel-list">{duels.map(duel=>{
         const incoming=duel.opponent_id===userId;
-          const isWinner=duel.winner_id===userId;
+        const mine=incoming?duel.opponent_minutes:duel.challenger_minutes;
+        const isWinner=duel.winner_id===userId;
         const status=duel.status==='pending'?'Awaiting response':duel.status==='active'?'Live sprint':duel.status==='completed'?(duel.winner_id===null?'Draw':isWinner?'Victory':'Completed'):(duel.status==='declined'?'Declined':'Cancelled');
         const progress=Math.min(100,Math.round(mine/duel.goal_minutes*100));
         return <article className="duel-card" key={duel.id}>
