@@ -15,6 +15,7 @@ type UserRow = {
   completed_steps: number;
 };
 type Stats = Record<string, number>;
+type Vehicle = { id: string; name: string; maker: string; tier: string; rarity: string; price_coins: number; price_cash: number; stock_limit: number | null; stock_sold: number; is_available: boolean; is_limited: boolean; is_operator_drop: boolean; top_speed_kmh: number | null; zero_to_100: number | null; horsepower: number | null };
 type Broadcast = {
   id: string;
   title: string;
