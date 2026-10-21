@@ -3,7 +3,7 @@ import { createClient, type Session, type SupabaseClient } from '@supabase/supab
 import Onboarding from './Onboarding';
 import Garage from './Garage';
 import OperatorPanel from './OperatorPanel';
-import { Activity, ArrowUpRight, BookOpen, CarFront, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Search, Settings2, ShieldCheck, Sparkles, Target, Trophy, Wallet, X } from 'lucide-react';
+import { Activity, ArrowUpRight, BookOpen, CarFront, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, Sparkles, Target, Trophy, Wallet, X } from 'lucide-react';
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
