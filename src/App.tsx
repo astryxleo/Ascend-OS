@@ -188,7 +188,11 @@ function App() {
         if (!Number.isFinite(reward?.coins_earned) || !Number.isFinite(reward?.xp_earned)) {
           setNotice('Could not save focus session: the server returned an unexpected reward response.');
         } else {
-          setCoins(v=>v+Number(reward.coins_earned));
+          // Re-read the authoritative balance after the reward RPC commits.
+          // This avoids drifting local state if an operator adjusted the wallet concurrently.
+          const {data:wallet,error:walletError} = await supabase.from('wallets').select('coins').eq('user_id',session.user.id).maybeSingle();
+          if (!walletError && wallet && Number.isFinite(Number(wallet.coins))) setCoins(Number(wallet.coins));
+          else setCoins(v=>v+Number(reward.coins_earned));
           setFocusCompleted(false);
           setFocusRunId(null);
           setFocusSeconds(mode==='pomodoro'?1500:mode==='deep_sprint'?3000:5400);
