@@ -118,7 +118,7 @@ function App() {
       if (!cancelled && walletError) setNotice('Could not load your Lumen wallet: ' + walletError.message);
       if (!cancelled && !walletError && !wallet) setNotice('Your wallet record was not found. Your displayed balance may be incomplete; please contact support.');
       if (!cancelled && wallet) setCoins(wallet.coins);
-      const {data:activeRun,error:activeRunError} = await supabase!.from('focus_session_runs').select('id,mode,target_minutes,started_at,paused_at,paused_seconds').eq('user_id',session.user.id).is('completed_at',null).gt('started_at',new Date(Date.now()-4*60*60*1000).toISOString()).order('started_at',{ascending:false}).limit(1).maybeSingle();
+      const {data:activeRun,error:activeRunError} = await supabase!.from('focus_session_runs').select('id,mode,target_minutes,started_at,paused_at,paused_seconds').eq('user_id',session.user.id).is('completed_at',null).or('paused_at.not.is.null,started_at.gt.'+new Date(Date.now()-4*60*60*1000).toISOString()).order('started_at',{ascending:false}).limit(1).maybeSingle();
       if (!cancelled && activeRunError) setNotice('Could not restore your active focus session: ' + activeRunError.message);
       if (!cancelled && activeRun) {
         const wallSeconds = Math.max(0,Math.floor((Date.now()-new Date(activeRun.started_at).getTime())/1000));
