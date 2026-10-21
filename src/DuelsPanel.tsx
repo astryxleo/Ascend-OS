@@ -20,10 +20,13 @@ export default function DuelsPanel({supabase,userId,setNotice}:Props) {
   const [busy,setBusy] = useState<string|null>(null);
   const [error,setError] = useState('');
   const requestId = useRef(0);
+  const activeUserIdRef = useRef(userId);
+  activeUserIdRef.current = userId;
 
   const load = useCallback(async (quiet=false) => {
     const request = ++requestId.current;
-    if (!supabase) { setError('Supabase is not configured.'); setLoading(false); return; }
+    const actorId = userId;
+    if (!supabase || !actorId) { setError('Sign in to load study duels.'); setLoading(false); return; }
     if (!quiet) setLoading(true);
     setError('');
     try {
@@ -47,7 +50,7 @@ export default function DuelsPanel({supabase,userId,setNotice}:Props) {
     } finally {
       if (request === requestId.current) setLoading(false);
     }
-  },[supabase]);
+  },[supabase,userId]);
 
   useEffect(()=>{
     void load();
@@ -63,48 +66,55 @@ export default function DuelsPanel({supabase,userId,setNotice}:Props) {
 
   async function createDuel(e:FormEvent) {
     e.preventDefault();
-    if (!supabase || busy) return;
+    if (!supabase || busy || !userId) return;
+    const actorId = userId;
     setBusy('create');
     try {
       const {error:rpcError}=await supabase.rpc('create_study_duel',{p_opponent_username:username.trim().replace(/^@/,''),p_goal_minutes:Number(goal)});
+      if (activeUserIdRef.current !== actorId) return;
       if (rpcError) { setNotice('Could not send challenge: '+rpcError.message); return; }
       setUsername(''); setNotice('Study duel invitation sent.'); await load(true);
     } catch (reason) {
-      setNotice('Could not send challenge: '+(reason instanceof Error?reason.message:'Unexpected network error.'));
+      if (activeUserIdRef.current === actorId) setNotice('Could not send challenge: '+(reason instanceof Error?reason.message:'Unexpected network error.'));
     } finally {
-      setBusy(null);
+      if (activeUserIdRef.current === actorId) setBusy(null);
     }
   }
   async function respond(duel:Duel,accept:boolean) {
-    if (!supabase) return;
+    if (!supabase || !userId) return;
+    const actorId = userId;
     setBusy(duel.id);
     try {
       const {error:rpcError}=await supabase.rpc('respond_study_duel',{p_duel_id:duel.id,p_accept:accept});
+      if (activeUserIdRef.current !== actorId) return;
       if (rpcError) { setNotice('Could not respond to challenge: '+rpcError.message); return; }
       if (accept) {
         const {error:refreshError}=await supabase.rpc('refresh_study_duel',{p_duel_id:duel.id});
+        if (activeUserIdRef.current !== actorId) return;
         if (refreshError) setNotice('Duel accepted, but progress refresh failed: '+refreshError.message);
       }
       setNotice(accept?'Duel accepted. Your 24-hour challenge has started!':'Challenge declined.');
       await load(true);
     } catch (reason) {
-      setNotice('Could not respond to challenge: '+(reason instanceof Error?reason.message:'Unexpected network error.'));
+      if (activeUserIdRef.current === actorId) setNotice('Could not respond to challenge: '+(reason instanceof Error?reason.message:'Unexpected network error.'));
     } finally {
-      setBusy(null);
+      if (activeUserIdRef.current === actorId) setBusy(null);
     }
   }
   async function refreshDuel(duel:Duel) {
-    if (!supabase) return;
+    if (!supabase || !userId) return;
+    const actorId = userId;
     setBusy(duel.id);
     try {
       const {error:rpcError}=await supabase.rpc('refresh_study_duel',{p_duel_id:duel.id});
+      if (activeUserIdRef.current !== actorId) return;
       if (rpcError) setNotice('Could not refresh duel: '+rpcError.message);
       else setNotice('Duel progress refreshed.');
       await load(true);
     } catch (reason) {
-      setNotice('Could not refresh duel: '+(reason instanceof Error?reason.message:'Unexpected network error.'));
+      if (activeUserIdRef.current === actorId) setNotice('Could not refresh duel: '+(reason instanceof Error?reason.message:'Unexpected network error.'));
     } finally {
-      setBusy(null);
+      if (activeUserIdRef.current === actorId) setBusy(null);
     }
   }
   const name=(id:string)=>people[id]?.full_name||people[id]?.username||'Student';
