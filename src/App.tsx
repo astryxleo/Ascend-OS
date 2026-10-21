@@ -180,23 +180,26 @@ function App() {
   async function resetFocus() {
     if (focusSaving) return;
     const wasRunning = focusRunning;
+    setFocusSaving(true);
     setFocusRunning(false);
-    if (supabase && focusRunId) {
-      try {
+    try {
+      if (supabase && focusRunId) {
         const {error} = await supabase.rpc('cancel_focus_session',{run_id:focusRunId});
         if (error) {
           setFocusRunning(wasRunning);
           setNotice('Could not reset session: '+error.message);
           return;
         }
-      } catch (error) {
-        setFocusRunning(wasRunning);
-        setNotice('Could not reset session: '+(error instanceof Error?error.message:'Unexpected error.'));
-        return;
       }
+      setFocusRunId(null);
+      setFocusCompleted(false);
+      setFocusSeconds(focusMode==='Pomodoro'?1500:focusMode==='Deep Sprint'?3000:5400);
+    } catch (error) {
+      setFocusRunning(wasRunning);
+      setNotice('Could not reset session: '+(error instanceof Error?error.message:'Unexpected error.'));
+    } finally {
+      setFocusSaving(false);
     }
-    setFocusRunId(null); setFocusCompleted(false);
-    setFocusSeconds(focusMode==='Pomodoro'?1500:focusMode==='Deep Sprint'?3000:5400);
   }
   async function settleFocus() {
     if (!supabase || !session || !focusCompleted || focusSaving) return;
