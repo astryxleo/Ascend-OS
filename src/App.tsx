@@ -337,7 +337,11 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
  const [filter,setFilter]=useState<'all'|'incomplete'|'complete'>('all');
  const [search,setSearch]=useState('');
  useEffect(()=>{
-  if(!supabase||!userId){setLoading(false);return;}
+  // Never show the previous account's syllabus/progress while a new account loads.
+  setSteps([]);
+  setProgress({});
+  setLoading(true);
+  if(!supabase||!userId){setLoading(false);setSteps([]);setProgress({});return;}
   let alive=true;
   (async()=>{
    setLoading(true);
