@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js';
 import Onboarding from './Onboarding';
 import Garage from './Garage';
+import OperatorPanel from './OperatorPanel';
 import { Activity, ArrowUpRight, BookOpen, CarFront, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Search, Settings2, ShieldCheck, Sparkles, Target, Trophy, Wallet, X } from 'lucide-react';
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
@@ -179,7 +180,7 @@ function App() {
         {activeNav==='Exams & marks'&&<ExamCommand supabase={supabase} userId={session?.user.id??null} setNotice={setNotice}/>}
         {activeNav==='Garage'&&<Garage supabase={supabase} userId={session?.user.id??null} coins={coins} setCoins={setCoins} setNotice={setNotice}/>}
         {activeNav==='Leaderboard'&&<Placeholder icon={Trophy} title="The leaderboard" text="Compete on focus, consistency and syllabus mastery." detail="Public profiles and duels will be enabled after privacy controls."/>}
-        {activeNav==='Control center'&&isOperator&&<OperatorPanel setNotice={setNotice}/>}
+        {activeNav==='Control center'&&isOperator&&<OperatorPanel supabase={supabase} setNotice={setNotice}/>}
         {activeNav==='Settings'&&<Placeholder icon={Settings2} title="Your preferences" text="Personalize your Lumen workspace." detail="Profile editing and avatar uploads are queued for the next module."/>}
         <footer className="footer"><span>◈ LUMEN <i>STUDY OS</i></span><span>BUILT FOR THE LONG GAME <span className="footer-dot">●</span></span></footer>
       </div>
