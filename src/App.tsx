@@ -64,15 +64,23 @@ function App() {
 
   useEffect(() => {
     if (!supabase) return;
+    // A newer auth event must win over a slower initial session restore.
+    let authEventSeen = false;
     supabase.auth.getSession().then(({data,error}) => {
-      if (error) setAuthMessage('Could not restore your session: ' + error.message);
-      setSession(data.session);
+      if (!authEventSeen) {
+        if (error) setAuthMessage('Could not restore your session: ' + error.message);
+        setSession(data.session);
+      }
       setAuthReady(true);
     }).catch(() => {
-      setAuthMessage('Could not restore your session because of a network error. Please reload and try again.');
+      if (!authEventSeen) setAuthMessage('Could not restore your session because of a network error. Please reload and try again.');
       setAuthReady(true);
     });
-    const {data:{subscription}} = supabase.auth.onAuthStateChange((_event,next) => { setSession(next); });
+    const {data:{subscription}} = supabase.auth.onAuthStateChange((_event,next) => {
+      authEventSeen = true;
+      setSession(next);
+      setAuthReady(true);
+    });
     return () => subscription.unsubscribe();
   },[]);
   useEffect(() => {
