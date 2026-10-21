@@ -340,6 +340,7 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
   // Never show the previous account's syllabus/progress while a new account loads.
   setSteps([]);
   setProgress({});
+  setSaving(null);
   setCompletedSteps(0);
   setLoading(true);
   if(!supabase||!userId){setLoading(false);setSteps([]);setProgress({});setCompletedSteps(0);return;}
