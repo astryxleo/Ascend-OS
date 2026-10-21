@@ -113,6 +113,7 @@ function App() {
       }
       const {data:wallet,error:walletError} = await supabase!.from('wallets').select('coins').eq('user_id',session.user.id).maybeSingle();
       if (!cancelled && walletError) setNotice('Could not load your Lumen wallet: ' + walletError.message);
+      if (!cancelled && !walletError && !wallet) setNotice('Your wallet record was not found. Your displayed balance may be incomplete; please contact support.');
       if (!cancelled && wallet) setCoins(wallet.coins);
       const {data:activeRun,error:activeRunError} = await supabase!.from('focus_session_runs').select('id,mode,target_minutes,started_at').eq('user_id',session.user.id).is('completed_at',null).gt('started_at',new Date(Date.now()-4*60*60*1000).toISOString()).order('started_at',{ascending:false}).limit(1).maybeSingle();
       if (!cancelled && activeRunError) setNotice('Could not restore your active focus session: ' + activeRunError.message);
