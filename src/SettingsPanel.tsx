@@ -124,6 +124,12 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
           cacheControl: '3600',
         });
         if (uploadError) throw uploadError;
+        // If the account changed while the network upload was in flight, remove
+        // the now-unreferenced object instead of leaving an orphaned avatar.
+        if (currentUserId.current !== userId) {
+          await supabase.storage.from('lumen-avatars').remove([path]);
+          return;
+        }
         avatarUrl = supabase.storage.from('lumen-avatars').getPublicUrl(path).data.publicUrl;
       }
       if (currentUserId.current !== userId) return;
