@@ -48,3 +48,5 @@ The database helper verifies either a verified JWT email matching `astryxleo@gma
 - Garage/dealership: 30 seeded vehicles across five tiers, search/filter/sort, collection and favorites.
 - Secure `purchase_vehicle` database RPC atomically checks availability, stock, duplicate ownership and wallet balance before recording the purchase.
 - Production build and end-to-end browser verification are still pending.
+
+- Operator Control Center now includes server-authorized overview telemetry, scoped user search with progress and wallet balances, audited coin/cash adjustments, and publish/unpublish broadcast controls.
