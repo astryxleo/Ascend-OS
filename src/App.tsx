@@ -129,7 +129,8 @@ function App() {
         setFocusRunId(activeRun.id);
         setFocusMode(activeRun.mode==='pomodoro'?'Pomodoro':activeRun.mode==='deep_sprint'?'Deep Sprint':activeRun.mode==='extreme_grind'?'Extreme Grind':'Pomodoro');
         setFocusSeconds(remaining);
-        if (remaining===0) { setFocusCompleted(true); setFocusRunning(false); }
+        if (remaining===0 && !activeRun.paused_at) { setFocusCompleted(true); setFocusRunning(false); }
+        else if (activeRun.paused_at) { setFocusCompleted(false); setFocusRunning(false); }
         else setFocusRunning(true);
       }
       const {count,error:countError} = await supabase!.from('chapter_progress').select('*',{count:'exact',head:true}).eq('user_id',session.user.id).eq('completed',true);
