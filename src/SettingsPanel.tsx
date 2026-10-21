@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ChangeEvent } from 'react';
+import { useEffect, useState, type FormEvent, type ChangeEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { Save, ShieldCheck, Upload, UserRound } from 'lucide-react';
 
@@ -53,11 +53,21 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (!avatarPreview.startsWith('blob:')) return;
+    return () => URL.revokeObjectURL(avatarPreview);
+  }, [avatarPreview]);
+
   function chooseAvatar(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null;
+    if (file && !file.type.startsWith('image/')) {
+      setAvatarFile(null);
+      event.target.value = '';
+      setError('Choose an image file.');
+      return;
+    }
     setAvatarFile(file);
     if (file) {
-      if (!file.type.startsWith('image/')) { setError('Choose an image file.'); return; }
       setAvatarPreview(URL.createObjectURL(file));
       setError('');
     }
