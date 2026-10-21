@@ -30,7 +30,8 @@ begin
  order by p.created_at desc limit 50;
 end $$;
 
-create or replace function public.operator_adjust_wallet(p_target_user uuid,p_currency text,p_amount bigint,p_reason text)
+drop function if exists public.operator_adjust_wallet(uuid,text,bigint,text);
+create function public.operator_adjust_wallet(p_target_user uuid,p_currency text,p_amount bigint,p_reason text)
 returns jsonb language plpgsql security definer set search_path=public as $$
 declare v_wallet public.wallets%rowtype; v_balance bigint;
 begin
