@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ArrowUpRight, ShieldCheck } from 'lucide-react';
 
@@ -39,6 +39,19 @@ export default function Onboarding({ supabase, profile, userId, onSaved }: Props
   const [avatar, setAvatar] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const activeUserId = useRef(userId);
+  activeUserId.current = userId;
+
+  useEffect(() => {
+    setName(profile.full_name || '');
+    setUsername(profile.username || '');
+    setGrade(profile.class_grade || '12');
+    setStream(profile.stream || 'PCM');
+    setSchool(profile.school_target || '');
+    setAvatar(null);
+    setError('');
+    setBusy(false);
+  }, [userId, profile.full_name, profile.username, profile.class_grade, profile.stream, profile.school_target, profile.avatar_url]);
 
   function chooseAvatar(file: File | null) {
     if (file && !file.type.startsWith('image/')) {
@@ -71,20 +84,27 @@ export default function Onboarding({ supabase, profile, userId, onSaved }: Props
       let avatarUrl = profile.avatar_url || null;
       if (avatar) {
         const blob = await compressImage(avatar);
+        if (activeUserId.current !== userId) return;
         const path = userId + '/avatar-' + Date.now() + '.webp';
         const { error: uploadError } = await supabase.storage.from('lumen-avatars').upload(path, blob, { contentType: 'image/webp', upsert: true });
         if (uploadError) throw uploadError;
+        if (activeUserId.current !== userId) {
+          await supabase.storage.from('lumen-avatars').remove([path]);
+          return;
+        }
         avatarUrl = supabase.storage.from('lumen-avatars').getPublicUrl(path).data.publicUrl;
       }
+      if (activeUserId.current !== userId) return;
       const { data, error: updateError } = await supabase.from('profiles')
         .update({ full_name: name.trim(), username: username.toLowerCase(), class_grade: grade, stream, school_target: school.trim() + ' · ' + target, avatar_url: avatarUrl })
         .eq('id', userId).select('*').single();
       if (updateError) throw updateError;
+      if (activeUserId.current !== userId) return;
       onSaved(data);
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : 'Could not save your profile.');
+      if (activeUserId.current === userId) setError(reason instanceof Error ? reason.message : 'Could not save your profile.');
     } finally {
-      setBusy(false);
+      if (activeUserId.current === userId) setBusy(false);
     }
   }
 
