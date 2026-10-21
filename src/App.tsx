@@ -44,6 +44,8 @@ function App() {
   const [profileLoaded,setProfileLoaded] = useState(false);
   const [tasks,setTasks] = useState<Task[]>([]);
   const [plannerDay,setPlannerDay] = useState(studyDay());
+  const activePlannerDayRef = useRef(plannerDay);
+  activePlannerDayRef.current = plannerDay;
   const [taskTitle,setTaskTitle] = useState('');
   const [taskSubject,setTaskSubject] = useState(subjects[0]);
   const [taskPriority,setTaskPriority] = useState<'P1'|'P2'|'P3'>('P2');
@@ -148,11 +150,11 @@ function App() {
     if (!supabase) { setNotice('Supabase is not configured yet.'); return; }
     try {
       const {data,error} = await supabase.from('planner_tasks').insert(row).select('*').single();
-      if (activeUserIdRef.current !== row.user_id) return;
+      if (activeUserIdRef.current !== row.user_id || activePlannerDayRef.current !== row.study_day) return;
       if (error) { setNotice('Could not add task: '+error.message); return; }
       setTasks(old=>[...old,data as Task]); setTaskTitle(''); setNewTaskOpen(false); setNotice('Task added to your study board.');
     } catch (error) {
-      if (activeUserIdRef.current === row.user_id) setNotice('Could not add task because of a network error. Please try again.');
+      if (activeUserIdRef.current === row.user_id && activePlannerDayRef.current === row.study_day) setNotice('Could not add task because of a network error. Please try again.');
     }
   }
   async function toggleTask(task:Task) {
