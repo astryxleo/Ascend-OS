@@ -334,6 +334,7 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
  const [expanded,setExpanded]=useState<Record<string,boolean>>({});
  const [loading,setLoading]=useState(true);
  const [saving,setSaving]=useState<string|null>(null);
+ const progressCountRequestRef=useRef(0);
  const [filter,setFilter]=useState<'all'|'incomplete'|'complete'>('all');
  const [search,setSearch]=useState('');
  useEffect(()=>{
@@ -341,6 +342,7 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
   setSteps([]);
   setProgress({});
   setSaving(null);
+  progressCountRequestRef.current+=1;
   setCompletedSteps(0);
   setLoading(true);
   if(!supabase||!userId){setLoading(false);setSteps([]);setProgress({});setCompletedSteps(0);return;}
@@ -377,8 +379,9 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
    const after=payload.eventType==='DELETE'?false:!!(payload.new as SyllabusProgress).completed;
    setProgress(prev=>({...prev,[row.step_id]:after}));
    const refreshUserId=userId;
+   const requestVersion=++progressCountRequestRef.current;
    void supabase.from('chapter_progress').select('step_id').eq('user_id',refreshUserId).eq('completed',true).then(({data,error})=>{
-    if(alive&&activeUserIdRef.current===refreshUserId&&!error&&data)setCompletedSteps(data.length);
+    if(alive&&activeUserIdRef.current===refreshUserId&&progressCountRequestRef.current===requestVersion&&!error&&data)setCompletedSteps(data.length);
    });
   }).subscribe();
   return()=>{alive=false;void supabase.removeChannel(channel);};
@@ -394,7 +397,14 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
    const {error}=await supabase.from('chapter_progress').upsert({user_id:actorId,subject_id:step.subject_id,chapter_id:step.chapter_id,step_id:step.id,completed:next,completed_at:next?new Date().toISOString():null,updated_at:new Date().toISOString()},{onConflict:'user_id,subject_id,chapter_id,step_id'});
    if(activeUserIdRef.current!==actorId)return;
    if(error)setNotice('Progress was not saved: '+error.message);
-   else {setProgress(prev=>({...prev,[step.id]:next}));setCompletedSteps(current=>Math.max(0,current+(next?1:-1)));setNotice(next?'Checkpoint completed and synced.':'Checkpoint marked incomplete.');}
+   else {
+    setProgress(prev=>({...prev,[step.id]:next}));
+    setNotice(next?'Checkpoint completed and synced.':'Checkpoint marked incomplete.');
+    const requestVersion=++progressCountRequestRef.current;
+    void supabase.from('chapter_progress').select('step_id').eq('user_id',actorId).eq('completed',true).then(({data,count,error:countError})=>{
+     if(activeUserIdRef.current===actorId&&progressCountRequestRef.current===requestVersion&&!countError&&data)setCompletedSteps(data.length);
+    });
+   }
   } catch(reason) {
    if(activeUserIdRef.current===actorId)setNotice('Progress could not be saved because of a network error. Please try again.');
   } finally {
