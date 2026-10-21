@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { Swords, RefreshCw, Clock3, Trophy, ShieldCheck, Send, Check, X, Users } from 'lucide-react';
 
@@ -19,30 +19,40 @@ export default function DuelsPanel({supabase,userId,setNotice}:Props) {
   const [loading,setLoading] = useState(true);
   const [busy,setBusy] = useState<string|null>(null);
   const [error,setError] = useState('');
+  const requestId = useRef(0);
 
   const load = useCallback(async (quiet=false) => {
+    const request = ++requestId.current;
     if (!supabase) { setError('Supabase is not configured.'); setLoading(false); return; }
     if (!quiet) setLoading(true);
     setError('');
     try {
       const {data,error:loadError} = await supabase.from('study_duels').select('*').order('created_at',{ascending:false}).limit(100);
       if (loadError) throw loadError;
+      if (request !== requestId.current) return;
       const rows = (data??[]) as Duel[];
-      setDuels(rows);
       const ids = [...new Set(rows.flatMap(d=>[d.challenger_id,d.opponent_id]))];
+      let nextPeople: Record<string,Person> = {};
       if (ids.length) {
         const {data:profiles,error:profilesError} = await supabase.from('profiles').select('id,username,full_name,avatar_url').in('id',ids);
         if (profilesError) throw profilesError;
-        setPeople(Object.fromEntries(((profiles??[]) as Person[]).map(p=>[p.id,p])));
-      } else setPeople({});
+        if (request !== requestId.current) return;
+        nextPeople = Object.fromEntries(((profiles??[]) as Person[]).map(p=>[p.id,p]));
+      }
+      if (request !== requestId.current) return;
+      setDuels(rows);
+      setPeople(nextPeople);
     } catch (reason) {
-      setError(reason instanceof Error?reason.message:'Could not load study duels. Check your connection and retry.');
+      if (request === requestId.current) setError(reason instanceof Error?reason.message:'Could not load study duels. Check your connection and retry.');
     } finally {
-      setLoading(false);
+      if (request === requestId.current) setLoading(false);
     }
   },[supabase]);
 
-  useEffect(()=>{ void load(); },[load]);
+  useEffect(()=>{
+    void load();
+    return () => { requestId.current += 1; };
+  },[load]);
   useEffect(()=>{
     if (!supabase) return;
     const channel=supabase.channel('study-duels-live')
