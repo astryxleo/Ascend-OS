@@ -67,9 +67,13 @@ export default function OperatorPanel({
   const [vehicleDrop, setVehicleDrop] = useState(false);
   const [vehicleAvailable, setVehicleAvailable] = useState(true);
   const usersRequestId = useRef(0);
+  const dashboardRequestId = useRef(0);
+  const vehiclesRequestId = useRef(0);
+  const walletAuditRequestId = useRef(0);
 
   async function refresh() {
     if (!supabase) return;
+    const dashboardRequest = ++dashboardRequestId.current;
     const usersRequest = ++usersRequestId.current;
     setBusy(true);
     try {
@@ -78,6 +82,7 @@ export default function OperatorPanel({
         supabase.rpc('operator_search_users', { p_query: query }),
         supabase.from('broadcasts').select('*').order('created_at', { ascending: false }).limit(20),
       ]);
+      if (dashboardRequest !== dashboardRequestId.current) return;
       if (s.error) setNotice('Dashboard stats failed: ' + s.error.message);
       else setStats((s.data ?? {}) as Stats);
 
@@ -99,9 +104,9 @@ export default function OperatorPanel({
       if (b.error) setNotice('Broadcast refresh failed: ' + b.error.message);
       else setBroadcasts((b.data ?? []) as Broadcast[]);
     } catch (error) {
-      setNotice('Dashboard refresh failed: ' + (error instanceof Error ? error.message : 'Unexpected error.'));
+      if (dashboardRequest === dashboardRequestId.current) setNotice('Dashboard refresh failed: ' + (error instanceof Error ? error.message : 'Unexpected error.'));
     } finally {
-      setBusy(false);
+      if (dashboardRequest === dashboardRequestId.current) setBusy(false);
     }
   }
 
@@ -238,9 +243,11 @@ export default function OperatorPanel({
 
   async function loadVehicles() {
     if (!supabase) return;
+    const request = ++vehiclesRequestId.current;
     setBusy(true);
     try {
       const { data, error } = await supabase.from('vehicles').select('id,name,maker,tier,rarity,price_coins,price_cash,stock_limit,stock_sold,is_available,is_limited,is_operator_drop,top_speed_kmh,zero_to_100,horsepower').order('created_at', { ascending: false });
+      if (request !== vehiclesRequestId.current) return;
       if (error) {
         setVehicles([]);
         setVehicleLoadError(error.message);
@@ -250,14 +257,15 @@ export default function OperatorPanel({
         setVehicles((data ?? []) as Vehicle[]);
       }
     } catch (error) {
+      if (request !== vehiclesRequestId.current) return;
       const message = error instanceof Error ? error.message : 'Unexpected error.';
       setVehicles([]);
       setVehicleLoadError(message);
       setNotice('Marketplace catalog failed to load: ' + message);
-    } finally { setBusy(false); }
+    } finally { if (request === vehiclesRequestId.current) setBusy(false); }
   }
 
-  useEffect(() => { if (tab === 'Marketplace') void loadVehicles(); }, [tab, supabase]);
+  useEffect(() => { if (tab === 'Marketplace') void loadVehicles(); else vehiclesRequestId.current += 1; }, [tab, supabase]);
 
   function selectVehicle(vehicle: Vehicle) {
     setVehicleId(vehicle.id); setVehicleName(vehicle.name); setVehicleMaker(vehicle.maker);
@@ -299,9 +307,11 @@ export default function OperatorPanel({
   const visibleVehicles = vehicles.filter(v => (v.name + ' ' + v.maker + ' ' + v.id).toLowerCase().includes(vehicleQuery.toLowerCase()));
   async function loadWalletAudit() {
     if (!supabase) return;
+    const request = ++walletAuditRequestId.current;
     setBusy(true);
     try {
       const { data, error } = await supabase.rpc('operator_wallet_audit', { p_limit: 100 });
+      if (request !== walletAuditRequestId.current) return;
       if (error) {
         setWalletTransactions([]);
         setWalletAuditError(error.message);
@@ -311,14 +321,15 @@ export default function OperatorPanel({
         setWalletTransactions((data ?? []) as WalletTransaction[]);
       }
     } catch (error) {
+      if (request !== walletAuditRequestId.current) return;
       const message = error instanceof Error ? error.message : 'Unexpected error.';
       setWalletTransactions([]);
       setWalletAuditError(message);
       setNotice('Wallet audit history failed to load: ' + message);
     }
-    finally { setBusy(false); }
+    finally { if (request === walletAuditRequestId.current) setBusy(false); }
   }
-  useEffect(() => { if (tab === 'Wallet audit') void loadWalletAudit(); }, [tab, supabase]);
+  useEffect(() => { if (tab === 'Wallet audit') void loadWalletAudit(); else walletAuditRequestId.current += 1; }, [tab, supabase]);
   const visibleWalletTransactions = walletTransactions.filter(row => {
     return [row.reason, row.source, row.currency, row.user_id, row.username ?? '', row.full_name ?? ''].join(' ').toLowerCase().includes(walletAuditQuery.toLowerCase());
   });
