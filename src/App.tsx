@@ -8,7 +8,8 @@ import UpdatesPanel from './UpdatesPanel';
 import LeaderboardPanel from './LeaderboardPanel';
 import DuelsPanel from './DuelsPanel';
 import AchievementsPanel from './AchievementsPanel';
-import { Activity, ArrowUpRight, Bell, BookOpen, CarFront, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, Award, Sparkles, Swords, Target, Trophy, Wallet, X } from 'lucide-react';
+import AnalyticsPanel from './AnalyticsPanel';
+import { Activity, ArrowUpRight, Bell, BookOpen, ChartNoAxesColumn, CarFront, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, Award, Sparkles, Swords, Target, Trophy, Wallet, X } from 'lucide-react';
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
@@ -27,6 +28,7 @@ const nav = [
   {label:'Leaderboard',icon:Trophy},
   {label:'Duels',icon:Swords},
   {label:'Achievements',icon:Award},
+  {label:'Analytics',icon:ChartNoAxesColumn},
 ];
 function studyDay() { const d = new Date(Date.now() - 4 * 60 * 60 * 1000); return d.toLocaleDateString('en-CA'); }
 function App() {
@@ -191,6 +193,7 @@ function App() {
         {activeNav==='Leaderboard'&&<LeaderboardPanel supabase={supabase} userId={session?.user.id??''}/>}
         {activeNav==='Duels'&&<DuelsPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
         {activeNav==='Achievements'&&<AchievementsPanel supabase={supabase} userId={session.user.id}/>}
+        {activeNav==='Analytics'&&<AnalyticsPanel supabase={supabase} userId={session.user.id}/>}
         {activeNav==='Control center'&&isOperator&&<OperatorPanel supabase={supabase} setNotice={setNotice}/>}
         {activeNav==='Settings'&&<SettingsPanel supabase={supabase} profile={profile} userId={session.user.id} onSaved={setProfile} setNotice={setNotice}/>}
         <footer className="footer"><span>◈ LUMEN <i>STUDY OS</i></span><span>BUILT FOR THE LONG GAME <span className="footer-dot">●</span></span></footer>
