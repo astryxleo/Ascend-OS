@@ -12,9 +12,13 @@ export default function AchievementsPanel({supabase,userId}:Props){
  const load=useCallback(async()=>{
   if(!supabase||!userId){setError('Sign in to view achievements.');setLoading(false);return;}
   setLoading(true);setError('');
-  const {data,error:queryError}=await supabase.from('focus_sessions').select('id,duration_minutes,ended_at,xp_earned,completed,subject').eq('user_id',userId).eq('completed',true).order('ended_at',{ascending:false}).limit(2000);
-  if(queryError){setError(queryError.message);setLoading(false);return;}
-  setRows((data??[]) as FocusRow[]);setLoading(false);
+  try {
+   const {data,error:queryError}=await supabase.from('focus_sessions').select('id,duration_minutes,ended_at,xp_earned,completed,subject').eq('user_id',userId).eq('completed',true).order('ended_at',{ascending:false}).limit(2000);
+   if(queryError)throw queryError;
+   setRows((data??[]) as FocusRow[]);
+  } catch(reason) {
+   setError(reason instanceof Error?reason.message:'Could not load achievements. Check your connection and retry.');
+  } finally {setLoading(false);}
  },[supabase,userId]);
  useEffect(()=>{void load();},[load]);
  useEffect(()=>{if(!supabase||!userId)return;const ch=supabase.channel('achievements-focus-'+userId).on('postgres_changes',{event:'*',schema:'public',table:'focus_sessions',filter:'user_id=eq.'+userId},()=>void load()).subscribe();return()=>{void supabase.removeChannel(ch);};},[supabase,userId,load]);
