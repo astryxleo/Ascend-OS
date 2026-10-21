@@ -49,30 +49,47 @@ export default function DuelsPanel({supabase,userId,setNotice}:Props) {
     e.preventDefault();
     if (!supabase || busy) return;
     setBusy('create');
-    const {error:rpcError}=await supabase.rpc('create_study_duel',{p_opponent_username:username.trim().replace(/^@/,''),p_goal_minutes:Number(goal)});
-    setBusy(null);
-    if (rpcError) { setNotice('Could not send challenge: '+rpcError.message); return; }
-    setUsername(''); setNotice('Study duel invitation sent.'); await load(true);
+    try {
+      const {error:rpcError}=await supabase.rpc('create_study_duel',{p_opponent_username:username.trim().replace(/^@/,''),p_goal_minutes:Number(goal)});
+      if (rpcError) { setNotice('Could not send challenge: '+rpcError.message); return; }
+      setUsername(''); setNotice('Study duel invitation sent.'); await load(true);
+    } catch (reason) {
+      setNotice('Could not send challenge: '+(reason instanceof Error?reason.message:'Unexpected network error.'));
+    } finally {
+      setBusy(null);
+    }
   }
   async function respond(duel:Duel,accept:boolean) {
     if (!supabase) return;
     setBusy(duel.id);
-    const {error:rpcError}=await supabase.rpc('respond_study_duel',{p_duel_id:duel.id,p_accept:accept});
-    if (!rpcError && accept) {
-      const {error:refreshError}=await supabase.rpc('refresh_study_duel',{p_duel_id:duel.id});
-      if (refreshError) setNotice('Duel accepted, but progress refresh failed: '+refreshError.message);
+    try {
+      const {error:rpcError}=await supabase.rpc('respond_study_duel',{p_duel_id:duel.id,p_accept:accept});
+      if (rpcError) { setNotice('Could not respond to challenge: '+rpcError.message); return; }
+      if (accept) {
+        const {error:refreshError}=await supabase.rpc('refresh_study_duel',{p_duel_id:duel.id});
+        if (refreshError) setNotice('Duel accepted, but progress refresh failed: '+refreshError.message);
+      }
+      setNotice(accept?'Duel accepted. Your 24-hour challenge has started!':'Challenge declined.');
+      await load(true);
+    } catch (reason) {
+      setNotice('Could not respond to challenge: '+(reason instanceof Error?reason.message:'Unexpected network error.'));
+    } finally {
+      setBusy(null);
     }
-    setBusy(null);
-    if (rpcError) setNotice(rpcError.message);
-    else { setNotice(accept?'Duel accepted. Your 24-hour challenge has started!':'Challenge declined.'); await load(true); }
   }
   async function refreshDuel(duel:Duel) {
     if (!supabase) return;
     setBusy(duel.id);
-    const {error:rpcError}=await supabase.rpc('refresh_study_duel',{p_duel_id:duel.id});
-    setBusy(null);
-    if (rpcError) setNotice('Could not refresh duel: '+rpcError.message);
-    await load(true);
+    try {
+      const {error:rpcError}=await supabase.rpc('refresh_study_duel',{p_duel_id:duel.id});
+      if (rpcError) setNotice('Could not refresh duel: '+rpcError.message);
+      else setNotice('Duel progress refreshed.');
+      await load(true);
+    } catch (reason) {
+      setNotice('Could not refresh duel: '+(reason instanceof Error?reason.message:'Unexpected network error.'));
+    } finally {
+      setBusy(null);
+    }
   }
   const name=(id:string)=>people[id]?.full_name||people[id]?.username||'Student';
   const remaining=(end:string|null)=>end?Math.max(0,Math.ceil((new Date(end).getTime()-Date.now())/3600000)):24;
