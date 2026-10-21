@@ -22,11 +22,13 @@ export default function DuelsPanel({supabase,userId,setNotice}:Props) {
   const requestId = useRef(0);
   const activeUserIdRef = useRef(userId);
   activeUserIdRef.current = userId;
+  const loadedUserIdRef = useRef(userId);
 
   const load = useCallback(async (quiet=false) => {
     const request = ++requestId.current;
     const actorId = userId;
-    if (!supabase || !actorId) { setError('Sign in to load study duels.'); setLoading(false); return; }
+    if (loadedUserIdRef.current !== actorId) { loadedUserIdRef.current = actorId; setDuels([]); setPeople({}); }
+    if (!supabase || !actorId) { setDuels([]); setPeople({}); setError('Sign in to load study duels.'); setLoading(false); return; }
     if (!quiet) setLoading(true);
     setError('');
     try {
@@ -46,7 +48,7 @@ export default function DuelsPanel({supabase,userId,setNotice}:Props) {
       setDuels(rows);
       setPeople(nextPeople);
     } catch (reason) {
-      if (request === requestId.current) setError(reason instanceof Error?reason.message:'Could not load study duels. Check your connection and retry.');
+      if (request === requestId.current) { setDuels([]); setPeople({}); setError(reason instanceof Error?reason.message:'Could not load study duels. Check your connection and retry.'); }
     } finally {
       if (request === requestId.current) setLoading(false);
     }
