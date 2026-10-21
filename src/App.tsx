@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js';
-import { Activity, ArrowDownRight, ArrowUpRight, BookOpen, CarFront, Check, ChevronDown, CircleHelp, Clock3, Command, Crown, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Search, Settings2, ShieldCheck, Sparkles, Target, Timer, Trophy, Wallet, X } from 'lucide-react';
+import { Activity, ArrowUpRight, BookOpen, CarFront, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Search, Settings2, ShieldCheck, Sparkles, Target, Trophy, Wallet, X } from 'lucide-react';
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
@@ -38,7 +38,6 @@ function App() {
   const [coins,setCoins] = useState(1000);
   const [completedSteps,setCompletedSteps] = useState(0);
   const [notice,setNotice] = useState('');
-  const [loading,setLoading] = useState(false);
   const [newTaskOpen,setNewTaskOpen] = useState(false);
 
   useEffect(() => {
@@ -91,7 +90,7 @@ function App() {
     } catch(e) { setAuthMessage(e instanceof Error?e.message:'Sign-in failed. Please try again.'); }
     finally { setAuthBusy(false); }
   }
-  async function addTask(e:React.FormEvent) {
+  async function addTask(e:FormEvent) {
     e.preventDefault(); if (!taskTitle.trim()) return;
     const row = {user_id:session!.user.id,title:taskTitle.trim(),subject:taskSubject,priority:taskPriority,estimated_minutes:25,study_day:studyDay(),completed:false};
     if (!supabase) { setNotice('Supabase is not configured yet.'); return; }
