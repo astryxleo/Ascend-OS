@@ -106,7 +106,11 @@ function App() {
     }
     (async () => {
       const {data,error} = await supabase!.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
-      if (!cancelled && !error && data) setProfile(data);
+      if (!cancelled) {
+        if (error) setNotice('Could not load your profile: ' + error.message);
+        else if (data) setProfile(data);
+        else setNotice('Your profile record was not found. Please contact support before continuing.');
+      }
       const {data:wallet} = await supabase!.from('wallets').select('coins').eq('user_id',session.user.id).maybeSingle();
       if (!cancelled && wallet) setCoins(wallet.coins);
       const {data:activeRun} = await supabase!.from('focus_session_runs').select('id,mode,target_minutes,started_at').eq('user_id',session.user.id).is('completed_at',null).gt('started_at',new Date(Date.now()-4*60*60*1000).toISOString()).order('started_at',{ascending:false}).limit(1).maybeSingle();
@@ -122,7 +126,7 @@ function App() {
       const {count} = await supabase!.from('chapter_progress').select('*',{count:'exact',head:true}).eq('user_id',session.user.id).eq('completed',true);
       if (!cancelled && count !== null) setCompletedSteps(count);
       if (!cancelled) setProfileLoaded(true);
-    })().catch(() => { if (!cancelled) setProfileLoaded(true); });
+    })().catch(() => { if (!cancelled) { setNotice('Could not load your workspace because of a network error. Please reload and try again.'); setProfileLoaded(true); } });
     return () => { cancelled = true; };
   },[session?.user?.id]);
   useEffect(()=>{if(!supabase||!session?.user.id){setTasks([]);return;}let alive=true;setTasks([]);(async()=>{try{const {data,error}=await supabase.from('planner_tasks').select('*').eq('user_id',session.user.id).eq('study_day',plannerDay).order('created_at');if(!alive)return;if(error){setNotice('Could not load planner history: '+error.message);return;}setTasks((data??[]) as Task[]);}catch{if(alive)setNotice('Could not load planner history because of a network error. Please retry by changing the study day.');}})();return()=>{alive=false};},[session?.user?.id,plannerDay]);
