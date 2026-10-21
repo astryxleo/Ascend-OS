@@ -380,8 +380,8 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
    setProgress(prev=>({...prev,[row.step_id]:after}));
    const refreshUserId=userId;
    const requestVersion=++progressCountRequestRef.current;
-   void supabase.from('chapter_progress').select('step_id').eq('user_id',refreshUserId).eq('completed',true).then(({data,error})=>{
-    if(alive&&activeUserIdRef.current===refreshUserId&&progressCountRequestRef.current===requestVersion&&!error&&data)setCompletedSteps(data.length);
+   void supabase.from('chapter_progress').select('step_id',{count:'exact',head:true}).eq('user_id',refreshUserId).eq('completed',true).then(({count,error})=>{
+    if(alive&&activeUserIdRef.current===refreshUserId&&progressCountRequestRef.current===requestVersion&&!error&&typeof count==='number')setCompletedSteps(count);
    });
   }).subscribe();
   return()=>{alive=false;void supabase.removeChannel(channel);};
@@ -401,8 +401,8 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
     setProgress(prev=>({...prev,[step.id]:next}));
     setNotice(next?'Checkpoint completed and synced.':'Checkpoint marked incomplete.');
     const requestVersion=++progressCountRequestRef.current;
-    void supabase.from('chapter_progress').select('step_id').eq('user_id',actorId).eq('completed',true).then(({data,error:countError})=>{
-     if(activeUserIdRef.current===actorId&&progressCountRequestRef.current===requestVersion&&!countError&&data)setCompletedSteps(data.length);
+    void supabase.from('chapter_progress').select('step_id',{count:'exact',head:true}).eq('user_id',actorId).eq('completed',true).then(({count,error:countError})=>{
+     if(activeUserIdRef.current===actorId&&progressCountRequestRef.current===requestVersion&&!countError&&typeof count==='number')setCompletedSteps(count);
     });
    }
   } catch(reason) {
