@@ -372,10 +372,13 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
   })();
   const channel=supabase.channel('syllabus-progress-'+userId).on('postgres_changes',{event:'*',schema:'public',table:'chapter_progress',filter:'user_id=eq.'+userId},payload=>{
    const row=(payload.new??payload.old) as SyllabusProgress;
-   if(!alive||!row?.step_id)return;
+   if(!alive||activeUserIdRef.current!==userId||!row?.step_id)return;
    const after=payload.eventType==='DELETE'?false:!!(payload.new as SyllabusProgress).completed;
    setProgress(prev=>({...prev,[row.step_id]:after}));
-   void supabase.from('chapter_progress').select('step_id').eq('user_id',userId).eq('completed',true).then(({data})=>{if(alive&&data)setCompletedSteps(data.length);});
+   const refreshUserId=userId;
+   void supabase.from('chapter_progress').select('step_id').eq('user_id',refreshUserId).eq('completed',true).then(({data,error})=>{
+    if(alive&&activeUserIdRef.current===refreshUserId&&!error&&data)setCompletedSteps(data.length);
+   });
   }).subscribe();
   return()=>{alive=false;void supabase.removeChannel(channel);};
  },[supabase,userId,setCompletedSteps,setNotice]);
