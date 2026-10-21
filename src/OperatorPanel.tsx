@@ -46,6 +46,19 @@ export default function OperatorPanel({
   const [kind, setKind] = useState('info');
   const [publish, setPublish] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [vehicleQuery, setVehicleQuery] = useState('');
+  const [vehicleId, setVehicleId] = useState('');
+  const [vehicleName, setVehicleName] = useState('');
+  const [vehicleMaker, setVehicleMaker] = useState('');
+  const [vehicleTier, setVehicleTier] = useState('Hypercar');
+  const [vehicleRarity, setVehicleRarity] = useState('Rare');
+  const [vehicleCoins, setVehicleCoins] = useState('1000');
+  const [vehicleCash, setVehicleCash] = useState('0');
+  const [vehicleStock, setVehicleStock] = useState('');
+  const [vehicleLimited, setVehicleLimited] = useState(false);
+  const [vehicleDrop, setVehicleDrop] = useState(false);
+  const [vehicleAvailable, setVehicleAvailable] = useState(true);
 
   async function refresh() {
     if (!supabase) return;
@@ -202,7 +215,59 @@ export default function OperatorPanel({
     }
   }
 
-  const tabs = ['Overview', 'Users', 'Wallet', 'Broadcasts'];
+  async function loadVehicles() {
+    if (!supabase) return;
+    setBusy(true);
+    try {
+      const { data, error } = await supabase.from('vehicles').select('id,name,maker,tier,rarity,price_coins,price_cash,stock_limit,stock_sold,is_available,is_limited,is_operator_drop,top_speed_kmh,zero_to_100,horsepower').order('created_at', { ascending: false });
+      if (error) setNotice('Marketplace catalog failed to load: ' + error.message);
+      else setVehicles((data ?? []) as Vehicle[]);
+    } catch (error) {
+      setNotice('Marketplace catalog failed to load: ' + (error instanceof Error ? error.message : 'Unexpected error.'));
+    } finally { setBusy(false); }
+  }
+
+  useEffect(() => { if (tab === 'Marketplace') void loadVehicles(); }, [tab, supabase]);
+
+  function selectVehicle(vehicle: Vehicle) {
+    setVehicleId(vehicle.id); setVehicleName(vehicle.name); setVehicleMaker(vehicle.maker);
+    setVehicleTier(vehicle.tier); setVehicleRarity(vehicle.rarity);
+    setVehicleCoins(String(vehicle.price_coins)); setVehicleCash(String(vehicle.price_cash));
+    setVehicleStock(vehicle.stock_limit === null ? '' : String(vehicle.stock_limit));
+    setVehicleLimited(vehicle.is_limited); setVehicleDrop(vehicle.is_operator_drop); setVehicleAvailable(vehicle.is_available);
+  }
+
+  function resetVehicleForm() {
+    setVehicleId(''); setVehicleName(''); setVehicleMaker(''); setVehicleTier('Hypercar'); setVehicleRarity('Rare');
+    setVehicleCoins('1000'); setVehicleCash('0'); setVehicleStock(''); setVehicleLimited(false); setVehicleDrop(false); setVehicleAvailable(true);
+  }
+
+  async function saveVehicle(event: FormEvent) {
+    event.preventDefault();
+    if (!supabase) return;
+    const cleanId = vehicleId.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    const coins = Number(vehicleCoins); const cash = Number(vehicleCash);
+    const stock = vehicleStock.trim() === '' ? null : Number(vehicleStock);
+    if (!cleanId || cleanId.length > 48 || !vehicleName.trim() || !vehicleMaker.trim()) { setNotice('Enter a valid vehicle ID, name and maker.'); return; }
+    if (!Number.isSafeInteger(coins) || coins < 0 || !Number.isSafeInteger(cash) || cash < 0) { setNotice('Prices must be non-negative whole numbers.'); return; }
+    if (stock !== null && (!Number.isSafeInteger(stock) || stock < 0)) { setNotice('Stock limit must be a non-negative whole number or left blank for unlimited stock.'); return; }
+    const existing = vehicles.find(v => v.id === cleanId);
+    if (!existing && vehicleId.trim() !== cleanId) { setNotice('Vehicle ID may contain lowercase letters, numbers and hyphens only.'); return; }
+    if (existing && stock !== null && stock < existing.stock_sold) { setNotice('Stock limit cannot be lower than units already sold (' + existing.stock_sold + ').'); return; }
+    const payload = { id: cleanId, name: vehicleName.trim(), maker: vehicleMaker.trim(), tier: vehicleTier, rarity: vehicleRarity, price_coins: coins, price_cash: cash, stock_limit: stock, is_limited: vehicleLimited, is_operator_drop: vehicleDrop, is_available: vehicleAvailable };
+    setBusy(true);
+    try {
+      const result = existing
+        ? await supabase.from('vehicles').update({ name: payload.name, maker: payload.maker, tier: payload.tier, rarity: payload.rarity, price_coins: payload.price_coins, price_cash: payload.price_cash, stock_limit: payload.stock_limit, is_limited: payload.is_limited, is_operator_drop: payload.is_operator_drop, is_available: payload.is_available }).eq('id', cleanId)
+        : await supabase.from('vehicles').insert(payload);
+      if (result.error) setNotice('Vehicle save failed: ' + result.error.message);
+      else { setNotice(existing ? 'Vehicle catalog entry updated.' : 'Vehicle added to the dealership catalog.'); resetVehicleForm(); await loadVehicles(); }
+    } catch (error) { setNotice('Vehicle save failed: ' + (error instanceof Error ? error.message : 'Unexpected error.')); }
+    finally { setBusy(false); }
+  }
+
+  const visibleVehicles = vehicles.filter(v => (v.name + ' ' + v.maker + ' ' + v.id).toLowerCase().includes(vehicleQuery.toLowerCase()));
+  const tabs = ['Overview', 'Users', 'Wallet', 'Broadcasts', 'Marketplace'];
 
   return (
     <section className="panel operator-panel">
@@ -253,7 +318,7 @@ export default function OperatorPanel({
             <button onClick={() => setTab('Users')}><Users /><b>User inspector</b><span>Progress & readiness</span></button>
             <button onClick={() => setTab('Wallet')}><Wallet /><b>Reward terminal</b><span>Audited wallet changes</span></button>
             <button onClick={() => setTab('Broadcasts')}><Activity /><b>Global broadcast</b><span>System-wide alerts</span></button>
-            <button onClick={() => setNotice('Marketplace catalog editor is not implemented yet.')}><CarFront /><b>Marketplace</b><span>Vehicle catalog</span></button>
+            <button onClick={() => setTab('Marketplace')}><CarFront /><b>Marketplace</b><span>Manage dealership inventory</span></button>
           </div>
         </>
       )}
@@ -307,6 +372,42 @@ export default function OperatorPanel({
           <label>Reason <input value={reason} onChange={(event) => setReason(event.target.value)} minLength={3} maxLength={240} required /></label>
           <button className="operator-primary" disabled={busy || !target}><Wallet size={14} /> Apply adjustment</button>
         </form>
+      )}
+
+      {tab === 'Marketplace' && (
+        <>
+          <div className="operator-warning">
+            <CarFront size={18} />
+            <div><b>Dealership catalog</b><span>Add vehicles, update pricing and control availability. Existing purchases and sold-stock counts are preserved.</span></div>
+          </div>
+          <form className="operator-form" onSubmit={saveVehicle}>
+            <label>Vehicle ID <input value={vehicleId} onChange={event => setVehicleId(event.target.value)} placeholder="e.g. apex-v12" pattern="[a-z0-9-]+" maxLength={48} required disabled={vehicles.some(v => v.id === vehicleId)} /></label>
+            <label>Vehicle name <input value={vehicleName} onChange={event => setVehicleName(event.target.value)} maxLength={100} required /></label>
+            <label>Maker <input value={vehicleMaker} onChange={event => setVehicleMaker(event.target.value)} maxLength={80} required /></label>
+            <label>Tier <select value={vehicleTier} onChange={event => setVehicleTier(event.target.value)}>{['Hypercar','Track Toy','Luxury GT','Concept Prototype','Le Mans Legend'].map(value => <option key={value}>{value}</option>)}</select></label>
+            <label>Rarity <select value={vehicleRarity} onChange={event => setVehicleRarity(event.target.value)}>{['Common','Rare','Exotic','Mythic','1-of-1'].map(value => <option key={value}>{value}</option>)}</select></label>
+            <label>Price (coins) <input type="number" min="0" step="1" value={vehicleCoins} onChange={event => setVehicleCoins(event.target.value)} required /></label>
+            <label>Price (cash) <input type="number" min="0" step="1" value={vehicleCash} onChange={event => setVehicleCash(event.target.value)} required /></label>
+            <label>Stock limit <input type="number" min="0" step="1" value={vehicleStock} onChange={event => setVehicleStock(event.target.value)} placeholder="Blank = unlimited" /></label>
+            <label className="operator-check"><input type="checkbox" checked={vehicleAvailable} onChange={event => setVehicleAvailable(event.target.checked)} /> Available in dealership</label>
+            <label className="operator-check"><input type="checkbox" checked={vehicleLimited} onChange={event => setVehicleLimited(event.target.checked)} /> Limited release</label>
+            <label className="operator-check"><input type="checkbox" checked={vehicleDrop} onChange={event => setVehicleDrop(event.target.checked)} /> Operator drop</label>
+            <div className="operator-wide" style={{display:'flex',gap:'.65rem',flexWrap:'wrap'}}>
+              <button className="operator-primary" disabled={busy}>{busy ? 'Saving…' : vehicles.some(v => v.id === vehicleId) ? 'Save catalog changes' : 'Add vehicle'}</button>
+              <button type="button" disabled={busy} onClick={resetVehicleForm}>Clear form</button>
+              <button type="button" disabled={busy} onClick={() => void loadVehicles()}><RefreshCw size={14}/> Refresh catalog</button>
+            </div>
+          </form>
+          <div className="operator-search"><input value={vehicleQuery} onChange={event => setVehicleQuery(event.target.value)} placeholder="Filter by name, maker or ID…" aria-label="Filter marketplace catalog" /></div>
+          <div className="operator-broadcast-list">
+            <h3>Catalog inventory · {visibleVehicles.length} vehicles</h3>
+            {visibleVehicles.map(vehicle => <article key={vehicle.id}>
+              <div><b>{vehicle.name} <small>· {vehicle.maker}</small></b><p>{vehicle.id} · {vehicle.tier} · {vehicle.rarity}</p><small>◈ {Number(vehicle.price_coins).toLocaleString()} coins · {vehicle.price_cash.toLocaleString()} cash · {vehicle.stock_limit === null ? 'Unlimited stock' : Math.max(0, vehicle.stock_limit - vehicle.stock_sold) + ' remaining'} · {vehicle.is_available ? 'Available' : 'Hidden'}</small></div>
+              <button type="button" disabled={busy} onClick={() => selectVehicle(vehicle)}>Edit</button>
+            </article>)}
+            {visibleVehicles.length === 0 && <p className="operator-help">No vehicles match this filter.</p>}
+          </div>
+        </>
       )}
 
       {tab === 'Broadcasts' && (
