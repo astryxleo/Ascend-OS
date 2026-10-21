@@ -6,8 +6,9 @@ A responsive Class XII study dashboard built with React, TypeScript, Vite, Supab
 - Premium obsidian / titanium / gold UI with responsive sidebar.
 - Supabase magic-link and Google OAuth sign-in entry points.
 - Account-scoped profile, wallet, chapter progress and daily planner reads.
+- First-login profile onboarding with image compression and account-scoped avatar storage.
 - Persisted planner task creation and completion.
-- Focus timer modes and initial Operator Control Center shell.
+- Server-timestamped focus session start, recovery after reload, and one-time server-side rewards.
 - SQL foundation for profiles, wallets, syllabus progress, focus sessions, planner tasks, exams, vehicles, wallet audit, broadcasts, and activity events.
 
 Some screens are intentionally labeled as the next module; do not treat mock graphs, the local focus timer, or placeholder screens as production features.
@@ -28,10 +29,11 @@ The database helper verifies either a verified JWT email matching `astryxleo@gma
 ## Not production-complete yet
 - OAuth provider configuration and redirect URL verification.
 - Full NCERT chapter/exercise seed data.
-- Secure focus-session settlement and server-calculated XP/coins.
+- Focus timer QA across tab suspension, device sleep, and deliberate pause/reset edge cases.
 - Wallet purchases, atomic inventory checks, and rewards anti-abuse controls.
 - AI Study Kit Edge Function and caching.
 - Exam CRUD and analytics, public profiles/duels, and realtime broadcasts.
 - Operator search/airdrop/broadcast/vehicle management forms and audit views.
 - Storage bucket setup and per-user object policies.
 - Automated tests, accessibility audit, and deployment verification.
+- CI workflow is committed; build status still needs to be confirmed from GitHub Actions.
