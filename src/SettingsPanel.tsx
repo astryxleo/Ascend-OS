@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent, type ChangeEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type ChangeEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { Save, ShieldCheck, Upload, UserRound } from 'lucide-react';
 
@@ -52,6 +52,8 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
   const [avatarPreview, setAvatarPreview] = useState(profile?.avatar_url ?? '');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const currentUserId = useRef(userId);
+  currentUserId.current = userId;
 
   useEffect(() => {
     if (!avatarPreview.startsWith('blob:')) return;
@@ -123,6 +125,7 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
         if (uploadError) throw uploadError;
         avatarUrl = supabase.storage.from('lumen-avatars').getPublicUrl(path).data.publicUrl;
       }
+      if (currentUserId.current !== userId) return;
       const { data, error: updateError } = await supabase.from('profiles').update({
         full_name: name.trim(),
         username: username.toLowerCase(),
@@ -132,13 +135,14 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
         avatar_url: avatarUrl,
       }).eq('id', userId).select('*').single();
       if (updateError) throw updateError;
+      if (currentUserId.current !== userId) return;
       onSaved(data as Profile);
       setAvatarFile(null);
       setNotice('Profile settings saved.');
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : 'Could not save settings.');
+      if (currentUserId.current === userId) setError(reason instanceof Error ? reason.message : 'Could not save settings.');
     } finally {
-      setBusy(false);
+      if (currentUserId.current === userId) setBusy(false);
     }
   }
 
