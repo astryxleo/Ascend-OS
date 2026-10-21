@@ -6,7 +6,6 @@ type FocusRow={id:string;duration_minutes:number;ended_at:string;subject:string|
 type Props={supabase:SupabaseClient|null;userId:string};
 type DayStat={key:string,label:string,minutes:number};
 const istDay=(value:Date)=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(value);
-const dateKey=(d:Date)=>{const y=d.getFullYear();const m=String(d.getMonth()+1).padStart(2,'0');const day=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+day;};
 const startOfISTDay=(key:string)=>new Date(key+'T00:00:00+05:30');
 const minsLabel=(minutes:number)=>minutes>=60?Math.floor(minutes/60)+'h '+minutes%60+'m':minutes+'m';
 export default function AnalyticsPanel({supabase,userId}:Props){
