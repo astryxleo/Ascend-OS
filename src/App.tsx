@@ -301,6 +301,8 @@ function FocusRoom({focusSeconds,fmt,setFocusSeconds,focusRunning,setFocusRunnin
 type SyllabusStep = {id:string;subject_id:string;chapter_id:string;chapter_title:string;step_title:string;step_order:number};
 type SyllabusProgress = {subject_id:string;chapter_id:string;step_id:string;completed:boolean};
 function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{supabase:SupabaseClient|null;userId:string|null;completedSteps:number;setCompletedSteps:(n:number)=>void;setNotice:(s:string)=>void}) {
+ const activeUserIdRef=useRef<string|null>(userId);
+ activeUserIdRef.current=userId;
  const [steps,setSteps]=useState<SyllabusStep[]>([]);
  const [progress,setProgress]=useState<Record<string,boolean>>({});
  const [selectedSubject,setSelectedSubject]=useState('mathematics');
@@ -344,15 +346,17 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
  async function toggle(step:SyllabusStep){
   if(!supabase||!userId){setNotice('Sign in to save syllabus progress.');return;}
   if(saving)return;
+  const actorId=userId;
   const next=!progress[step.id];setSaving(step.id);
   try {
-   const {error}=await supabase.from('chapter_progress').upsert({user_id:userId,subject_id:step.subject_id,chapter_id:step.chapter_id,step_id:step.id,completed:next,completed_at:next?new Date().toISOString():null,updated_at:new Date().toISOString()},{onConflict:'user_id,subject_id,chapter_id,step_id'});
+   const {error}=await supabase.from('chapter_progress').upsert({user_id:actorId,subject_id:step.subject_id,chapter_id:step.chapter_id,step_id:step.id,completed:next,completed_at:next?new Date().toISOString():null,updated_at:new Date().toISOString()},{onConflict:'user_id,subject_id,chapter_id,step_id'});
+   if(activeUserIdRef.current!==actorId)return;
    if(error)setNotice('Progress was not saved: '+error.message);
    else {setProgress(prev=>({...prev,[step.id]:next}));setCompletedSteps(Math.max(0,completedSteps+(next?1:-1)));setNotice(next?'Checkpoint completed and synced.':'Checkpoint marked incomplete.');}
   } catch(reason) {
-   setNotice('Progress could not be saved because of a network error. Please try again.');
+   if(activeUserIdRef.current===actorId)setNotice('Progress could not be saved because of a network error. Please try again.');
   } finally {
-   setSaving(null);
+   if(activeUserIdRef.current===actorId)setSaving(null);
   }
  }
  return <section className="panel syllabus-panel syllabus-workspace">
