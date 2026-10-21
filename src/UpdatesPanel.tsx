@@ -44,7 +44,7 @@ export default function UpdatesPanel({supabase}:{supabase:SupabaseClient|null}) 
       if(request!==requestId.current)return;
       setItems((data??[]) as Broadcast[]);
     } catch(reason) {
-      if(request===requestId.current)setError(reason instanceof Error?reason.message:'Could not load updates.');
+      if(request===requestId.current){setItems([]);setError(reason instanceof Error?reason.message:'Could not load updates.');}
     } finally {if(request===requestId.current){setLoading(false);setRefreshing(false);}}
   },[supabase]);
 
