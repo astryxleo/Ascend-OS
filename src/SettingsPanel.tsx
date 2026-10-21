@@ -116,6 +116,7 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
       let avatarUrl = profile?.avatar_url ?? null;
       if (avatarFile) {
         const blob = await compressAvatar(avatarFile);
+        if (currentUserId.current !== userId) return;
         const path = userId + '/avatar-' + Date.now() + '.webp';
         const { error: uploadError } = await supabase.storage.from('lumen-avatars').upload(path, blob, {
           contentType: 'image/webp',
