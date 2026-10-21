@@ -354,10 +354,18 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
     if(!alive)return;
     if(catalog.error){setNotice('Could not load syllabus: '+catalog.error.message);setSteps([]);}
     else setSteps((catalog.data??[]) as SyllabusStep[]);
-    if(owned.error)setNotice('Could not load saved progress: '+owned.error.message);
-    else {const ownedRows=(owned.data??[]) as SyllabusProgress[];const map:Record<string,boolean>={};ownedRows.forEach(p=>{map[p.step_id]=p.completed});setProgress(map);setCompletedSteps(ownedRows.filter(p=>p.completed).length);}
+    if(owned.error){
+     setProgress({});
+     setCompletedSteps(0);
+     setNotice('Could not load saved progress: '+owned.error.message);
+    } else {const ownedRows=(owned.data??[]) as SyllabusProgress[];const map:Record<string,boolean>={};ownedRows.forEach(p=>{map[p.step_id]=p.completed});setProgress(map);setCompletedSteps(ownedRows.filter(p=>p.completed).length);}
    } catch(reason) {
-    if(alive)setNotice('Could not load syllabus because of a network error. Reopen Syllabus to retry.');
+    if(alive){
+     setSteps([]);
+     setProgress({});
+     setCompletedSteps(0);
+     setNotice('Could not load syllabus because of a network error. Reopen Syllabus to retry.');
+    }
    } finally {
     if(alive)setLoading(false);
    }
