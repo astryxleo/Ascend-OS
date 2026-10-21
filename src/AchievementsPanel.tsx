@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { Award, Flame, Clock3, Target, Sparkles, RefreshCw, LockKeyhole, CheckCircle2 } from 'lucide-react';
 
@@ -9,18 +9,21 @@ export default function AchievementsPanel({supabase,userId}:Props){
  const [rows,setRows]=useState<FocusRow[]>([]);
  const [loading,setLoading]=useState(true);
  const [error,setError]=useState('');
+ const requestId=useRef(0);
  const load=useCallback(async()=>{
-  if(!supabase||!userId){setError('Sign in to view achievements.');setLoading(false);return;}
+  const request=++requestId.current;
+  if(!supabase||!userId){setRows([]);setError('Sign in to view achievements.');setLoading(false);return;}
   setLoading(true);setError('');
   try {
    const {data,error:queryError}=await supabase.from('focus_sessions').select('id,duration_minutes,ended_at,xp_earned,completed,subject').eq('user_id',userId).eq('completed',true).order('ended_at',{ascending:false}).limit(2000);
    if(queryError)throw queryError;
+   if(request!==requestId.current)return;
    setRows((data??[]) as FocusRow[]);
   } catch(reason) {
-   setError(reason instanceof Error?reason.message:'Could not load achievements. Check your connection and retry.');
-  } finally {setLoading(false);}
+   if(request===requestId.current)setError(reason instanceof Error?reason.message:'Could not load achievements. Check your connection and retry.');
+  } finally {if(request===requestId.current)setLoading(false);}
  },[supabase,userId]);
- useEffect(()=>{void load();},[load]);
+ useEffect(()=>{void load();return()=>{requestId.current+=1}},[load]);
  useEffect(()=>{if(!supabase||!userId)return;const ch=supabase.channel('achievements-focus-'+userId).on('postgres_changes',{event:'*',schema:'public',table:'focus_sessions',filter:'user_id=eq.'+userId},()=>void load()).subscribe();return()=>{void supabase.removeChannel(ch);};},[supabase,userId,load]);
  const totalMinutes=rows.reduce((s,r)=>s+Math.max(0,r.duration_minutes||0),0);
  const totalXp=rows.reduce((s,r)=>s+Math.max(0,r.xp_earned||0),0);
