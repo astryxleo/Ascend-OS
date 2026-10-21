@@ -139,17 +139,38 @@ function App() {
     if (!supabase || !session || focusSaving) return;
     if (focusRunId) { setFocusRunning(true); return; }
     setFocusSaving(true);
-    const mode = focusMode === 'Pomodoro' ? 'pomodoro' : focusMode === 'Deep Sprint' ? 'deep_sprint' : 'extreme_grind';
-    const {data,error} = await supabase.rpc('start_focus_session',{subject_name:taskSubject,mode_name:mode});
-    if (error) setNotice('Could not start focus session: '+error.message);
-    else { setFocusRunId((data as {session_id:string}).session_id); setFocusRunning(true); setFocusCompleted(false); }
-    setFocusSaving(false);
+    try {
+      const mode = focusMode === 'Pomodoro' ? 'pomodoro' : focusMode === 'Deep Sprint' ? 'deep_sprint' : 'extreme_grind';
+      const {data,error} = await supabase.rpc('start_focus_session',{subject_name:taskSubject,mode_name:mode});
+      if (error) setNotice('Could not start focus session: '+error.message);
+      else if (data && typeof (data as {session_id?:unknown}).session_id === 'string') {
+        setFocusRunId((data as {session_id:string}).session_id);
+        setFocusRunning(true);
+        setFocusCompleted(false);
+      } else setNotice('Could not start focus session: the server returned an unexpected response.');
+    } catch (error) {
+      setNotice('Could not start focus session: '+(error instanceof Error?error.message:'Unexpected error.'));
+    } finally {
+      setFocusSaving(false);
+    }
   }
   async function resetFocus() {
+    if (focusSaving) return;
+    const wasRunning = focusRunning;
     setFocusRunning(false);
     if (supabase && focusRunId) {
-      const {error} = await supabase.rpc('cancel_focus_session',{run_id:focusRunId});
-      if (error) { setNotice('Could not reset session: '+error.message); return; }
+      try {
+        const {error} = await supabase.rpc('cancel_focus_session',{run_id:focusRunId});
+        if (error) {
+          setFocusRunning(wasRunning);
+          setNotice('Could not reset session: '+error.message);
+          return;
+        }
+      } catch (error) {
+        setFocusRunning(wasRunning);
+        setNotice('Could not reset session: '+(error instanceof Error?error.message:'Unexpected error.'));
+        return;
+      }
     }
     setFocusRunId(null); setFocusCompleted(false);
     setFocusSeconds(focusMode==='Pomodoro'?1500:focusMode==='Deep Sprint'?3000:5400);
@@ -157,12 +178,28 @@ function App() {
   async function settleFocus() {
     if (!supabase || !session || !focusCompleted || focusSaving) return;
     const mode = focusMode === 'Pomodoro' ? 'pomodoro' : focusMode === 'Deep Sprint' ? 'deep_sprint' : focusMode === 'Extreme Grind' ? 'extreme_grind' : 'stopwatch';
+    if (!focusRunId) { setNotice('Start a focus session before claiming rewards.'); return; }
     setFocusSaving(true);
-    if (!focusRunId) { setNotice('Start a focus session before claiming rewards.'); setFocusSaving(false); return; }
-    const {data,error} = await supabase.rpc('complete_focus_session',{run_id:focusRunId});
-    if (error) setNotice('Could not save focus session: '+error.message);
-    else { const reward = data as {coins_earned:number;xp_earned:number}; setCoins(v=>v+reward.coins_earned); setFocusCompleted(false); setFocusRunId(null); setFocusSeconds(mode==='pomodoro'?1500:mode==='deep_sprint'?3000:5400); setNotice('Session saved · +'+reward.coins_earned+' Lumen Coins · +'+reward.xp_earned+' XP'); }
-    setFocusSaving(false);
+    try {
+      const {data,error} = await supabase.rpc('complete_focus_session',{run_id:focusRunId});
+      if (error) setNotice('Could not save focus session: '+error.message);
+      else {
+        const reward = data as {coins_earned?:number;xp_earned?:number};
+        if (!Number.isFinite(reward?.coins_earned) || !Number.isFinite(reward?.xp_earned)) {
+          setNotice('Could not save focus session: the server returned an unexpected reward response.');
+        } else {
+          setCoins(v=>v+Number(reward.coins_earned));
+          setFocusCompleted(false);
+          setFocusRunId(null);
+          setFocusSeconds(mode==='pomodoro'?1500:mode==='deep_sprint'?3000:5400);
+          setNotice('Session saved · +'+reward.coins_earned+' Lumen Coins · +'+reward.xp_earned+' XP');
+        }
+      }
+    } catch (error) {
+      setNotice('Could not save focus session: '+(error instanceof Error?error.message:'Unexpected error.'));
+    } finally {
+      setFocusSaving(false);
+    }
   }
   if (!authReady) return <div className="boot"><div className="brand-mark">L</div><span>INITIALIZING LUMEN</span></div>;
   if (!session) return <AuthScreen email={email} setEmail={setEmail} authMode={authMode} setAuthMode={setAuthMode} signIn={signIn} busy={authBusy} message={authMessage} />;
