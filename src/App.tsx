@@ -401,7 +401,7 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
     setProgress(prev=>({...prev,[step.id]:next}));
     setNotice(next?'Checkpoint completed and synced.':'Checkpoint marked incomplete.');
     const requestVersion=++progressCountRequestRef.current;
-    void supabase.from('chapter_progress').select('step_id').eq('user_id',actorId).eq('completed',true).then(({data,count,error:countError})=>{
+    void supabase.from('chapter_progress').select('step_id').eq('user_id',actorId).eq('completed',true).then(({data,error:countError})=>{
      if(activeUserIdRef.current===actorId&&progressCountRequestRef.current===requestVersion&&!countError&&data)setCompletedSteps(data.length);
     });
    }
