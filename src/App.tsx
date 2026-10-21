@@ -127,7 +127,7 @@ function App() {
         if (remaining===0) { setFocusCompleted(true); setFocusRunning(false); }
         else setFocusRunning(true);
       }
-      const {count,countError} = await supabase!.from('chapter_progress').select('*',{count:'exact',head:true}).eq('user_id',session.user.id).eq('completed',true);
+      const {count,error:countError} = await supabase!.from('chapter_progress').select('*',{count:'exact',head:true}).eq('user_id',session.user.id).eq('completed',true);
       if (!cancelled && countError) setNotice('Could not load your syllabus progress total: ' + countError.message);
       if (!cancelled && !countError && count !== null) setCompletedSteps(count);
       if (!cancelled) setProfileLoaded(true);
