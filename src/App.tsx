@@ -174,12 +174,12 @@ function App() {
     const completed = !task.completed;
     try {
       const {error} = await supabase.from('planner_tasks').update({completed,completed_at:completed?new Date().toISOString():null}).eq('id',task.id).eq('user_id',actorId);
-      if (activeUserIdRef.current !== actorId) return;
+      if (activeUserIdRef.current !== actorId || activePlannerDayRef.current !== task.study_day) return;
       if (error) { setNotice('Could not update task: '+error.message); return; }
       setTasks(old=>old.map(t=>t.id===task.id?{...t,completed}:t));
       if (completed) setNotice('Task complete. Keep your momentum.');
     } catch {
-      if (activeUserIdRef.current === actorId) setNotice('Could not update task because of a network error. Please try again.');
+      if (activeUserIdRef.current === actorId && activePlannerDayRef.current === task.study_day) setNotice('Could not update task because of a network error. Please try again.');
     }
   }
   async function signOut() {
