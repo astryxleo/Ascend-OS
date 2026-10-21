@@ -33,7 +33,7 @@ export default function LeaderboardPanel({supabase,userId}:{supabase:SupabaseCli
 
   const load=useCallback(async(quiet=false)=>{
     const request=++requestId.current;
-    if(!supabase){setError('Connect Supabase to load the leaderboard.');setLoading(false);setRefreshing(false);return;}
+    if(!supabase){setEntries([]);setError('Connect Supabase to load the leaderboard.');setLoading(false);setRefreshing(false);return;}
     if(quiet)setRefreshing(true);else setLoading(true);
     setError('');
     try{
@@ -41,7 +41,7 @@ export default function LeaderboardPanel({supabase,userId}:{supabase:SupabaseCli
       if(rpcError)throw rpcError;
       if(request===requestId.current)setEntries((data??[]) as Entry[]);
     }catch(reason){
-      if(request===requestId.current)setError(reason instanceof Error?reason.message:'Could not load the leaderboard.');
+      if(request===requestId.current){setEntries([]);setError(reason instanceof Error?reason.message:'Could not load the leaderboard.');}
     }finally{
       if(request===requestId.current){setLoading(false);setRefreshing(false);}
     }
