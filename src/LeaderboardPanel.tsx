@@ -59,6 +59,8 @@ export default function LeaderboardPanel({supabase,userId}:{supabase:SupabaseCli
     return a.rank-b.rank;
   });
   const me=entries.find(entry=>entry.user_id===userId);
+  const meSortedIndex=sorted.findIndex(entry=>entry.user_id===userId);
+  const displayedRank=(entry:Entry,index:number)=>period==='all'?entry.rank:index+1;
   const top=sorted.slice(0,3);
 
   return <section className="panel leaderboard-panel">
@@ -70,7 +72,7 @@ export default function LeaderboardPanel({supabase,userId}:{supabase:SupabaseCli
     {me&&<div className="leaderboard-you">
       <div className="leaderboard-you-icon"><ShieldCheck size={17}/></div>
       <div className="leaderboard-you-copy"><b>Your position</b><span>{me.display_name} · {me.focus_minutes.toLocaleString('en-IN')} focus minutes</span></div>
-      <strong>#{me.rank}</strong>
+      <strong>#{period==='all'?me.rank:meSortedIndex+1}</strong>
     </div>}
     <div className="leaderboard-filters" role="group" aria-label="Sort leaderboard">
       <button className={period==='all'?'active':''} onClick={()=>setPeriod('all')}>Overall</button>
@@ -94,8 +96,8 @@ export default function LeaderboardPanel({supabase,userId}:{supabase:SupabaseCli
         })}</div>
         <div className="leaderboard-table-wrap"><table className="leaderboard-table">
           <thead><tr><th>RANK</th><th>STUDENT</th><th><Clock3 size={12}/> FOCUS MIN</th><th><BookOpen size={12}/> CHECKPOINTS</th><th>SESSIONS</th></tr></thead>
-          <tbody>{sorted.map(entry=><tr key={entry.user_id} className={entry.user_id===userId?'leaderboard-current':''}>
-            <td><span className={'leaderboard-rank '+(entry.rank<=3?'top-rank':'')}>{String(entry.rank).padStart(2,'0')}</span></td>
+          <tbody>{sorted.map((entry,index)=><tr key={entry.user_id} className={entry.user_id===userId?'leaderboard-current':''}>
+            <td><span className={'leaderboard-rank '+(displayedRank(entry,index)<=3?'top-rank':'')}>{String(displayedRank(entry,index)).padStart(2,'0')}</span></td>
             <td><div className="leaderboard-student"><div className="leaderboard-avatar small">{entry.avatar_url?<img src={entry.avatar_url} alt=""/>:initials(entry.display_name)}</div><div><b>{entry.display_name}{entry.user_id===userId?' · YOU':''}</b><span>@{entry.username}</span></div></div></td>
             <td>{entry.focus_minutes.toLocaleString('en-IN')}</td><td>{entry.completed_steps.toLocaleString('en-IN')}</td><td>{entry.completed_sessions.toLocaleString('en-IN')}</td>
           </tr>)}</tbody>
