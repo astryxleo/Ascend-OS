@@ -283,16 +283,21 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
   let alive=true;
   (async()=>{
    setLoading(true);
-   const [catalog,owned]=await Promise.all([
-    supabase.from('syllabus_steps').select('id,subject_id,chapter_id,chapter_title,step_title,step_order').eq('is_published',true).order('step_order'),
-    supabase.from('chapter_progress').select('subject_id,chapter_id,step_id,completed').eq('user_id',userId)
-   ]);
-   if(!alive)return;
-   if(catalog.error){setNotice('Could not load syllabus: '+catalog.error.message);setSteps([]);}
-   else setSteps((catalog.data??[]) as SyllabusStep[]);
-   if(owned.error)setNotice('Could not load saved progress: '+owned.error.message);
-   else {const ownedRows=(owned.data??[]) as SyllabusProgress[];const map:Record<string,boolean>={};ownedRows.forEach(p=>{map[p.step_id]=p.completed});setProgress(map);setCompletedSteps(ownedRows.filter(p=>p.completed).length);}
-   setLoading(false);
+   try {
+    const [catalog,owned]=await Promise.all([
+     supabase.from('syllabus_steps').select('id,subject_id,chapter_id,chapter_title,step_title,step_order').eq('is_published',true).order('step_order'),
+     supabase.from('chapter_progress').select('subject_id,chapter_id,step_id,completed').eq('user_id',userId)
+    ]);
+    if(!alive)return;
+    if(catalog.error){setNotice('Could not load syllabus: '+catalog.error.message);setSteps([]);}
+    else setSteps((catalog.data??[]) as SyllabusStep[]);
+    if(owned.error)setNotice('Could not load saved progress: '+owned.error.message);
+    else {const ownedRows=(owned.data??[]) as SyllabusProgress[];const map:Record<string,boolean>={};ownedRows.forEach(p=>{map[p.step_id]=p.completed});setProgress(map);setCompletedSteps(ownedRows.filter(p=>p.completed).length);}
+   } catch(reason) {
+    if(alive)setNotice('Could not load syllabus because of a network error. Reopen Syllabus to retry.');
+   } finally {
+    if(alive)setLoading(false);
+   }
   })();
   const channel=supabase.channel('syllabus-progress-'+userId).on('postgres_changes',{event:'*',schema:'public',table:'chapter_progress',filter:'user_id=eq.'+userId},payload=>{
    const row=(payload.new??payload.old) as SyllabusProgress;
@@ -309,10 +314,15 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
   if(!supabase||!userId){setNotice('Sign in to save syllabus progress.');return;}
   if(saving)return;
   const next=!progress[step.id];setSaving(step.id);
-  const {error}=await supabase.from('chapter_progress').upsert({user_id:userId,subject_id:step.subject_id,chapter_id:step.chapter_id,step_id:step.id,completed:next,completed_at:next?new Date().toISOString():null,updated_at:new Date().toISOString()},{onConflict:'user_id,subject_id,chapter_id,step_id'});
-  if(error)setNotice('Progress was not saved: '+error.message);
-  else {setProgress(prev=>({...prev,[step.id]:next}));setCompletedSteps(Math.max(0,completedSteps+(next?1:-1)));setNotice(next?'Checkpoint completed and synced.':'Checkpoint marked incomplete.');}
-  setSaving(null);
+  try {
+   const {error}=await supabase.from('chapter_progress').upsert({user_id:userId,subject_id:step.subject_id,chapter_id:step.chapter_id,step_id:step.id,completed:next,completed_at:next?new Date().toISOString():null,updated_at:new Date().toISOString()},{onConflict:'user_id,subject_id,chapter_id,step_id'});
+   if(error)setNotice('Progress was not saved: '+error.message);
+   else {setProgress(prev=>({...prev,[step.id]:next}));setCompletedSteps(Math.max(0,completedSteps+(next?1:-1)));setNotice(next?'Checkpoint completed and synced.':'Checkpoint marked incomplete.');}
+  } catch(reason) {
+   setNotice('Progress could not be saved because of a network error. Please try again.');
+  } finally {
+   setSaving(null);
+  }
  }
  return <section className="panel syllabus-panel syllabus-workspace">
   <div className="section-heading"><div><span className="eyebrow">CLASS XII · NCERT</span><h2>Syllabus atlas</h2></div><span className="badge">6 SUBJECTS · {steps.length} CHECKPOINTS</span></div>
