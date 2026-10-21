@@ -37,6 +37,7 @@ export default function OperatorPanel({
   const [tab, setTab] = useState('Overview');
   const [stats, setStats] = useState<Stats>({});
   const [users, setUsers] = useState<UserRow[]>([]);
+  const [usersLoadError, setUsersLoadError] = useState('');
   const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
   const [query, setQuery] = useState('');
   const [target, setTarget] = useState('');
@@ -77,8 +78,11 @@ export default function OperatorPanel({
       else setStats((s.data ?? {}) as Stats);
 
       if (u.error) {
+        setUsers([]);
+        setUsersLoadError(u.error.message);
         setNotice('User list refresh failed: ' + u.error.message);
       } else {
+        setUsersLoadError('');
         const nextUsers = (u.data ?? []) as UserRow[];
         setUsers(nextUsers);
         setTarget((current) =>
@@ -110,9 +114,12 @@ export default function OperatorPanel({
     try {
       const { data, error } = await supabase.rpc('operator_search_users', { p_query: query });
       if (error) {
+        setUsers([]);
+        setUsersLoadError(error.message);
         setNotice('User search failed: ' + error.message);
         return;
       }
+      setUsersLoadError('');
       const nextUsers = (data ?? []) as UserRow[];
       setUsers(nextUsers);
       setTarget((current) =>
@@ -121,7 +128,10 @@ export default function OperatorPanel({
           : (nextUsers[0]?.user_id ?? ''),
       );
     } catch (error) {
-      setNotice('User search failed: ' + (error instanceof Error ? error.message : 'Unexpected error.'));
+      const message = error instanceof Error ? error.message : 'Unexpected error.';
+      setUsers([]);
+      setUsersLoadError(message);
+      setNotice('User search failed: ' + message);
     } finally {
       setBusy(false);
     }
@@ -350,6 +360,7 @@ export default function OperatorPanel({
             <button disabled={busy}><Search size={14} /> Search</button>
           </form>
           <div className="operator-user-list">
+            {usersLoadError && <p className="operator-help" role="alert">Could not load users: {usersLoadError}. Try searching again or use Refresh.</p>}
             {users.map((user) => (
               <button
                 type="button"
@@ -368,7 +379,7 @@ export default function OperatorPanel({
                 </span>
               </button>
             ))}
-            {users.length === 0 && <p className="operator-help">No users found for this search.</p>}
+            {users.length === 0 && !usersLoadError && <p className="operator-help">No users found for this search.</p>}
           </div>
         </>
       )}
