@@ -177,7 +177,7 @@ function App() {
         {activeNav==='Focus room'&&<FocusRoom focusSeconds={focusSeconds} fmt={fmt} focusRunning={focusRunning} setFocusRunning={setFocusRunning} focusMode={focusMode} setFocusMode={setFocusMode} focusCompleted={focusCompleted} settleFocus={settleFocus} focusSaving={focusSaving} startFocus={startFocus} resetFocus={resetFocus} sessionActive={!!focusRunId}/>}
         {activeNav==='Syllabus'&&<Syllabus supabase={supabase} userId={session?.user.id??null} completedSteps={completedSteps} setCompletedSteps={setCompletedSteps} setNotice={setNotice}/>}
         {activeNav==='Exams & marks'&&<ExamCommand supabase={supabase} userId={session?.user.id??null} setNotice={setNotice}/>}
-        {activeNav==='Garage'&&<Placeholder icon={CarFront} title="The dealership" text="A collection earned through consistency." detail="Vehicle catalog and secure purchases are the next module."/>}
+        {activeNav==='Garage'&&<Garage supabase={supabase} userId={session?.user.id??null} coins={coins} setCoins={setCoins} setNotice={setNotice}/>}
         {activeNav==='Leaderboard'&&<Placeholder icon={Trophy} title="The leaderboard" text="Compete on focus, consistency and syllabus mastery." detail="Public profiles and duels will be enabled after privacy controls."/>}
         {activeNav==='Control center'&&isOperator&&<OperatorPanel setNotice={setNotice}/>}
         {activeNav==='Settings'&&<Placeholder icon={Settings2} title="Your preferences" text="Personalize your Lumen workspace." detail="Profile editing and avatar uploads are queued for the next module."/>}
