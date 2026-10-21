@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ChartNoAxesColumn, Clock3, Flame, RefreshCw, Target, TrendingUp } from 'lucide-react';
 
@@ -13,18 +13,21 @@ export default function AnalyticsPanel({supabase,userId}:Props){
  const [loading,setLoading]=useState(true);
  const [error,setError]=useState('');
  const [goal,setGoal]=useState(120);
+ const requestId=useRef(0);
  const load=useCallback(async()=>{
-  if(!supabase||!userId){setError('Sign in to see your analytics.');setLoading(false);return;}
+  const request=++requestId.current;
+  if(!supabase||!userId){setRows([]);setError('Sign in to see your analytics.');setLoading(false);return;}
   setLoading(true);setError('');
   try {
    const {data,error:queryError}=await supabase.from('focus_sessions').select('id,duration_minutes,ended_at,subject,completed').eq('user_id',userId).eq('completed',true).order('ended_at',{ascending:false}).limit(3000);
    if(queryError)throw queryError;
+   if(request!==requestId.current)return;
    setRows((data??[]) as FocusRow[]);
   } catch(reason) {
-   setError(reason instanceof Error?reason.message:'Could not load analytics. Check your connection and retry.');
-  } finally {setLoading(false);}
+   if(request===requestId.current)setError(reason instanceof Error?reason.message:'Could not load analytics. Check your connection and retry.');
+  } finally {if(request===requestId.current)setLoading(false);}
  },[supabase,userId]);
- useEffect(()=>{void load();},[load]);
+ useEffect(()=>{void load();return()=>{requestId.current+=1}},[load]);
  useEffect(()=>{if(!supabase||!userId)return;const channel=supabase.channel('analytics-focus-'+userId).on('postgres_changes',{event:'*',schema:'public',table:'focus_sessions',filter:'user_id=eq.'+userId},()=>void load()).subscribe();return()=>{void supabase.removeChannel(channel);};},[supabase,userId,load]);
  const days=useMemo<DayStat[]>(()=>{const today=istDay(new Date());const base=startOfISTDay(today);return Array.from({length:7},(_,i)=>{const d=new Date(base.getTime()-(6-i)*86400000);const key=istDay(d);return {key,label:new Intl.DateTimeFormat('en',{timeZone:'Asia/Kolkata',weekday:'short'}).format(d),minutes:rows.filter(r=>istDay(new Date(r.ended_at))===key).reduce((sum,r)=>sum+Math.max(0,r.duration_minutes||0),0)};});},[rows]);
  const today=days[6]?.minutes??0;
