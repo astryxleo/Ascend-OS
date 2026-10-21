@@ -174,7 +174,7 @@ function App() {
         {activeNav==='Overview'&&<Overview tasks={tasks} done={done} percent={percent} focusSeconds={focusSeconds} fmt={fmt} setFocusSeconds={setFocusSeconds} focusRunning={focusRunning} setFocusRunning={setFocusRunning} focusMode={focusMode} setFocusMode={setFocusMode} setActiveNav={setActiveNav} completedSteps={completedSteps} coins={coins} startFocus={startFocus} resetFocus={resetFocus} focusCompleted={focusCompleted} focusSaving={focusSaving} sessionActive={!!focusRunId} />}
         {activeNav==='Planner'&&<section className="panel task-panel"><div className="section-heading"><div><span className="eyebrow">DAILY EXECUTION</span><h2>Study board</h2></div><button className="primary-btn" onClick={()=>setNewTaskOpen(v=>!v)}><Plus size={16}/> New task</button></div><div className="progress-row"><span>{done} of {tasks.length} tasks complete</span><b>{percent}%</b></div><div className="progress-track"><div style={{width:percent+'%'}}/></div><TaskList tasks={tasks} toggleTask={toggleTask}/>{newTaskOpen&&<form className="task-form" onSubmit={addTask}><input value={taskTitle} onChange={e=>setTaskTitle(e.target.value)} placeholder="What will you work on?" autoFocus/><select value={taskSubject} onChange={e=>setTaskSubject(e.target.value)}>{subjects.map(s=><option key={s}>{s}</option>)}</select><select value={taskPriority} onChange={e=>setTaskPriority(e.target.value as 'P1'|'P2'|'P3')}><option value="P1">P1 · High</option><option value="P2">P2 · Normal</option><option value="P3">P3 · Low</option></select><button className="primary-btn" type="submit">Add task</button></form>}</section>}
         {activeNav==='Focus room'&&<FocusRoom focusSeconds={focusSeconds} fmt={fmt} focusRunning={focusRunning} setFocusRunning={setFocusRunning} focusMode={focusMode} setFocusMode={setFocusMode} focusCompleted={focusCompleted} settleFocus={settleFocus} focusSaving={focusSaving} startFocus={startFocus} resetFocus={resetFocus} sessionActive={!!focusRunId}/>}
-        {activeNav==='Syllabus'&&<Syllabus supabase={supabase} userId={session?.user.id??null} completedSteps={completedSteps} setCompletedSteps={setCompletedSteps} setNotice={setNotice}/ >}
+        {activeNav==='Syllabus'&&<Syllabus supabase={supabase} userId={session?.user.id??null} completedSteps={completedSteps} setCompletedSteps={setCompletedSteps} setNotice={setNotice}/>}
         {activeNav==='Exams & marks'&&<Placeholder icon={GraduationCap} title="Exam command" text="Your exam calendar and marks analytics will live here." detail="Add your first exam from the next build phase."/>}
         {activeNav==='Garage'&&<Placeholder icon={CarFront} title="The dealership" text="A collection earned through consistency." detail="Vehicle catalog and secure purchases are the next module."/>}
         {activeNav==='Leaderboard'&&<Placeholder icon={Trophy} title="The leaderboard" text="Compete on focus, consistency and syllabus mastery." detail="Public profiles and duels will be enabled after privacy controls."/>}
@@ -219,13 +219,16 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
    if(catalog.error){setNotice('Could not load syllabus: '+catalog.error.message);setSteps([]);}
    else setSteps((catalog.data??[]) as SyllabusStep[]);
    if(owned.error)setNotice('Could not load saved progress: '+owned.error.message);
-   else {const map:Record<string,boolean>={};(owned.data as SyllabusProgress[]??[]).forEach(p=>{map[p.step_id]=p.completed});setProgress(map);setCompletedSteps((owned.data as SyllabusProgress[]??[]).filter(p=>p.completed).length);}
+   else {const ownedRows=(owned.data??[]) as SyllabusProgress[];const map:Record<string,boolean>={};ownedRows.forEach(p=>{map[p.step_id]=p.completed});setProgress(map);setCompletedSteps(ownedRows.filter(p=>p.completed).length);}
    setLoading(false);
   })();
   const channel=supabase.channel('syllabus-progress-'+userId).on('postgres_changes',{event:'*',schema:'public',table:'chapter_progress',filter:'user_id=eq.'+userId},payload=>{
    const row=(payload.new??payload.old) as SyllabusProgress;
    if(!row?.step_id)return;
-   setProgress(prev=>({...prev,[row.step_id]:payload.eventType==='DELETE'?false:row.completed}));
+   const before=payload.eventType==='INSERT'?false:!!(payload.old as SyllabusProgress).completed;
+   const after=payload.eventType==='DELETE'?false:!!(payload.new as SyllabusProgress).completed;
+   setProgress(prev=>({...prev,[row.step_id]:after}));
+   if(before!==after)setCompletedSteps(n=>Math.max(0,n+(after?1:-1)));
   }).subscribe();
   return()=>{alive=false;void supabase.removeChannel(channel);};
  },[supabase,userId,setCompletedSteps,setNotice]);
