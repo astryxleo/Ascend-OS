@@ -58,6 +58,22 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
     return () => URL.revokeObjectURL(avatarPreview);
   }, [avatarPreview]);
 
+  // Rehydrate every form field when the signed-in account/profile changes.
+  // The panel can stay mounted across navigation, so useState initializers alone
+  // would otherwise leave the previous account's draft visible.
+  useEffect(() => {
+    setName(profile?.full_name ?? '');
+    setUsername(profile?.username ?? '');
+    setGrade(profile?.class_grade ?? '12');
+    setStream(profile?.stream ?? 'PCM');
+    setSchool((profile?.school_target ?? '').split(' · ')[0] ?? '');
+    setTargetExam((profile?.school_target ?? '').split(' · ').slice(1).join(' · ') || 'JEE');
+    setAvatarFile(null);
+    setAvatarPreview(profile?.avatar_url ?? '');
+    setError('');
+    setBusy(false);
+  }, [userId, profile?.full_name, profile?.username, profile?.class_grade, profile?.stream, profile?.school_target, profile?.avatar_url]);
+
   function chooseAvatar(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null;
     if (file && !file.type.startsWith('image/')) {
