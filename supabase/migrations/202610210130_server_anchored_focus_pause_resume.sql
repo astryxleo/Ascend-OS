@@ -85,7 +85,7 @@ begin
   if elapsed < run.target_minutes then raise exception 'Focus interval has not elapsed yet.'; end if;
   if run.mode='stopwatch' then elapsed := least(elapsed,180); else elapsed := run.target_minutes; end if;
 
-  perform pg_advisory_xact_lock(hashtextextended(actor::text, 731204));
+  perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(actor::text,0));
   select coalesce(sum(duration_minutes),0)::integer into used_today
     from public.focus_sessions
     where user_id=actor
