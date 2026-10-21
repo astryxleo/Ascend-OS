@@ -336,6 +336,7 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
  const [loadError,setLoadError]=useState<string|null>(null);
  const [reloadKey,setReloadKey]=useState(0);
  const [saving,setSaving]=useState<string|null>(null);
+ const savingLockRef=useRef<string|null>(null);
  const progressCountRequestRef=useRef(0);
  const [filter,setFilter]=useState<'all'|'incomplete'|'complete'>('all');
  const [search,setSearch]=useState('');
@@ -344,6 +345,7 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
   setSteps([]);
   setProgress({});
   setSaving(null);
+  savingLockRef.current=null;
   progressCountRequestRef.current+=1;
   setCompletedSteps(0);
   setLoading(true);
@@ -397,9 +399,11 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
  const chapters=Array.from(new Map(visibleSteps.map(s=>[s.chapter_id,{id:s.chapter_id,title:s.chapter_title}])).values()).filter(ch=>ch.title.toLowerCase().includes(search.toLowerCase())||visibleSteps.some(s=>s.chapter_id===ch.id&&s.step_title.toLowerCase().includes(search.toLowerCase())));
  async function toggle(step:SyllabusStep){
   if(!supabase||!userId){setNotice('Sign in to save syllabus progress.');return;}
-  if(saving)return;
+  if(savingLockRef.current!==null)return;
   const actorId=userId;
-  const next=!progress[step.id];setSaving(step.id);
+  const next=!progress[step.id];
+  savingLockRef.current=step.id;
+  setSaving(step.id);
   try {
    const {error}=await supabase.from('chapter_progress').upsert({user_id:actorId,subject_id:step.subject_id,chapter_id:step.chapter_id,step_id:step.id,completed:next,completed_at:next?new Date().toISOString():null,updated_at:new Date().toISOString()},{onConflict:'user_id,subject_id,chapter_id,step_id'});
    if(activeUserIdRef.current!==actorId)return;
@@ -415,7 +419,7 @@ function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{
   } catch(reason) {
    if(activeUserIdRef.current===actorId)setNotice('Progress could not be saved because of a network error. Please try again.');
   } finally {
-   if(activeUserIdRef.current===actorId)setSaving(null);
+   if(activeUserIdRef.current===actorId){savingLockRef.current=null;setSaving(null);}
   }
  }
  return <section className="panel syllabus-panel syllabus-workspace">
