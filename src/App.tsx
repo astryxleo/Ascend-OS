@@ -60,7 +60,14 @@ function App() {
 
   useEffect(() => {
     if (!supabase) return;
-    supabase.auth.getSession().then(({data}) => { setSession(data.session); setAuthReady(true); });
+    supabase.auth.getSession().then(({data,error}) => {
+      if (error) setAuthMessage('Could not restore your session: ' + error.message);
+      setSession(data.session);
+      setAuthReady(true);
+    }).catch(() => {
+      setAuthMessage('Could not restore your session because of a network error. Please reload and try again.');
+      setAuthReady(true);
+    });
     const {data:{subscription}} = supabase.auth.onAuthStateChange((_event,next) => { setSession(next); });
     return () => subscription.unsubscribe();
   },[]);
