@@ -171,11 +171,13 @@ function App() {
   async function signOut() { await supabase?.auth.signOut(); setTasks([]); setProfile(null); setFocusRunning(false); setFocusRunId(null); setFocusCompleted(false); }
   async function startFocus() {
     if (!supabase || !session || focusSaving) return;
+    const actorId = session.user.id;
     if (focusRunId) { setFocusRunning(true); return; }
     setFocusSaving(true);
     try {
       const mode = focusMode === 'Pomodoro' ? 'pomodoro' : focusMode === 'Deep Sprint' ? 'deep_sprint' : 'extreme_grind';
       const {data,error} = await supabase.rpc('start_focus_session',{subject_name:taskSubject,mode_name:mode});
+      if (activeUserIdRef.current !== actorId) return;
       if (error) setNotice('Could not start focus session: '+error.message);
       else if (data && typeof (data as {session_id?:unknown}).session_id === 'string') {
         setFocusRunId((data as {session_id:string}).session_id);
@@ -183,19 +185,21 @@ function App() {
         setFocusCompleted(false);
       } else setNotice('Could not start focus session: the server returned an unexpected response.');
     } catch (error) {
-      setNotice('Could not start focus session: '+(error instanceof Error?error.message:'Unexpected error.'));
+      if (activeUserIdRef.current === actorId) setNotice('Could not start focus session: '+(error instanceof Error?error.message:'Unexpected error.'));
     } finally {
-      setFocusSaving(false);
+      if (activeUserIdRef.current === actorId) setFocusSaving(false);
     }
   }
   async function resetFocus() {
     if (focusSaving) return;
+    const actorId = session?.user.id ?? null;
     const wasRunning = focusRunning;
     setFocusSaving(true);
     setFocusRunning(false);
     try {
       if (supabase && focusRunId) {
         const {error} = await supabase.rpc('cancel_focus_session',{run_id:focusRunId});
+        if (activeUserIdRef.current !== actorId) return;
         if (error) {
           setFocusRunning(wasRunning);
           setNotice('Could not reset session: '+error.message);
@@ -206,19 +210,23 @@ function App() {
       setFocusCompleted(false);
       setFocusSeconds(focusMode==='Pomodoro'?1500:focusMode==='Deep Sprint'?3000:5400);
     } catch (error) {
-      setFocusRunning(wasRunning);
-      setNotice('Could not reset session: '+(error instanceof Error?error.message:'Unexpected error.'));
+      if (activeUserIdRef.current === actorId) {
+        setFocusRunning(wasRunning);
+        setNotice('Could not reset session: '+(error instanceof Error?error.message:'Unexpected error.'));
+      }
     } finally {
-      setFocusSaving(false);
+      if (activeUserIdRef.current === actorId) setFocusSaving(false);
     }
   }
   async function settleFocus() {
     if (!supabase || !session || !focusCompleted || focusSaving) return;
+    const actorId = session.user.id;
     const mode = focusMode === 'Pomodoro' ? 'pomodoro' : focusMode === 'Deep Sprint' ? 'deep_sprint' : focusMode === 'Extreme Grind' ? 'extreme_grind' : 'stopwatch';
     if (!focusRunId) { setNotice('Start a focus session before claiming rewards.'); return; }
     setFocusSaving(true);
     try {
       const {data,error} = await supabase.rpc('complete_focus_session',{run_id:focusRunId});
+      if (activeUserIdRef.current !== actorId) return;
       if (error) setNotice('Could not save focus session: '+error.message);
       else {
         const reward = data as {coins_earned?:number;xp_earned?:number};
@@ -227,7 +235,8 @@ function App() {
         } else {
           // Re-read the authoritative balance after the reward RPC commits.
           // This avoids drifting local state if an operator adjusted the wallet concurrently.
-          const {data:wallet,error:walletError} = await supabase.from('wallets').select('coins').eq('user_id',session.user.id).maybeSingle();
+          const {data:wallet,error:walletError} = await supabase.from('wallets').select('coins').eq('user_id',actorId).maybeSingle();
+          if (activeUserIdRef.current !== actorId) return;
           if (!walletError && wallet && Number.isFinite(Number(wallet.coins))) setCoins(Number(wallet.coins));
           else setCoins(v=>v+Number(reward.coins_earned));
           setFocusCompleted(false);
@@ -237,9 +246,9 @@ function App() {
         }
       }
     } catch (error) {
-      setNotice('Could not save focus session: '+(error instanceof Error?error.message:'Unexpected error.'));
+      if (activeUserIdRef.current === actorId) setNotice('Could not save focus session: '+(error instanceof Error?error.message:'Unexpected error.'));
     } finally {
-      setFocusSaving(false);
+      if (activeUserIdRef.current === actorId) setFocusSaving(false);
     }
   }
   if (!authReady) return <div className="boot"><div className="brand-mark">L</div><span>INITIALIZING LUMEN</span></div>;
