@@ -74,3 +74,18 @@ revoke all on table public.operator_contact_requests from public, anon, authenti
 revoke all on table public.ascend_notifications from public, anon, authenticated;
 grant select on table public.operator_contact_requests, public.ascend_notifications to authenticated;
 grant update(read_at) on table public.ascend_notifications to authenticated;
+
+create or replace function public.operator_send_notification(p_user_id uuid,p_title text,p_message text,p_kind text default 'operator')
+returns public.ascend_notifications language plpgsql security definer set search_path='' as $$
+declare e text:=lower(coalesce(auth.jwt()->>'email','')); result public.ascend_notifications;
+begin
+ if auth.uid() is null or e<>'astryxleo@gmail.com' then raise exception 'Operator access required'; end if;
+ if p_user_id is null then raise exception 'Choose a recipient'; end if;
+ if char_length(trim(coalesce(p_title,''))) not between 3 and 120 then raise exception 'Title must be 3–120 characters'; end if;
+ if char_length(trim(coalesce(p_message,''))) not between 3 and 4000 then raise exception 'Message must be 3–4000 characters'; end if;
+ if p_kind not in ('info','success','warning','operator') then raise exception 'Invalid notification type'; end if;
+ insert into public.ascend_notifications(user_id,title,message,kind) values(p_user_id,trim(p_title),trim(p_message),p_kind) returning * into result;
+ return result;
+end; $$;
+revoke all on function public.operator_send_notification(uuid,text,text,text) from public,anon;
+grant execute on function public.operator_send_notification(uuid,text,text,text) to authenticated;
