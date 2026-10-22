@@ -124,6 +124,12 @@ export default function AnalyticsPanel({ supabase, userId, initialTab = 'analyti
   useEffect(()=>{void load();},[selectedId,load]);
   useEffect(()=>{
     if(!supabase||!userId)return;
+    const poll=window.setInterval(()=>void load(true),30000);
+    return()=>window.clearInterval(poll);
+  },[supabase,userId,selectedId,tab,load]);
+
+  useEffect(()=>{
+    if(!supabase||!userId)return;
     const channel=supabase.channel('analytics-live-'+userId+'-'+(selectedId||'none'))
       .on('postgres_changes',{event:'*',schema:'public',table:'focus_sessions'},()=>void load(true))
       .on('postgres_changes',{event:'*',schema:'public',table:'planner_tasks'},()=>void load(true))
