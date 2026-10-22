@@ -94,3 +94,12 @@
 .cq-history{margin-top:4px}
 @media(max-width:900px){.cq-atlas-wrap{height:78vh;min-height:650px}.cq-side{grid-template-columns:1fr}.cq-atlas-territory:hover,.cq-atlas-territory.selected{width:150px;min-height:110px}}
 @media(max-width:560px){.cq-atlas-wrap{height:72vh;min-height:560px}.cq-atlas-canvas{width:2000px;height:1600px}.cq-atlas-controls>span{font-size:8px}.cq-atlas-controls button{width:32px;height:32px}.cq-atlas-hint{font-size:7px;letter-spacing:.08em}.cq-atlas-territory:hover,.cq-atlas-territory.selected{width:132px;min-height:102px;padding:9px}}
+
+/* Render the 500 × 400 world as 200,000 individually bounded micro-sectors. */
+.cq-world-grid{position:absolute;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(#dce9d51c 1px,transparent 1px),linear-gradient(90deg,#dce9d51c 1px,transparent 1px),radial-gradient(ellipse at 18% 22%,#5ca36c22,transparent 24%),radial-gradient(ellipse at 76% 30%,#9c80cf1c,transparent 25%),radial-gradient(ellipse at 48% 77%,#59b8c01c,transparent 28%);background-size:4px 4px,4px 4px,auto,auto,auto}
+.cq-atlas-territory{width:3.5px;height:3.5px;min-width:3.5px;min-height:3.5px;max-width:3.5px;padding:0;border-radius:1px;border-width:.45px;box-shadow:none;backdrop-filter:none;overflow:visible}
+.cq-atlas-territory .cq-territory-mark{display:none}
+.cq-atlas-territory.owned{box-shadow:0 0 5px #48e0b288}
+.cq-atlas-territory.rival{box-shadow:0 0 5px #ff526b77}
+.cq-atlas-territory:hover,.cq-atlas-territory.selected{width:172px;height:auto;min-width:172px;max-width:172px;min-height:118px;padding:12px 13px;border-radius:13px;border-width:1px;box-shadow:0 12px 34px #000b,inset 0 1px #ffffff18;overflow:hidden}
+.cq-atlas-territory:hover .cq-territory-mark,.cq-atlas-territory.selected .cq-territory-mark{display:grid}
