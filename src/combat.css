@@ -118,8 +118,8 @@
 .stick-svg{width:80px;height:130px;overflow:visible;filter:drop-shadow(0 5px 9px #0008);--fighter-edge:#f2d9df}
 .stick-svg .fighter-drawing{display:block;width:100%;height:100%;overflow:visible;position:relative;z-index:1}
 .stick-svg .fighter-drawing .head,.stick-svg .fighter-drawing .helmet,.stick-svg .fighter-drawing .visor,.stick-svg .fighter-drawing .body,.stick-svg .fighter-drawing .arm,.stick-svg .fighter-drawing .leg,.stick-svg .fighter-drawing .joint,.stick-svg .fighter-drawing .weapon{position:static;left:auto;top:auto;width:auto;height:auto;border:0;border-radius:0;transform:none;opacity:1;box-shadow:none}
-.stick-svg .fighter-drawing .head{fill:url(#fighter-metal);stroke:#f8dce2;stroke-width:2.4}
-.stick-svg .fighter-drawing .armor-plate{fill:url(#fighter-metal);stroke:var(--fighter-glow);stroke-width:1.7}
+.stick-svg .fighter-drawing .head{stroke:#f8dce2;stroke-width:2.4}
+.stick-svg .fighter-drawing .armor-plate{stroke:var(--fighter-glow);stroke-width:1.7}
 .stick-svg .fighter-drawing .eye-fire{opacity:.65;filter:drop-shadow(0 0 3px var(--eye-fire,var(--fighter-glow)))}
 .stick-svg .fighter-drawing .fighter-shadow{fill:#0008;filter:blur(2px)}
 .stick-svg .fighter-drawing .fighter-weapon{transform-origin:75px 45px;filter:drop-shadow(0 0 3px var(--fighter-glow))}
