@@ -41,7 +41,7 @@ const routeByLabel: Record<string, string> = {
 };
 const labelByRoute = Object.fromEntries(Object.entries(routeByLabel).map(([label, route]) => [route, label])) as Record<string, string>;
 function labelFromPath(path: string) {
-  const normalized = path.replace(/\\/+$/, '') || '/';
+  const normalized = path.length > 1 && path.endsWith('/') ? path.slice(0, -1) : path;
   return labelByRoute[normalized] || 'Overview';
 }
 
