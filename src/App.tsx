@@ -85,8 +85,8 @@ function App() {
     const move = (event:PointerEvent) => { pointer.style.left = event.clientX + 'px'; pointer.style.top = event.clientY + 'px'; pointer.style.visibility = 'visible'; };
     const change = (event:Event) => { const detail = (event as CustomEvent<{id:number;size:number}>).detail; if (!detail) return; try { localStorage.setItem('ascend-cursor-id',String(detail.id)); localStorage.setItem('ascend-cursor-size',String(detail.size)); } catch {} apply(detail.id,detail.size); };
     let id = 6, size = 23; try { id = Number(localStorage.getItem('ascend-cursor-id') || 6); size = Number(localStorage.getItem('ascend-cursor-size') || 23); } catch {}
-    apply(id,size); window.addEventListener('pointermove',move,{passive:true,capture:true}); window.addEventListener('mousemove',move,{passive:true,capture:true}); window.addEventListener('ascend-cursor-settings-change',change);
-    return () => { window.removeEventListener('pointermove',move,true); window.removeEventListener('mousemove',move,true); window.removeEventListener('ascend-cursor-settings-change',change); document.documentElement.classList.remove('ascend-custom-cursor'); pointer.remove(); style.remove(); };
+    apply(id,size); window.addEventListener('pointermove',move,{passive:true,capture:true}); window.addEventListener('ascend-cursor-settings-change',change);
+    return () => { window.removeEventListener('pointermove',move,true); window.removeEventListener('ascend-cursor-settings-change',change); document.documentElement.classList.remove('ascend-custom-cursor'); pointer.remove(); style.remove(); };
   }, []);
   const [session,setSession] = useState<Session|null>(null);
   const activeUserIdRef = useRef<string | null>(null);
