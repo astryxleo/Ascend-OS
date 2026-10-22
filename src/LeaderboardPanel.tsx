@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { BookOpen, Clock3, Crown, Coins, Medal, RefreshCw, ShieldCheck, Trophy, Users, Swords, Zap, Target, Flame, ListChecks, Star, ChevronUp, Sparkles } from 'lucide-react';
+import { BookOpen, Clock3, Crown, Coins, Medal, RefreshCw, ShieldCheck, Trophy, Users, Swords, Zap, Flame, ListChecks, ChevronUp, Sparkles } from 'lucide-react';
 
 type UserEntry = {
   user_id:string; username:string; display_name:string; avatar_url:string|null;
