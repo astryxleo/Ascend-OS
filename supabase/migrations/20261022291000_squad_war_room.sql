@@ -60,7 +60,7 @@ begin
  select coalesce(jsonb_agg(jsonb_build_object('id',s.id,'name',s.name,'force',public.squad_force_snapshot(s.id)) order by s.name), '[]'::jsonb)
  into targets from public.study_squads s
  where not exists(select 1 from public.study_squad_members own where own.squad_id=s.id and own.user_id=u)
- and exists(select 1 from public.study_squad_members);
+ and exists(select 1 from public.study_squad_members target_members where target_members.squad_id=s.id);
  select coalesce(jsonb_agg(jsonb_build_object('id',w.id,'status',w.status,'attacker_squad_id',w.attacker_squad_id,
   'defender_squad_id',w.defender_squad_id,'attacker_snapshot',w.attacker_snapshot,'defender_snapshot',w.defender_snapshot,
   'attacker_losses',w.attacker_losses,'defender_losses',w.defender_losses,'winner_squad_id',w.winner_squad_id,
@@ -123,6 +123,17 @@ begin
  return jsonb_build_object('id',p_war_id,'status','completed','winner_squad_id',winner,'attacker_losses',al,'defender_losses',dl,'battle_log',events);
 end $$;
 revoke all on function public.squad_force_snapshot(uuid) from public,anon,authenticated;
+create or replace function public.get_my_squad_force(p_squad uuid) returns jsonb
+language plpgsql security definer set search_path='' as $
+declare u uuid:=auth.uid();
+begin
+ if u is null then raise exception 'Sign in required'; end if;
+ if not exists(select 1 from public.study_squad_members where squad_id=p_squad and user_id=u) then raise exception 'You are not a member of this squad'; end if;
+ return public.squad_force_snapshot(p_squad);
+end $;
+revoke all on function public.get_my_squad_force(uuid) from public,anon;
+grant execute on function public.get_my_squad_force(uuid) to authenticated;
+
 revoke all on function public.get_squad_war_room() from public,anon;
 revoke all on function public.start_squad_war(uuid,uuid) from public,anon;
 revoke all on function public.resolve_squad_war(uuid) from public,anon;
