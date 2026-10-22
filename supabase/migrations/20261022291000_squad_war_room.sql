@@ -124,13 +124,13 @@ begin
 end $$;
 revoke all on function public.squad_force_snapshot(uuid) from public,anon,authenticated;
 create or replace function public.get_my_squad_force(p_squad uuid) returns jsonb
-language plpgsql security definer set search_path='' as $
+language plpgsql security definer set search_path='' as $$
 declare u uuid:=auth.uid();
 begin
  if u is null then raise exception 'Sign in required'; end if;
  if not exists(select 1 from public.study_squad_members where squad_id=p_squad and user_id=u) then raise exception 'You are not a member of this squad'; end if;
  return public.squad_force_snapshot(p_squad);
-end $;
+end $$;
 revoke all on function public.get_my_squad_force(uuid) from public,anon;
 grant execute on function public.get_my_squad_force(uuid) to authenticated;
 
