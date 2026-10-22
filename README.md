@@ -1,4 +1,4 @@
-# LUMEN — Luxury Study OS
+# Ascend OS — Luxury Study OS
 
 A responsive Class XII study dashboard built with React, TypeScript, Vite, Supabase Auth, and PostgreSQL.
 
@@ -21,7 +21,7 @@ Some screens are intentionally labeled as the next module; do not treat mock gra
 5. Run `npm install`, then `npm run dev`.
 
 ## Database
-The initial schema migration is in `supabase/migrations/202610210001_lumen_core_schema.sql`. It has been applied to the connected Supabase project during initial setup. Do not run the initial schema again on the same project; use migration-aware deployment for future changes.
+The initial schema migration is in `supabase/migrations/202610210001_ascend-os_core_schema.sql`. It has been applied to the connected Supabase project during initial setup. Do not run the initial schema again on the same project; use migration-aware deployment for future changes.
 
 ## Operator security
 The database helper verifies either a verified JWT email matching `astryxleo@gmail.com` or an operator role in the profile table. The client only hides/shows the operator navigation; every sensitive operation must still be guarded by database RLS or server-side authorization. Verify the intended Google account is actually verified before using operator tools.
