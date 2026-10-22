@@ -735,3 +735,52 @@ input:focus,select:focus,textarea:focus{border-color:#f0c8758c!important;box-sha
 .primary-btn:focus-visible,.secondary-btn:focus-visible,.icon-btn:focus-visible,.text-btn:focus-visible,.nav-item:focus-visible{outline:2px solid #e8c56c;outline-offset:3px}
 .metric-card:focus-within,.focus-card:focus-within{border-color:#e8c56c45}
 @media(prefers-reduced-motion:reduce){.nav-item:before,.panel,.metric-card,.focus-card,.primary-btn,.secondary-btn,.icon-btn,.text-btn{transition:none}}
+
+
+/* ASCEND FIELD MANUAL + first-run welcome */
+.ascend-intro-lock,.ascend-intro-lock *{cursor:none!important}
+.tutorial-overlay,.tutorial-nudge-backdrop{position:fixed;inset:0;z-index:1000000;display:grid;place-items:center;padding:22px;background:rgba(2,3,8,.78);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);animation:tutorial-fade-in .22s ease both}
+.tutorial-modal,.tutorial-nudge{position:relative;width:min(100%,980px);max-height:min(88vh,900px);overflow:auto;border:1px solid rgba(222,190,117,.24);border-radius:26px;background:radial-gradient(ellipse at 90% 0%,rgba(99,229,245,.08),transparent 38%),linear-gradient(145deg,#15151c,#09090e 72%);box-shadow:0 36px 120px #000b,0 0 60px #c49b4510;padding:clamp(22px,3.2vw,36px);color:#f4f4f7}
+.tutorial-modal>header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding-bottom:22px;border-bottom:1px solid #ffffff12}
+.tutorial-modal>header h2,.tutorial-nudge h2{font-size:clamp(27px,4vw,39px);letter-spacing:-.045em;line-height:1.08;margin:9px 0}
+.tutorial-modal>header p,.tutorial-nudge>p{margin:0;color:#9a9ba9;line-height:1.7;font-size:13px}
+.tutorial-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:22px 0}
+.tutorial-grid article{min-width:0;padding:17px;border:1px solid #ffffff12;border-radius:17px;background:linear-gradient(145deg,#ffffff07,#ffffff02);transition:transform .2s ease,border-color .2s ease,background .2s ease}
+.tutorial-grid article:hover{transform:translateY(-3px);border-color:#d8b86a60;background:linear-gradient(145deg,#d8b86a12,#ffffff03)}
+.tutorial-grid article>span,.tutorial-nudge-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;color:#f1d58c;background:linear-gradient(145deg,#d4ad5d24,#63e5f50b);border:1px solid #d4ad5d30;margin-bottom:13px}
+.tutorial-grid article>b{display:block;font-size:14px;margin-bottom:7px}
+.tutorial-grid article>p{margin:0;color:#a3a4b1;font-size:12px;line-height:1.7}
+.tutorial-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-top:18px;border-top:1px solid #ffffff12}
+.tutorial-footer>span{display:flex;align-items:center;gap:8px;color:#8e91a0;font-size:11px}
+.tutorial-footer .primary-btn,.tutorial-nudge-actions .primary-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+.tutorial-nudge{width:min(100%,490px);text-align:left;padding:30px}
+.tutorial-nudge-icon{width:52px;height:52px;margin-bottom:20px;border-radius:16px;color:#8edcff;background:linear-gradient(145deg,#2563eb38,#38bdf812);border-color:#60a5fa35}
+.tutorial-nudge .eyebrow{color:#82cfff}
+.tutorial-nudge>p{margin:12px 0 22px}
+.tutorial-nudge-actions{display:flex;gap:10px;flex-wrap:wrap}
+.tutorial-nudge>small{display:block;color:#777f91;font-size:10px;line-height:1.6;margin-top:18px}
+.help-trigger{color:#9adfff!important;border-color:#5bbce72a!important;transition:all .2s ease}
+.help-trigger:hover{color:#fff!important;background:#2563eb2a!important;box-shadow:0 0 22px #2563eb2b;transform:translateY(-1px)}
+.hero-syllabus-percent{display:block;color:#83d8f0;font-size:10px;letter-spacing:.04em;margin-top:6px}
+.ascend-hero-footer .ascend-mini-track{height:4px;margin-top:8px;overflow:hidden;border-radius:20px;background:#ffffff12}
+.ascend-hero-footer .ascend-mini-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#63e5f5,#d6b66e);box-shadow:0 0 12px #63e5f566}
+.ascend-hero-footer>div{min-width:0}
+.ascend-hero-footer>div>b{display:block}
+.ascend-hero-footer .hero-syllabus-percent{font-size:10px}
+@keyframes tutorial-fade-in{from{opacity:0}to{opacity:1}}
+/* Keep chart tooltips above their own SVG and neighboring cards. */
+.aa-radar-wrap{position:relative;isolation:isolate;overflow:visible}
+.aa-radar{position:relative;z-index:1;overflow:visible}
+.aa-card,.aa-analytics-card,.aa-graph-card{overflow:visible}
+.aa-chart-tooltip,.aa-tooltip{z-index:12;pointer-events:none}
+.squad-dashboard{scroll-margin-top:90px}
+.squad-dashboard-highlight{animation:squad-command-flash 1.2s ease}
+.squad-dashboard-kpis article,.squad-section.panel,.squad-detail.panel{transition:border-color .25s ease,transform .25s ease,box-shadow .25s ease}
+.squad-dashboard-kpis article:hover,.squad-section.panel:hover,.squad-detail.panel:hover{border-color:#d7b96b55;box-shadow:0 14px 42px #0003,0 0 26px #d7b96b08}
+.squad-dashboard-open{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.squad-challenge-delete{display:grid;place-items:center;transition:background .2s ease,color .2s ease,transform .2s ease}
+.squad-challenge-delete:hover{color:#fff;background:#ef444433;transform:translateY(-1px)}
+@keyframes squad-command-flash{0%{box-shadow:0 0 0 0 #d8b86a00}35%{box-shadow:0 0 0 3px #d8b86a40,0 0 50px #d8b86a15}100%{box-shadow:0 0 0 0 #d8b86a00}}
+@media(max-width:760px){.tutorial-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tutorial-footer{align-items:flex-start;flex-direction:column}.tutorial-modal{max-height:92vh;padding:20px}.tutorial-nudge{padding:23px}}
+@media(max-width:460px){.tutorial-grid{grid-template-columns:1fr}.tutorial-nudge-actions{flex-direction:column}.tutorial-nudge-actions>*{width:100%}}
+@media(prefers-reduced-motion:reduce){.tutorial-overlay,.tutorial-nudge-backdrop,.tutorial-grid article,.help-trigger{animation:none!important;transition:none!important}}
