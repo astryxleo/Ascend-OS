@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import './operator-contact.css';
+import MarkdownMessage from './MarkdownMessage';
 import { Activity, RefreshCw, Search, Send, ShieldCheck, Wallet, Users, MessageSquareText, CheckCircle2, Clock3 } from 'lucide-react';
 
 type UserRow = {
@@ -402,8 +403,8 @@ export default function OperatorPanel({
           <div className="operator-contact-list">{filteredContactRequests.map(row=><article className="operator-contact-card" key={row.id}>
             <div className="operator-contact-card-head"><span className={'operator-contact-status status-'+row.status}>{row.status.replaceAll('_',' ')}</span><time>{new Date(row.created_at).toLocaleString()}</time></div>
             <h3>{row.subject}</h3><div className="operator-contact-meta"><span>{row.category}</span><span>{row.user_email||row.user_id}</span><span>Ref · {row.id.slice(0,8).toUpperCase()}</span></div>
-            <div className="operator-contact-message"><b>Full message</b><p>{row.message}</p></div>
-            <label className="operator-contact-remark">Operator remark / reply<textarea rows={3} maxLength={4000} value={remarks[row.id]??row.operator_remark??''} onChange={e=>setRemarks(v=>({...v,[row.id]:e.target.value}))} placeholder="Write a clear reply. It will appear in the user's request tracker and notification…"/></label>
+            <div className="operator-contact-message"><b>Full message</b><MarkdownMessage value={row.message}/></div>
+            <label className="operator-contact-remark">Operator remark / reply<textarea rows={3} maxLength={4000} value={remarks[row.id]??row.operator_remark??''} onChange={e=>setRemarks(v=>({...v,[row.id]:e.target.value}))} placeholder="Write a clear Markdown reply. It will appear in the user's request tracker and notification…"/></label>
             <label className="operator-contact-read"><input type="checkbox" checked={!!readRequest[row.id]} onChange={e=>setReadRequest(v=>({...v,[row.id]:e.target.checked}))}/> I have read the complete request and understand what the user is asking.</label>
             <div className="operator-contact-actions"><button disabled={!readRequest[row.id]||!!requestBusy} onClick={()=>void updateContactRequest(row,'accepted')}><CheckCircle2 size={14}/> Accept</button><button disabled={!readRequest[row.id]||!!requestBusy} onClick={()=>void updateContactRequest(row,'in_progress')}><Clock3 size={14}/> In progress</button><button disabled={!readRequest[row.id]||!!requestBusy} onClick={()=>void updateContactRequest(row,'rejected')}>Reject</button><button disabled={!readRequest[row.id]||!!requestBusy} onClick={()=>void updateContactRequest(row,'resolved')}>Resolve</button>{requestBusy===row.id&&<span>Saving…</span>}</div>
             <small className="operator-contact-updated">Last updated {new Date(row.updated_at).toLocaleString()} · Current status: {row.status.replaceAll('_',' ')}</small>
