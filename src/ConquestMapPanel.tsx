@@ -11,14 +11,14 @@ const clock=(seconds:number)=>{const s=Math.max(0,seconds);return [Math.floor(s/
 export default function ConquestMapPanel({supabase,setNotice}:Props){
  const [data,setData]=useState<Payload|null>(null),[selected,setSelected]=useState<number|null>(null),[busy,setBusy]=useState(false),[loading,setLoading]=useState(true),[report,setReport]=useState<any>(null),[cooldownSeconds,setCooldownSeconds]=useState(0),[zoom,setZoom]=useState(.82),[pan,setPan]=useState({x:0,y:0}),[dragging,setDragging]=useState(false),[attackConfirm,setAttackConfirm]=useState(false);
  const mapRef=useRef<HTMLDivElement|null>(null);
- const dragRef=useRef<{x:number;y:number;px:number;py:number}|null>(null);
+ const dragRef=useRef<{x:number;y:number;px:number;py:number;cx:number;cy:number}|null>(null);
  const initializedView=useRef(false);
  const regionLoader=useRef<()=>void>(()=>{});
  const regionTimer=useRef<number|null>(null);
  const zoomAt=(delta:number)=>{setZoom(v=>Math.max(.35,Math.min(3.2,Number((v+delta).toFixed(2)))));if(regionTimer.current!==null)window.clearTimeout(regionTimer.current);regionTimer.current=window.setTimeout(()=>regionLoader.current(),240);};
- const onMapPointerDown=(e:React.PointerEvent<HTMLDivElement>)=>{if((e.target as HTMLElement).closest('button'))return;dragRef.current={x:e.clientX,y:e.clientY,px:pan.x,py:pan.y};setDragging(true);e.currentTarget.setPointerCapture(e.pointerId);};
- const onMapPointerMove=(e:React.PointerEvent<HTMLDivElement>)=>{if(!dragRef.current)return;setPan({x:dragRef.current.px+e.clientX-dragRef.current.x,y:dragRef.current.py+e.clientY-dragRef.current.y});};
- const onMapPointerUp=()=>{dragRef.current=null;setDragging(false);if(regionTimer.current!==null)window.clearTimeout(regionTimer.current);regionTimer.current=window.setTimeout(()=>regionLoader.current(),160);};
+ const onMapPointerDown=(e:React.PointerEvent<HTMLDivElement>)=>{if((e.target as HTMLElement).closest('button'))return;dragRef.current={x:e.clientX,y:e.clientY,cx:e.clientX,cy:e.clientY,px:pan.x,py:pan.y};setDragging(true);try{e.currentTarget.setPointerCapture(e.pointerId);}catch{}};
+ const onMapPointerMove=(e:React.PointerEvent<HTMLDivElement>)=>{const drag=dragRef.current;if(!drag)return;drag.cx=e.clientX;drag.cy=e.clientY;const x=drag.px+e.clientX-drag.x,y=drag.py+e.clientY-drag.y;const canvas=mapRef.current?.querySelector<HTMLElement>('.cq-atlas-canvas');if(canvas)canvas.style.transform=`translate(${x}px,${y}px) scale(${zoom})`;};
+ const onMapPointerUp=()=>{const drag=dragRef.current;if(drag){setPan({x:drag.px+drag.cx-drag.x,y:drag.py+drag.cy-drag.y});}dragRef.current=null;setDragging(false);if(regionTimer.current!==null)window.clearTimeout(regionTimer.current);regionTimer.current=window.setTimeout(()=>regionLoader.current(),160);};
  const load=useCallback(async()=>{if(!supabase){setLoading(false);return;}const {data,error}=await supabase.rpc('get_conquest_map');if(error){setNotice('Conquest map could not load: '+error.message);setLoading(false);return;}setData(data as Payload);setCooldownSeconds(Number((data as Payload).cooldown_seconds||0));setLoading(false);},[supabase,setNotice]);
  useEffect(()=>{void load();},[load]);
  useEffect(()=>{if(cooldownSeconds<=0)return;const id=window.setInterval(()=>setCooldownSeconds(v=>Math.max(0,v-1)),1000);return()=>window.clearInterval(id);},[cooldownSeconds>0]);
