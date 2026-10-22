@@ -42,7 +42,7 @@ function Legend({ items }: { items: { label: string; color: string }[] }) {
 function LineGraph({ data, series, max, ticks, suffix = '', area = false }: { data: { date: string; [key: string]: string | number }[]; series: { key: string; label: string; color: string }[]; max: number; ticks: number[]; suffix?: string; area?: boolean }) {
   const W=760,H=238,L=42,R=12,T=12,B=30,innerW=W-L-R,innerH=H-T-B;
   const points=(key:string)=>data.map((d,i)=>({x:L+(data.length<=1?0:i/(data.length-1))*innerW,y:T+innerH-(pct(Number(d[key]||0)/Math.max(1,max)*100)/100)*innerH,value:Number(d[key]||0),label:String(d.date||'')}));
-  const path=(ps:{x:number;y:number}[])=>ps.map((p,i)=>(i?'L':'M')+p.x.toFixed(2)+','+p.y.toFixed(2)).join(' ');
+  const path=(ps:{x:number;y:number}[])=>{if(!ps.length)return '';if(ps.length===1)return 'M '+ps[0].x+','+ps[0].y;let d='M '+ps[0].x+','+ps[0].y;for(let i=1;i<ps.length-1;i++){const midX=(ps[i].x+ps[i+1].x)/2,midY=(ps[i].y+ps[i+1].y)/2;d+=' Q '+ps[i].x+','+ps[i].y+' '+midX+','+midY;}const last=ps[ps.length-1];d+=' T '+last.x+','+last.y;return d;};
   return <div className="aa-chart-scroll"><svg className="aa-chart" viewBox={'0 0 '+W+' '+H} role="img" aria-label={series.map(s=>s.label).join(' versus ')+' chart'}>
     {ticks.map(t=><g key={t}><line x1={L} x2={W-R} y1={T+innerH-t/Math.max(1,max)*innerH} y2={T+innerH-t/Math.max(1,max)*innerH} stroke="rgba(148,163,184,.15)" strokeDasharray="3 5"/><text x={L-8} y={T+innerH-t/Math.max(1,max)*innerH+4} textAnchor="end" className="aa-axis-text">{t}{suffix}</text></g>)}
     {series.map(s=>{const ps=points(s.key);const d=path(ps);const areaPath=d+' L '+(W-R)+' '+(T+innerH)+' L '+L+' '+(T+innerH)+' Z';return <g key={s.key}>{area&&<path d={areaPath} fill={s.color} opacity=".12"/>}<path d={d} fill="none" stroke={s.color} strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke"/>{ps.map((p,i)=>i===ps.length-1||i===0||i%7===0?<circle key={i} cx={p.x} cy={p.y} r="3" fill={s.color} stroke="#111827" strokeWidth="1.5"/>:null)}</g>})}
@@ -106,7 +106,7 @@ export default function AnalyticsPanel({ supabase, userId, initialTab = 'analyti
     if(quiet)setRefreshing(true);else setLoading(true);
     setError('');
     try{
-      const ids=[actor,...(selectedId&&selectedId!==actor?[selectedId]:[])];
+      const ids=[actor,...(tab==='duels'&&selectedId&&selectedId!==actor?[selectedId]:[])];
       const results=await Promise.all(ids.map(id=>supabase.rpc('get_study_analytics',{p_user_id:id})));
       if(seq!==request.current||activeUser.current!==actor)return;
       const failed=results.find(r=>r.error);
@@ -118,7 +118,7 @@ export default function AnalyticsPanel({ supabase, userId, initialTab = 'analyti
     }catch(reason){
       if(seq===request.current&&activeUser.current===actor){setSelf(null);setOpponent(null);setError(reason instanceof Error?reason.message:'Could not load study analytics. Please retry.');}
     }finally{if(seq===request.current){setLoading(false);setRefreshing(false);}}
-  },[supabase,userId,selectedId]);
+  },[supabase,userId,selectedId,tab]);
 
   useEffect(()=>{setSelf(null);setOpponent(null);setLoading(true);void loadPeople().then(()=>void load()).catch(e=>{setError(e instanceof Error?e.message:'Could not load student directory.');setLoading(false);});return()=>{request.current+=1};},[userId,loadPeople,load]);
   useEffect(()=>{void load();},[selectedId,load]);
