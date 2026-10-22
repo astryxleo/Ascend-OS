@@ -31,7 +31,7 @@ export default function SquadPanel({supabase,userId,setNotice}:Props){
   const [m,c,f]=await Promise.all([
    supabase.rpc('get_study_squad_leaderboard',{p_squad_id:selectedId}),
    supabase.rpc('get_study_squad_challenge_progress',{p_squad_id:selectedId}),
-   supabase.rpc('squad_force_snapshot',{p_squad:selectedId})
+   supabase.rpc('get_my_squad_force',{p_squad:selectedId})
   ]);
   if(m.error)setNotice('Could not load squad leaderboard: '+m.error.message);else setMembers((m.data||[]) as Member[]);
   if(c.error)setNotice('Could not load squad challenges: '+c.error.message);else setChallenges((c.data||[]) as Challenge[]);
