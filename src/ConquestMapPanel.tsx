@@ -4,7 +4,7 @@ import {Castle,Compass,Coins,RefreshCw,Shield,Skull,Swords,Zap,MapPinned,Flag,Lo
 import './conquest-map.css';
 type Territory={id:number;name:string;region:string;x:number;y:number;level:number;owner_id:string|null;owner_name:string;is_mine:boolean;is_adjacent:boolean;income:number;owner_level?:number;is_shielded?:boolean};
 type Battle={id:string;territory_id:number;territory_name:string;outcome:'captured'|'repelled';attack_score:number;defense_score:number;win_probability:number;reward_coins:number;report:any;created_at:string};
-type Payload={territories:Territory[];coins:number;fighter:any;recent:Battle[];owned_count:number;total_count:number;cooldown_until:string|null;cooldown_seconds:number;shield_level?:number;player_level?:number;player_shielded?:boolean};
+type Payload={territories:Territory[];coins:number;fighter:any;recent:Battle[];owned_count:number;total_count:number;cooldown_until:string|null;cooldown_seconds:number;shield_level?:number;player_level?:number;player_shielded?:boolean;home_x?:number;home_y?:number};
 type Props={supabase:SupabaseClient|null;setNotice:(s:string)=>void};
 const n=(v:any)=>Number(v||0).toLocaleString('en-IN');
 const clock=(seconds:number)=>{const s=Math.max(0,seconds);return [Math.floor(s/3600),Math.floor((s%3600)/60),s%60].map(v=>String(v).padStart(2,'0')).join(':');};
@@ -19,7 +19,7 @@ export default function ConquestMapPanel({supabase,setNotice}:Props){
  const onMapPointerDown=(e:React.PointerEvent<HTMLDivElement>)=>{if((e.target as HTMLElement).closest('button'))return;dragRef.current={x:e.clientX,y:e.clientY,cx:e.clientX,cy:e.clientY,px:pan.x,py:pan.y};setDragging(true);try{e.currentTarget.setPointerCapture(e.pointerId);}catch{}};
  const onMapPointerMove=(e:React.PointerEvent<HTMLDivElement>)=>{const drag=dragRef.current;if(!drag)return;drag.cx=e.clientX;drag.cy=e.clientY;const x=drag.px+e.clientX-drag.x,y=drag.py+e.clientY-drag.y;const canvas=mapRef.current?.querySelector<HTMLElement>('.cq-atlas-canvas');if(canvas)canvas.style.transform=`translate(${x}px,${y}px) scale(${zoom})`;};
  const onMapPointerUp=()=>{const drag=dragRef.current;if(drag){setPan({x:drag.px+drag.cx-drag.x,y:drag.py+drag.cy-drag.y});}dragRef.current=null;setDragging(false);if(regionTimer.current!==null)window.clearTimeout(regionTimer.current);regionTimer.current=window.setTimeout(()=>regionLoader.current(),160);};
- const load=useCallback(async()=>{if(!supabase){setLoading(false);return;}const {data,error}=await supabase.rpc('get_conquest_map');if(error){setNotice('Conquest map could not load: '+error.message);setLoading(false);return;}setData(data as Payload);setCooldownSeconds(Number((data as Payload).cooldown_seconds||0));setLoading(false);},[supabase,setNotice]);
+ const load=useCallback(async()=>{if(!supabase){setLoading(false);return;}const {data,error}=await supabase.rpc('get_conquest_map_overview');if(error){setNotice('Conquest map could not load. Try syncing the map.');setLoading(false);return;}setData({...data,territories:[]} as Payload);setCooldownSeconds(Number((data as Payload).cooldown_seconds||0));setLoading(false);},[supabase,setNotice]);
  useEffect(()=>{void load();},[load]);
  useEffect(()=>{if(cooldownSeconds<=0)return;const id=window.setInterval(()=>setCooldownSeconds(v=>Math.max(0,v-1)),1000);return()=>window.clearInterval(id);},[cooldownSeconds>0]);
  useEffect(()=>{const el=mapRef.current;if(!el)return;const wheel=(event:WheelEvent)=>{event.preventDefault();event.stopPropagation();setZoom(v=>Math.max(.35,Math.min(3.2,Number((v+(event.deltaY<0?.12:-.12)).toFixed(2)))));if(regionTimer.current!==null)window.clearTimeout(regionTimer.current);regionTimer.current=window.setTimeout(()=>regionLoader.current(),240);};el.addEventListener('wheel',wheel,{passive:false});return()=>{el.removeEventListener('wheel',wheel);if(regionTimer.current!==null)window.clearTimeout(regionTimer.current);};},[loading]);
@@ -27,8 +27,8 @@ export default function ConquestMapPanel({supabase,setNotice}:Props){
  const mapTerritories=data?.territories||[];
  const sortedX=mapTerritories.map(t=>t.x).sort((a,b)=>a-b);
  const sortedY=mapTerritories.map(t=>t.y).sort((a,b)=>a-b);
- const centerX=sortedX.length?sortedX[Math.floor(sortedX.length/2)]:250;
- const centerY=sortedY.length?sortedY[Math.floor(sortedY.length/2)]:200;
+ const centerX=sortedX.length?sortedX[Math.floor(sortedX.length/2)]:(data?.home_x??250);
+ const centerY=sortedY.length?sortedY[Math.floor(sortedY.length/2)]:(data?.home_y??200);
  const mapX=(t:Territory)=>t.x*4;
  const mapY=(t:Territory)=>t.y*4;
  const loadRegion=useCallback(async()=>{
@@ -36,7 +36,7 @@ export default function ConquestMapPanel({supabase,setNotice}:Props){
    if(!supabase||!el)return;
    const cx=Math.max(0,Math.min(499,Math.round((1000-pan.x/zoom)/4)));
    const cy=Math.max(0,Math.min(399,Math.round((800-pan.y/zoom)/4)));
-   const radius=Math.max(18,Math.min(150,Math.ceil(Math.max(el.clientWidth,el.clientHeight)/(8*zoom))+8));
+   const radius=Math.max(12,Math.min(45,Math.ceil(Math.max(el.clientWidth,el.clientHeight)/(24*zoom))+5));
    const {data:region,error}=await supabase.rpc('get_conquest_map_region',{p_center_x:cx,p_center_y:cy,p_radius:radius});
    if(error){setNotice('Unable to chart this map region. Try syncing the map.');return;}
    if(Array.isArray(region)){
