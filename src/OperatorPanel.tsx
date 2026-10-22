@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { Activity, RefreshCw, Search, Send, ShieldCheck, Wallet, Users } from 'lucide-react';
+import { Activity, RefreshCw, Search, Send, ShieldCheck, Wallet, Users, MessageSquareText, CheckCircle2, Clock3, Bell } from 'lucide-react';
 
 type UserRow = {
   user_id: string;
@@ -15,6 +15,7 @@ type UserRow = {
   completed_steps: number;
 };
 type Stats = Record<string, number>;
+type ContactRequest={id:string;user_id:string;user_email:string;category:string;subject:string;message:string;status:string;operator_remark:string;created_at:string;updated_at:string};
 type WalletTransaction = { id: string; user_id: string; username: string | null; full_name: string | null; currency: string; amount: number; reason: string; source: string; created_by: string | null; created_at: string };
 type Broadcast = {
   id: string;
@@ -52,6 +53,11 @@ export default function OperatorPanel({
   const [walletTransactions, setWalletTransactions] = useState<WalletTransaction[]>([]);
   const [walletAuditError, setWalletAuditError] = useState('');
   const [walletAuditQuery, setWalletAuditQuery] = useState('');
+  const [contactRequests,setContactRequests]=useState<ContactRequest[]>([]);
+  const [contactFilter,setContactFilter]=useState('all');
+  const [readRequest,setReadRequest]=useState<Record<string,boolean>>({});
+  const [remarks,setRemarks]=useState<Record<string,string>>({});
+  const [requestBusy,setRequestBusy]=useState('');
   const usersRequestId = useRef(0);
   const dashboardRequestId = useRef(0);
   const walletAuditRequestId = useRef(0);
@@ -261,11 +267,15 @@ export default function OperatorPanel({
     finally { if (request === walletAuditRequestId.current) setBusy(false); }
   }
   useEffect(() => { if (tab === 'Wallet audit') void loadWalletAudit(); else walletAuditRequestId.current += 1; }, [tab, supabase]);
+  const loadContactRequests=async()=>{if(!supabase)return;const {data,error}=await supabase.from('operator_contact_requests').select('*').order('created_at',{ascending:false}).limit(100);if(error){setNotice('Contact requests failed to load: '+error.message);return;}setContactRequests((data||[]) as ContactRequest[]);};
+  useEffect(()=>{if(tab!=='Contact requests'||!supabase)return;void loadContactRequests();const ch=supabase.channel('operator-contact-inbox').on('postgres_changes',{event:'*',schema:'public',table:'operator_contact_requests'},()=>void loadContactRequests()).subscribe();return()=>{void supabase.removeChannel(ch)};},[tab,supabase]);
+  async function updateContactRequest(row:ContactRequest,status:string){if(!supabase||requestBusy)return;if(!readRequest[row.id]){setNotice('Read the complete request card and confirm before changing its status.');return;}setRequestBusy(row.id);const remark=remarks[row.id]??row.operator_remark??'';const {error}=await supabase.rpc('operator_manage_contact_request',{p_request_id:row.id,p_status:status,p_remark:remark,p_read_confirmed:true});if(error)setNotice('Could not update request: '+error.message);else{setNotice('Request status updated. The user has been notified.');await loadContactRequests();}setRequestBusy('');}
+  const filteredContactRequests=contactRequests.filter(r=>contactFilter==='all'||r.status===contactFilter);
   const visibleWalletTransactions = walletTransactions.filter(row => {
     return [row.reason, row.source, row.currency, row.user_id, row.username ?? '', row.full_name ?? ''].join(' ').toLowerCase().includes(walletAuditQuery.toLowerCase());
   });
 
-  const tabs = ['Overview', 'Users', 'Wallet', 'Wallet audit', 'Broadcasts'];
+  const tabs = ['Overview', 'Users', 'Wallet', 'Wallet audit', 'Broadcasts', 'Contact requests'];
 
   return (
     <section className="panel operator-panel">
@@ -382,6 +392,22 @@ export default function OperatorPanel({
             {!busy && !walletAuditError && visibleWalletTransactions.length === 0 && <p className="operator-help">No transactions match this filter.</p>}
           </div>
         </>
+      )}
+
+      {tab === 'Contact requests' && (
+        <section className="operator-contact-inbox">
+          <div className="operator-warning"><MessageSquareText size={18}/><div><b>Direct Operator inbox · {contactRequests.filter(r=>r.status==='awaiting').length} awaiting</b><span>Read the entire request, then confirm you have read it before changing its status. Status changes notify the requester in real time.</span></div><button type="button" onClick={()=>void loadContactRequests()}><RefreshCw size={14}/> Refresh</button></div>
+          <div className="operator-contact-filters">{[{v:'all',l:'All requests'},{v:'awaiting',l:'Awaiting'},{v:'accepted',l:'Accepted'},{v:'in_progress',l:'In progress'},{v:'rejected',l:'Rejected'},{v:'resolved',l:'Resolved'}].map(x=><button type="button" key={x.v} className={contactFilter===x.v?'selected':''} onClick={()=>setContactFilter(x.v)}>{x.l}</button>)}</div>
+          <div className="operator-contact-list">{filteredContactRequests.map(row=><article className="operator-contact-card" key={row.id}>
+            <div className="operator-contact-card-head"><span className={'operator-contact-status status-'+row.status}>{row.status.replaceAll('_',' ')}</span><time>{new Date(row.created_at).toLocaleString()}</time></div>
+            <h3>{row.subject}</h3><div className="operator-contact-meta"><span>{row.category}</span><span>{row.user_email||row.user_id}</span><span>Ref · {row.id.slice(0,8).toUpperCase()}</span></div>
+            <div className="operator-contact-message"><b>Full message</b><p>{row.message}</p></div>
+            <label className="operator-contact-remark">Operator remark / reply<textarea rows={3} maxLength={4000} value={remarks[row.id]??row.operator_remark??''} onChange={e=>setRemarks(v=>({...v,[row.id]:e.target.value}))} placeholder="Write a clear reply. It will appear in the user's request tracker and notification…"/></label>
+            <label className="operator-contact-read"><input type="checkbox" checked={!!readRequest[row.id]} onChange={e=>setReadRequest(v=>({...v,[row.id]:e.target.checked}))}/> I have read the complete request and understand what the user is asking.</label>
+            <div className="operator-contact-actions"><button disabled={!readRequest[row.id]||!!requestBusy} onClick={()=>void updateContactRequest(row,'accepted')}><CheckCircle2 size={14}/> Accept</button><button disabled={!readRequest[row.id]||!!requestBusy} onClick={()=>void updateContactRequest(row,'in_progress')}><Clock3 size={14}/> In progress</button><button disabled={!readRequest[row.id]||!!requestBusy} onClick={()=>void updateContactRequest(row,'rejected')}>Reject</button><button disabled={!readRequest[row.id]||!!requestBusy} onClick={()=>void updateContactRequest(row,'resolved')}>Resolve</button>{requestBusy===row.id&&<span>Saving…</span>}</div>
+            <small className="operator-contact-updated">Last updated {new Date(row.updated_at).toLocaleString()} · Current status: {row.status.replaceAll('_',' ')}</small>
+          </article>)}{!filteredContactRequests.length&&<p className="operator-help">No requests in this view. New user messages will appear here live.</p>}</div>
+        </section>
       )}
 
       {tab === 'Broadcasts' && (
