@@ -1,3 +1,4 @@
+import './squads.css';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { Users, Plus, KeyRound, Copy, Crown, Shield, Trophy, Target, Clock3, CheckCircle2, LogOut, RefreshCw, Swords, Sparkles } from 'lucide-react';
