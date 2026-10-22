@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { Activity, Award, BarChart3, CalendarDays, CheckCircle2, Clock3, Flame, RefreshCw, Search, ShieldCheck, Swords, Target, TrendingUp, Trophy, Users, X } from 'lucide-react';
+import { Activity, Award, BarChart3, CheckCircle2, RefreshCw, Search, ShieldCheck, Swords, TrendingUp, Trophy, Users } from 'lucide-react';
 
 type Person = { id: string; username: string | null; full_name: string | null; avatar_url: string | null };
 type DayFocus = { date: string; minutes: number; hours: number };
@@ -30,7 +30,7 @@ const shortHours = (n: number) => Number(n || 0).toLocaleString(undefined, { max
 const safeArray = <T,>(value: unknown): T[] => Array.isArray(value) ? value as T[] : [];
 const niceName = (p: Person) => p.full_name?.trim() || p.username || 'Student';
 
-function Card({ eyebrow, title, children, className = '' }: { eyebrow: string; title: string; children: React.ReactNode; className?: string }) {
+function Card({ eyebrow, title, children, className = '' }: { eyebrow: string; title: string; children: ReactNode; className?: string }) {
   return <section className={'aa-card ' + className}><div className="aa-card-heading"><div><span className="aa-eyebrow">{eyebrow}</span><h3>{title}</h3></div></div>{children}</section>;
 }
 function Metric({ icon: Icon, label, value, hint, tone = 'red' }: { icon: typeof TrendingUp; label: string; value: string; hint: string; tone?: string }) {
@@ -75,7 +75,7 @@ function CompareBars({ you, them }: { you: Analytics; them: Analytics }) {
   return <div className="aa-compare-bars">{rows.map(([label,left,right,unit])=><div className="aa-compare-row" key={label}><b className="aa-compare-value red">{shortHours(left)}{unit}</b><div className="aa-compare-center"><span>{label}</span><div className="aa-duel-tracks"><i style={{width:pct(left/Math.max(left,right,1)*100)+'%',background:RED}}/><i style={{width:pct(right/Math.max(left,right,1)*100)+'%',background:CYAN}}/></div></div><b className="aa-compare-value cyan">{shortHours(right)}{unit}</b></div>)}</div>;
 }
 function ExamScore({ data, color }: { data: Analytics; color: string }) {
-  return <article className="aa-exam-score" style={{'--user-accent':color} as React.CSSProperties}><div className="aa-exam-user"><span className="aa-avatar" style={{borderColor:color}}>{data.avatar_url?<img src={data.avatar_url} alt=""/>:data.name.slice(0,1).toUpperCase()}</span><b>{data.name}</b></div><strong>{shortHours(data.average_score)}<small>%</small></strong><span>Average score</span><div className="aa-exam-foot"><span><b>{data.exams_taken}</b> exams taken</span><span><b>{data.top_subject?.score ?? '—'}{data.top_subject?'%':''}</b> top score</span></div><small className="aa-top-subject">{data.top_subject?.subject || 'No marked exams yet'}</small></article>;
+  return <article className="aa-exam-score" style={{'--user-accent':color} as CSSProperties}><div className="aa-exam-user"><span className="aa-avatar" style={{borderColor:color}}>{data.avatar_url?<img src={data.avatar_url} alt=""/>:data.name.slice(0,1).toUpperCase()}</span><b>{data.name}</b></div><strong>{shortHours(data.average_score)}<small>%</small></strong><span>Average score</span><div className="aa-exam-foot"><span><b>{data.exams_taken}</b> exams taken</span><span><b>{data.top_subject?.score ?? '—'}{data.top_subject?'%':''}</b> top score</span></div><small className="aa-top-subject">{data.top_subject?.subject || 'No marked exams yet'}</small></article>;
 }
 export default function AnalyticsPanel({ supabase, userId, initialTab = 'analytics' }: Props) {
   const [tab,setTab]=useState<'analytics'|'duels'>(initialTab);
