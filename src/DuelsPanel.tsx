@@ -8,12 +8,12 @@ type Duel = {
   starts_at: string|null; ends_at: string|null; challenger_minutes: number;
   opponent_minutes: number; winner_id: string|null; created_at: string;
 };
-type Person = { id: string; username: string|null; full_name: string|null; avatar_url: string|null };
+type Person = { id: string; username: string|null; full_name: string|null; avatar_url: string|null };\ntype CombatStat = { user_id:string; level:number; rating:number; wins:number; losses:number };
 type Props = { supabase: SupabaseClient|null; userId: string; setNotice: (message: string) => void };
 
 export default function DuelsPanel({supabase,userId,setNotice}:Props) {
   const [duels,setDuels] = useState<Duel[]>([]);
-  const [people,setPeople] = useState<Record<string,Person>>({});
+  const [people,setPeople] = useState<Record<string,Person>>({});\n  const [combatStats,setCombatStats] = useState<Record<string,CombatStat>>({});
   const [username,setUsername] = useState('');
   const [goal,setGoal] = useState('120');
   const [loading,setLoading] = useState(true);
@@ -27,8 +27,8 @@ export default function DuelsPanel({supabase,userId,setNotice}:Props) {
   const load = useCallback(async (quiet=false) => {
     const request = ++requestId.current;
     const actorId = userId;
-    if (loadedUserIdRef.current !== actorId) { loadedUserIdRef.current = actorId; setDuels([]); setPeople({}); }
-    if (!supabase || !actorId) { setDuels([]); setPeople({}); setError('Sign in to load study duels.'); setLoading(false); return; }
+    if (loadedUserIdRef.current !== actorId) { loadedUserIdRef.current = actorId; setDuels([]); setPeople({}); setCombatStats({}); }
+    if (!supabase || !actorId) { setDuels([]); setPeople({}); setCombatStats({}); setError('Sign in to load study duels.'); setLoading(false); return; }
     if (!quiet) setLoading(true);
     setError('');
     try {
@@ -44,11 +44,18 @@ export default function DuelsPanel({supabase,userId,setNotice}:Props) {
         if (request !== requestId.current) return;
         nextPeople = Object.fromEntries(((profiles??[]) as Person[]).map(p=>[p.id,p]));
       }
+      let nextCombat: Record<string,CombatStat> = {};
+      if (ids.length) {
+        const {data:combatRows} = await supabase.from('combat_fighters').select('user_id,level,rating,wins,losses').in('user_id',ids);
+        if (request !== requestId.current) return;
+        nextCombat = Object.fromEntries(((combatRows??[]) as CombatStat[]).map(row=>[row.user_id,row]));
+      }
       if (request !== requestId.current) return;
       setDuels(rows);
       setPeople(nextPeople);
+      setCombatStats(nextCombat);
     } catch (reason) {
-      if (request === requestId.current) { setDuels([]); setPeople({}); setError(reason instanceof Error?reason.message:'Could not load study duels. Check your connection and retry.'); }
+      if (request === requestId.current) { setDuels([]); setPeople({}); setCombatStats({}); setError(reason instanceof Error?reason.message:'Could not load study duels. Check your connection and retry.'); }
     } finally {
       if (request === requestId.current) setLoading(false);
     }
@@ -142,7 +149,7 @@ export default function DuelsPanel({supabase,userId,setNotice}:Props) {
         const progress=Math.min(100,Math.round(mine/duel.goal_minutes*100));
         return <article className="duel-card" key={duel.id}>
           <div className="duel-card-top"><span className={'duel-status '+duel.status}>{duel.status==='active'&&<span className="duel-live-dot"/>}{status}</span><span className="duel-goal"><TargetIcon/> {format(duel.goal_minutes)} goal</span></div>
-          <div className="duel-matchup"><div className="duel-person"><div className="duel-avatar">{people[duel.challenger_id]?.avatar_url?<img src={people[duel.challenger_id].avatar_url!} alt=""/>:name(duel.challenger_id).slice(0,1).toUpperCase()}</div><b>{name(duel.challenger_id)}{duel.challenger_id===userId?' · YOU':''}</b><span>{format(duel.challenger_minutes)}</span></div><div className="duel-versus"><Swords size={20}/><span>VS</span></div><div className="duel-person"><div className="duel-avatar">{people[duel.opponent_id]?.avatar_url?<img src={people[duel.opponent_id].avatar_url!} alt=""/>:name(duel.opponent_id).slice(0,1).toUpperCase()}</div><b>{name(duel.opponent_id)}{duel.opponent_id===userId?' · YOU':''}</b><span>{format(duel.opponent_minutes)}</span></div></div>
+          <div className="duel-matchup"><div className="duel-person"><div className="duel-avatar">{people[duel.challenger_id]?.avatar_url?<img src={people[duel.challenger_id].avatar_url!} alt=""/>:name(duel.challenger_id).slice(0,1).toUpperCase()}</div><b>{name(duel.challenger_id)}{duel.challenger_id===userId?' · YOU':''}</b><span>{format(duel.challenger_minutes)} focused</span><div className="duel-combat-metrics"><span>LVL <b>{combatStats[duel.challenger_id]?.level??1}</b></span><span>RATING <b>{(combatStats[duel.challenger_id]?.rating??0).toLocaleString()}</b></span><span>W <b>{combatStats[duel.challenger_id]?.wins??0}</b></span></div></div><div className="duel-versus"><Swords size={20}/><span>VS</span></div><div className="duel-person"><div className="duel-avatar">{people[duel.opponent_id]?.avatar_url?<img src={people[duel.opponent_id].avatar_url!} alt=""/>:name(duel.opponent_id).slice(0,1).toUpperCase()}</div><b>{name(duel.opponent_id)}{duel.opponent_id===userId?' · YOU':''}</b><span>{format(duel.opponent_minutes)} focused</span><div className="duel-combat-metrics"><span>LVL <b>{combatStats[duel.opponent_id]?.level??1}</b></span><span>RATING <b>{(combatStats[duel.opponent_id]?.rating??0).toLocaleString()}</b></span><span>W <b>{combatStats[duel.opponent_id]?.wins??0}</b></span></div></div></div>
           {duel.status==='active'&&<><div className="duel-progress-label"><span>Your focus time</span><b>{progress}% of goal</b></div><div className="progress-track"><div style={{width:progress+'%'}}/></div><div className="duel-time-left"><Clock3 size={13}/>{remaining(duel.ends_at)} hours remaining</div></>}
           {duel.status==='completed'&&<div className="duel-result"><Trophy size={15}/>{duel.winner_id===null?'A tie—great effort from both!':isWinner?'You won this duel!':name(duel.winner_id)+' won this duel.'}</div>}
           {duel.status==='pending'&&incoming&&<div className="duel-actions"><button className="primary-btn" onClick={()=>void respond(duel,true)} disabled={busy===duel.id}><Check size={14}/>Accept</button><button className="duel-decline" onClick={()=>void respond(duel,false)} disabled={busy===duel.id}><X size={14}/>Decline</button></div>}
