@@ -78,11 +78,24 @@ function BarGraph({ data, keys, max, ticks, suffix = '' }: { data: { label: stri
   </svg></div>;
 }
 function RadarGraph({ a, b }: { a: Subject[]; b?: Subject[] }) {
+  const [hovered,setHovered]=useState<number|null>(null);
   const W=360,H=300,cx=180,cy=145,r=92,n=6;
+  const names=['Mathematics','Physics','Chemistry','English','Computer Science','Yoga'];
   const point=(i:number,value:number,scale=100)=>{const angle=(-Math.PI/2)+i*2*Math.PI/n,rr=r*pct(value)/scale;return [cx+Math.cos(angle)*rr,cy+Math.sin(angle)*rr] as const;};
   const ring=(value:number)=>Array.from({length:n},(_,i)=>point(i,value).join(',')).join(' ');
   const poly=(items:Subject[])=>Array.from({length:n},(_,i)=>point(i,items[i]?.percent||0).join(',')).join(' ');
-  return <svg className="aa-radar" viewBox={'0 0 '+W+' '+H} role="img" aria-label="Subject mastery radar chart">{[25,50,75,100].map(v=><polygon key={v} points={ring(v)} fill="none" stroke="rgba(148,163,184,.23)" strokeWidth="1"/>)}{Array.from({length:n},(_,i)=>{const p=point(i,100);return <line key={i} x1={cx} y1={cy} x2={p[0]} y2={p[1]} stroke="rgba(148,163,184,.2)"/>})}<polygon points={poly(a)} fill={RED} fillOpacity=".22" stroke={RED} strokeWidth="2.4"/>{b&&<polygon points={poly(b)} fill={CYAN} fillOpacity=".2" stroke={CYAN} strokeWidth="2.4"/>}{Array.from({length:n},(_,i)=>{const p=point(i,119);const names=['Mathematics','Physics','Chemistry','English','Computer Sci.','Yoga'];return <text key={i} x={p[0]} y={p[1]} textAnchor={p[0]<cx-15?'end':p[0]>cx+15?'start':'middle'} className="aa-radar-label">{names[i]}</text>})}</svg>;
+  const focus=a[hovered??0];
+  const rival=b?.[hovered??0];
+  return <div className="aa-radar-interactive">
+    <svg className="aa-radar" viewBox={'0 0 '+W+' '+H} role="img" aria-label="Interactive subject mastery hexagon. Hover or tap a subject to see its mastery details.">
+      {[25,50,75,100].map(v=><polygon key={v} points={ring(v)} fill="none" stroke="rgba(148,163,184,.23)" strokeWidth="1"/>)} 
+      {Array.from({length:n},(_,i)=>{const p=point(i,100);return <line key={i} x1={cx} y1={cy} x2={p[0]} y2={p[1]} stroke="rgba(148,163,184,.2)"/>})}
+      <polygon points={poly(a)} fill={RED} fillOpacity=".22" stroke={RED} strokeWidth="2.4"/>
+      {b&&<polygon points={poly(b)} fill={CYAN} fillOpacity=".2" stroke={CYAN} strokeWidth="2.4"/>}
+      {Array.from({length:n},(_,i)=>{const p=point(i,119);const v=point(i,100);return <g key={i} className="aa-radar-axis-hit" tabIndex={0} role="button" aria-label={names[i]+': '+Math.round(a[i]?.percent||0)+'% mastery'+(b?', opponent '+Math.round(b[i]?.percent||0)+'%':'')} onMouseEnter={()=>setHovered(i)} onMouseLeave={()=>setHovered(null)} onFocus={()=>setHovered(i)} onBlur={()=>setHovered(null)} onClick={()=>setHovered(hovered===i?null:i)}><circle cx={v[0]} cy={v[1]} r="13" fill="transparent"/><circle cx={point(i,a[i]?.percent||0)[0]} cy={point(i,a[i]?.percent||0)[1]} r={hovered===i?5.5:3.5} fill={RED} stroke="#0b0c12" strokeWidth="1.5"/><text x={p[0]} y={p[1]} textAnchor={p[0]<cx-15?'end':p[0]>cx+15?'start':'middle'} className={'aa-radar-label '+(hovered===i?'radar-label-active':'')}>{names[i]}</text></g>})}
+    </svg>
+    {hovered!==null&&focus&&<div className="aa-radar-hover-card" role="status"><span className="aa-radar-hover-kicker">SUBJECT INTELLIGENCE</span><b>{focus.name||names[hovered]}</b><strong>{Math.round(focus.percent||0)}% <small>mastery</small></strong><div className="aa-radar-hover-track"><i style={{width:Math.max(0,Math.min(100,focus.percent||0))+'%'}}/></div><span>{focus.completed||0} / {focus.total||0} checkpoints complete</span>{rival&&<div className="aa-radar-rival">Opponent <b>{Math.round(rival.percent||0)}%</b></div>}</div>}
+  </div>;
 }
 function Donut({ grown, withered }: { grown: number; withered: number }) {
   const total=Math.max(1,grown+withered),r=47,c=2*Math.PI*r,grownLen=c*grown/total,witheredLen=c*withered/total;
