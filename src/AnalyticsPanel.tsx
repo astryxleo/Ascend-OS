@@ -160,7 +160,7 @@ export default function AnalyticsPanel({ supabase, userId, initialTab = 'analyti
       setCombatRanks(((data??[]) as CombatRanking[]).filter(row=>wanted.has(row.user_id)));
     });
     const channel=supabase.channel('duel-combat-'+userId+'-'+selectedId)
-      .on('postgres_changes',{event:'*',schema:'public',table:'combat_fighters'},()=>{supabase.rpc('get_ascend_rankings',{p_limit:100}).then(({data,error})=>{if(alive&&!error){const wanted=new Set([userId,selectedId]);setCombatRanks(((data??[]) as CombatRanking[]).filter(row=>wanted.has(row.user_id));}});})
+      .on('postgres_changes',{event:'*',schema:'public',table:'combat_fighters'},()=>{supabase.rpc('get_ascend_rankings',{p_limit:100}).then(({data,error})=>{if(alive&&!error){const wanted=new Set([userId,selectedId]);setCombatRanks(((data??[]) as CombatRanking[]).filter(row=>wanted.has(row.user_id)));}});})
       .on('postgres_changes',{event:'*',schema:'public',table:'combat_customizations'},()=>{supabase.rpc('get_ascend_rankings',{p_limit:100}).then(({data,error})=>{if(alive&&!error){const wanted=new Set([userId,selectedId]);setCombatRanks(((data??[]) as CombatRanking[]).filter(row=>wanted.has(row.user_id));}});})
       .subscribe();
     return()=>{alive=false;void supabase.removeChannel(channel);};
