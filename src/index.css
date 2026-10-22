@@ -168,3 +168,9 @@
 .subject-breakdown-row small{text-align:right}
 .analytics-footnote{margin:0;color:#858794;font-size:10px;line-height:1.6}
 @media(max-width:700px){.analytics-metrics{grid-template-columns:1fr}.analytics-metrics article{display:grid;grid-template-columns:1fr auto;gap:8px 12px}.analytics-metrics article>span{grid-column:1/-1}.analytics-metrics article>b{grid-column:1;grid-row:2}.analytics-metrics article>small{grid-column:2;grid-row:2;align-self:center}.analytics-metrics article>.progress-track{grid-column:1/-1}.analytics-chart-card{padding:13px}.weekly-bars{gap:5px}.weekly-bar-track{height:115px}.weekly-bars{min-height:175px}.weekly-bar-value{font-size:8px}.analytics-card-heading{align-items:flex-start}.analytics-card-heading label{flex-direction:column;align-items:flex-end;gap:4px}.subject-breakdown-row{grid-template-columns:minmax(90px,1fr) minmax(55px,1.4fr) 30px;gap:8px}}
+
+
+/* Keep the completed-session reward action on its own row; never overlap timer controls. */
+.focus-room .focus-claim{display:flex;width:fit-content;max-width:100%;margin:12px auto 0;white-space:normal;line-height:1.4;text-align:center;overflow-wrap:anywhere;position:relative;clear:both}
+.focus-room .timer-controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px}
+@media(max-width:420px){.focus-room .focus-claim{width:100%;padding:11px 12px}.focus-room .timer-controls>button{max-width:100%;white-space:normal}}
