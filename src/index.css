@@ -465,3 +465,58 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .boot-cinema-status i{display:block;width:3px;height:3px;border-radius:50%;background:#e8d5a3;box-shadow:0 0 10px rgba(232,213,163,.65)}
 .boot-cinema-status-dot{width:6px;height:6px;border-radius:50%;background:#9a83ff;box-shadow:0 0 12px rgba(154,131,255,.9);animation:boot-cinema-pulse 1.8s ease-in-out infinite}
 @keyframes boot-cinema-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
+
+
+/* Ascend OS — premium syllabus checkpoint interactions */
+.syllabus-workspace .syllabus-step-list{padding:9px 13px 12px;display:grid;gap:6px}
+.syllabus-workspace .syllabus-step{
+  position:relative;display:flex;align-items:center;gap:13px;min-height:54px;
+  padding:11px 13px;border:1px solid rgba(255,255,255,.055);border-radius:13px;
+  background:linear-gradient(115deg,rgba(255,255,255,.025),rgba(255,255,255,.008));
+  cursor:pointer;overflow:hidden;transition:transform .22s ease,border-color .22s ease,background .22s ease,box-shadow .22s ease;
+}
+.syllabus-workspace .syllabus-step::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;background:linear-gradient(100deg,rgba(255,215,0,.075),transparent 72%);transition:opacity .25s ease}
+.syllabus-workspace .syllabus-step:hover{transform:translateY(-1px);border-color:rgba(255,215,0,.32);background:linear-gradient(115deg,rgba(255,215,0,.045),rgba(255,255,255,.012));box-shadow:0 8px 24px rgba(0,0,0,.16)}
+.syllabus-workspace .syllabus-step:hover::before,.syllabus-workspace .syllabus-step.is-done::before{opacity:1}
+.syllabus-workspace .syllabus-step input[type="checkbox"]{
+  appearance:none;-webkit-appearance:none;position:relative;z-index:1;flex:0 0 25px;width:25px;height:25px;
+  margin:0;border-radius:8px;border:1.5px solid #55515e;background:linear-gradient(145deg,#17171f,#0c0c11);
+  display:grid;place-content:center;cursor:pointer;transition:background .22s ease,border-color .22s ease,box-shadow .22s ease,transform .22s ease;
+}
+.syllabus-workspace .syllabus-step input[type="checkbox"]::after{
+  content:"";width:6px;height:11px;border:solid #17120a;border-width:0 2.5px 2.5px 0;
+  transform:rotate(45deg) scale(0);transform-origin:center;margin-top:-2px;transition:transform .18s cubic-bezier(.2,.9,.25,1.4)
+}
+.syllabus-workspace .syllabus-step input[type="checkbox"]:checked{
+  background:linear-gradient(145deg,#fff0a8 0%,#f2c95d 44%,#c18a28 100%);border-color:#ffe7a0;
+  box-shadow:0 0 0 4px rgba(255,215,0,.075),0 0 20px rgba(255,198,65,.2);animation:syllabus-check-pop .32s cubic-bezier(.2,.9,.25,1.4)
+}
+.syllabus-workspace .syllabus-step input[type="checkbox"]:checked::after{transform:rotate(45deg) scale(1)}
+.syllabus-workspace .syllabus-step input[type="checkbox"]:focus-visible{outline:2px solid #ffe7a0;outline-offset:4px}
+.syllabus-workspace .syllabus-step input[type="checkbox"]:disabled{cursor:wait;opacity:.72}
+.syllabus-workspace .syllabus-step>span{position:relative;z-index:1;flex:1;min-width:0;color:#d9d6e1;font-size:12px;line-height:1.5;text-decoration:none;transition:color .22s ease}
+.syllabus-workspace .syllabus-step.is-done{border-color:rgba(255,215,0,.2);background:linear-gradient(110deg,rgba(255,215,0,.065),rgba(255,255,255,.012));box-shadow:inset 3px 0 0 rgba(255,215,0,.62)}
+.syllabus-workspace .syllabus-step.is-done>span{color:#aaa6b3;text-decoration:line-through;text-decoration-color:rgba(255,215,0,.48);text-decoration-thickness:1px}
+.syllabus-workspace .syllabus-step>small{position:relative;z-index:1;display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid rgba(255,215,0,.2);border-radius:999px;background:rgba(255,215,0,.07);color:#f4d782;font-size:8px;font-weight:800;letter-spacing:1px;white-space:nowrap}
+.syllabus-workspace .syllabus-step>small::before{content:"";width:5px;height:5px;border-radius:50%;background:#f5d36e;box-shadow:0 0 8px rgba(255,215,0,.65)}
+.syllabus-workspace .syllabus-chapter{border-color:rgba(255,255,255,.085);background:linear-gradient(145deg,rgba(20,19,27,.96),rgba(10,10,14,.96));transition:border-color .22s ease,box-shadow .22s ease}
+.syllabus-workspace .syllabus-chapter:has(.syllabus-step.is-done){border-color:rgba(255,215,0,.18)}
+.syllabus-workspace .syllabus-chapter-head{min-height:68px;padding:16px 17px}
+.syllabus-workspace .syllabus-chapter-head b{font-size:13px;letter-spacing:-.015em}
+.syllabus-workspace .chapter-progress{height:6px;background:#27232d;border:1px solid rgba(255,255,255,.035)}
+.syllabus-workspace .chapter-progress i{background:linear-gradient(90deg,#b8860b,#f3d477,#fff0b0);box-shadow:0 0 10px rgba(255,215,0,.22)}
+.syllabus-workspace .syllabus-tools>input{min-height:45px;border-radius:12px;background:rgba(12,12,17,.9);border-color:rgba(255,255,255,.1)}
+.syllabus-workspace .syllabus-filters button{border-radius:9px;transition:color .2s ease,background .2s ease,border-color .2s ease,transform .2s ease}
+.syllabus-workspace .syllabus-filters button:hover{transform:translateY(-1px)}
+.syllabus-workspace .syllabus-tile{position:relative;overflow:hidden;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
+.syllabus-workspace .syllabus-tile:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.22)}
+.syllabus-workspace .syllabus-tile.active{border-color:rgba(255,215,0,.42);box-shadow:inset 0 0 0 1px rgba(255,215,0,.08),0 0 24px rgba(255,215,0,.055)}
+@keyframes syllabus-check-pop{0%{transform:scale(.78)}65%{transform:scale(1.13)}100%{transform:scale(1)}}
+@media(max-width:600px){
+ .syllabus-workspace .syllabus-step-list{padding:8px;gap:6px}
+ .syllabus-workspace .syllabus-step{min-height:53px;padding:10px;gap:10px}
+ .syllabus-workspace .syllabus-step input[type="checkbox"]{flex-basis:24px;width:24px;height:24px}
+ .syllabus-workspace .syllabus-step>span{font-size:11px}
+ .syllabus-workspace .syllabus-step>small{padding:4px 6px;font-size:7px}
+}
+@media(prefers-reduced-motion:reduce){.syllabus-workspace .syllabus-step,.syllabus-workspace .syllabus-step input,.syllabus-workspace .syllabus-tile{animation:none!important;transition:none!important}}
