@@ -8,7 +8,8 @@ import UpdatesPanel from './UpdatesPanel';
 import LeaderboardPanel from './LeaderboardPanel';
 import AchievementsPanel from './AchievementsPanel';
 import AnalyticsPanel from './AnalyticsPanel';
-import { Activity, ArrowUpRight, Bell, BookOpen, ChartNoAxesColumn, CarFront, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, Award, Sparkles, Swords, Target, Trophy, Wallet, X } from 'lucide-react';
+import SquadPanel from './SquadPanel';
+import { Activity, ArrowUpRight, Bell, BookOpen, ChartNoAxesColumn, CarFront, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, Award, Sparkles, Swords, Target, Trophy, Wallet, Users, X } from 'lucide-react';
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
@@ -26,6 +27,7 @@ const nav = [
   {label:'Updates',icon:Bell},
   {label:'Leaderboard',icon:Trophy},
   {label:'Duels',icon:Swords},
+  {label:'Squads',icon:Users},
   {label:'Achievements',icon:Award},
   {label:'Analytics',icon:ChartNoAxesColumn},
 ];
@@ -355,6 +357,7 @@ function App() {
         {activeNav==='Updates'&&<UpdatesPanel supabase={supabase}/>}
         {activeNav==='Leaderboard'&&<LeaderboardPanel supabase={supabase} userId={session?.user.id??''}/>}
         {activeNav==='Duels'&&<AnalyticsPanel supabase={supabase} userId={session.user.id} initialTab="duels"/>}
+        {activeNav==='Squads'&&<SquadPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
         {activeNav==='Achievements'&&<AchievementsPanel supabase={supabase} userId={session.user.id}/>}
         {activeNav==='Analytics'&&<AnalyticsPanel supabase={supabase} userId={session.user.id} initialTab="analytics"/>}
         {activeNav==='Control center'&&isOperator&&<OperatorPanel supabase={supabase} setNotice={setNotice}/>}
