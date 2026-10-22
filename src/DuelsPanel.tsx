@@ -8,7 +8,8 @@ type Duel = {
   starts_at: string|null; ends_at: string|null; challenger_minutes: number;
   opponent_minutes: number; winner_id: string|null; created_at: string;
 };
-type Person = { id: string; username: string|null; full_name: string|null; avatar_url: string|null };\ntype CombatStat = { user_id:string; level:number; rating:number; wins:number; losses:number };
+type Person = { id: string; username: string|null; full_name: string|null; avatar_url: string|null };
+type CombatStat = { user_id:string; level:number; rating:number; wins:number; losses:number };
 type Props = { supabase: SupabaseClient|null; userId: string; setNotice: (message: string) => void };
 
 export default function DuelsPanel({supabase,userId,setNotice}:Props) {
