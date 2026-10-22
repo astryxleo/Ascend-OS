@@ -78,7 +78,6 @@ export default function LeaderboardPanel({supabase,userId}:Props){
   });
  },[users,category]);
  const selected=categories.find(c=>c.id===category)??categories[0];
- const MetricIcon=selected.icon;
  const myRank=sorted.findIndex(e=>e.user_id===userId)+1;
  const top=sorted.slice(0,3);
  const squadTop=[...squads].sort((a,b)=>number(b.squad_power)-number(a.squad_power)).slice(0,3);
