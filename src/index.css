@@ -675,3 +675,13 @@ input:focus,select:focus,textarea:focus{border-color:#f0c8758c!important;box-sha
  .section-heading{gap:10px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.content{animation:none!important}.panel,.primary-btn,.nav-item,.metric-card,.stat-tile,.analytics-card{transition:none!important}}
+
+
+/* Cinema intro owns the pointer until the reveal completes. */
+.boot-cinema-input-lock,.boot-cinema-input-lock *{cursor:none!important;pointer-events:none!important;-webkit-user-select:none!important;user-select:none!important}
+.boot-cinema-input-lock{position:fixed;inset:0;z-index:999999}
+.focus-float-trigger{position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;border:1px solid #3b82f65c!important;background:radial-gradient(circle at 50% 0%,#60a5fa24,transparent 75%),linear-gradient(145deg,#102447,#0b1426)!important;color:#60a5fa!important;box-shadow:0 0 0 1px #3b82f61a,0 0 28px #2563eb20;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s}
+.focus-float-trigger:hover{transform:translateY(-2px);border-color:#60a5fa!important;box-shadow:0 0 0 1px #3b82f633,0 0 34px #2563eb40}
+.focus-float-hint{font:7px 'DM Mono',monospace;letter-spacing:.11em;white-space:nowrap;color:#93c5fd}
+.focus-float-trigger:focus-visible{outline:2px solid #60a5fa;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.focus-float-trigger{transition:none}}
