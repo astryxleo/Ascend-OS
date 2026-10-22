@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent, type ChangeEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { Save, ShieldCheck, Upload, UserRound, MousePointer2, ShoppingBag, Check, Sparkles } from 'lucide-react';
+import { Save, ShieldCheck, Upload, UserRound, MousePointer2, ShoppingBag, Check, Sparkles, MessageSquareText, ArrowUpRight } from 'lucide-react';
 
 type Profile = {
   full_name?: string | null;
@@ -17,6 +17,7 @@ type Props = {
   userId: string;
   onSaved: (profile: Profile) => void;
   setNotice: (message: string) => void;
+  onContactOperator?: () => void;
 };
 
 async function compressAvatar(file: File): Promise<Blob> {
@@ -194,5 +195,6 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
       </article>)}</div>
       <div className="cursor-market-foot"><Sparkles size={15}/><span>All 21 cursor files are available to preview. Cursor 6 is your free default; every other cursor costs exactly 50,000 Ascend Coins.</span></div>
     </section>
+    <button type="button" className="settings-contact-operator" onClick={onContactOperator}><span><MessageSquareText size={19}/></span><span><b>Need a hand? Contact Operator</b><small>Send a private request, track its status, and receive a direct reply.</small></span><ArrowUpRight size={17}/></button>
   </section>;
 }
