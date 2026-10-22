@@ -39,21 +39,39 @@ function Metric({ icon: Icon, label, value, hint, tone = 'red' }: { icon: typeof
 function Legend({ items }: { items: { label: string; color: string }[] }) {
   return <div className="aa-legend">{items.map(i=><span key={i.label}><i style={{ background: i.color }}/>{i.label}</span>)}</div>;
 }
+function ChartTooltip({ x, y, title, rows }: { x:number; y:number; title:string; rows:{label:string;value:string;color:string}[] }) {
+  const w=196,h=43+rows.length*19,tx=Math.max(8,Math.min(760-w-8,x+14)),ty=Math.max(8,Math.min(238-h-8,y-h/2));
+  return <g className="aa-chart-tooltip" pointerEvents="none">
+    <rect x={tx} y={ty} width={w} height={h} rx="9" fill="#0b1220" stroke="rgba(148,163,184,.42)" strokeWidth="1" filter="drop-shadow(0 8px 15px rgba(0,0,0,.42))"/>
+    <text x={tx+12} y={ty+17} className="aa-tooltip-title">{title}</text>
+    {rows.map((r,i)=><g key={r.label}><circle cx={tx+14} cy={ty+32+i*19} r="3" fill={r.color}/><text x={tx+23} y={ty+36+i*19} className="aa-tooltip-label">{r.label}</text><text x={tx+w-11} y={ty+36+i*19} textAnchor="end" className="aa-tooltip-value">{r.value}</text></g>)}
+  </g>;
+}
 function LineGraph({ data, series, max, ticks, suffix = '', area = false }: { data: { date: string; [key: string]: string | number }[]; series: { key: string; label: string; color: string }[]; max: number; ticks: number[]; suffix?: string; area?: boolean }) {
+  const [hovered,setHovered]=useState<number|null>(null);
   const W=760,H=238,L=42,R=12,T=12,B=30,innerW=W-L-R,innerH=H-T-B;
-  const points=(key:string)=>data.map((d,i)=>({x:L+(data.length<=1?0:i/(data.length-1))*innerW,y:T+innerH-(pct(Number(d[key]||0)/Math.max(1,max)*100)/100)*innerH,value:Number(d[key]||0),label:String(d.date||'')}));
+  const xAt=(i:number)=>L+(data.length<=1?0:i/(data.length-1))*innerW;
+  const points=(key:string)=>data.map((d,i)=>({x:xAt(i),y:T+innerH-(pct(Number(d[key]||0)/Math.max(1,max)*100)/100)*innerH,value:Number(d[key]||0),label:String(d.date||'')}));
   const path=(ps:{x:number;y:number}[])=>{if(!ps.length)return '';if(ps.length===1)return 'M '+ps[0].x+','+ps[0].y;let d='M '+ps[0].x+','+ps[0].y;for(let i=1;i<ps.length-1;i++){const midX=(ps[i].x+ps[i+1].x)/2,midY=(ps[i].y+ps[i+1].y)/2;d+=' Q '+ps[i].x+','+ps[i].y+' '+midX+','+midY;}const last=ps[ps.length-1];d+=' T '+last.x+','+last.y;return d;};
+  const hoveredX=hovered===null?0:xAt(hovered),hoveredY=hovered===null?T+innerH:Math.min(...series.map(s=>points(s.key)[hovered]?.y??T+innerH));
+  const displayDate=(v:string)=>{const d=new Date(v+'T12:00:00');return Number.isNaN(d.getTime())?v:d.toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});};
   return <div className="aa-chart-scroll"><svg className="aa-chart" viewBox={'0 0 '+W+' '+H} role="img" aria-label={series.map(s=>s.label).join(' versus ')+' chart'}>
     {ticks.map(t=><g key={t}><line x1={L} x2={W-R} y1={T+innerH-t/Math.max(1,max)*innerH} y2={T+innerH-t/Math.max(1,max)*innerH} stroke="rgba(148,163,184,.15)" strokeDasharray="3 5"/><text x={L-8} y={T+innerH-t/Math.max(1,max)*innerH+4} textAnchor="end" className="aa-axis-text">{t}{suffix}</text></g>)}
-    {series.map(s=>{const ps=points(s.key);const d=path(ps);const areaPath=d+' L '+(W-R)+' '+(T+innerH)+' L '+L+' '+(T+innerH)+' Z';return <g key={s.key}>{area&&<path d={areaPath} fill={s.color} opacity=".12"/>}<path d={d} fill="none" stroke={s.color} strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke"/>{ps.map((p,i)=>i===ps.length-1||i===0||i%7===0?<circle key={i} cx={p.x} cy={p.y} r="3" fill={s.color} stroke="#111827" strokeWidth="1.5"/>:null)}</g>})}
-    {data.map((d,i)=>i%5===0||i===data.length-1?<text key={String(d.date)} x={L+(data.length<=1?0:i/(data.length-1))*innerW} y={H-8} textAnchor="middle" className="aa-axis-text">{dateLabel(String(d.date))}</text>:null)}
+    {series.map(s=>{const ps=points(s.key);const d=path(ps);const areaPath=d+' L '+(W-R)+' '+(T+innerH)+' L '+L+' '+(T+innerH)+' Z';return <g key={s.key}>{area&&<path d={areaPath} fill={s.color} opacity=".12"/>}<path d={d} fill="none" stroke={s.color} strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke"/>{ps.map((p,i)=><circle key={i} cx={p.x} cy={p.y} r={hovered===i?5:2.6} fill={s.color} stroke="#111827" strokeWidth="1.5" opacity={hovered===null||hovered===i?1:.68}/>)}</g>})}
+    {data.map((d,i)=>{const left=i===0?L:xAt(i-1)+(xAt(i)-xAt(i-1))/2,right=i===data.length-1?W-R:xAt(i)+(xAt(i+1)-xAt(i))/2;return <rect key={'hit-'+String(d.date)} x={left} y={T} width={Math.max(1,right-left)} height={innerH} fill="transparent" onMouseEnter={()=>setHovered(i)} onMouseMove={()=>setHovered(i)} onMouseLeave={()=>setHovered(null)} onFocus={()=>setHovered(i)} tabIndex={0} role="button" aria-label={displayDate(String(d.date))+': '+series.map(s=>s.label+' '+Number(d[s.key]||0)+suffix).join(', ')}/>})}
+    {data.map((d,i)=>i%5===0||i===data.length-1?<text key={String(d.date)} x={xAt(i)} y={H-8} textAnchor="middle" className="aa-axis-text">{dateLabel(String(d.date))}</text>:null)}
+    {hovered!==null&&data[hovered]&&<ChartTooltip x={hoveredX} y={hoveredY} title={displayDate(String(data[hovered].date))} rows={series.map(s=>({label:s.label,value:shortHours(Number(data[hovered!][s.key]||0))+suffix,color:s.color}))}/>}
   </svg></div>;
 }
 function BarGraph({ data, keys, max, ticks, suffix = '' }: { data: { label: string; [key: string]: string | number }[]; keys: { key: string; label: string; color: string }[]; max: number; ticks: number[]; suffix?: string; labels?: boolean }) {
+  const [hovered,setHovered]=useState<number|null>(null);
   const W=760,H=238,L=42,R=12,T=12,B=32,innerW=W-L-R,innerH=H-T-B,groupW=innerW/Math.max(1,data.length),barW=Math.min(24,groupW/(keys.length+1));
+  const xAt=(i:number)=>L+i*groupW+groupW/2;
+  const rows=hovered===null?[]:keys.map(k=>({label:k.label,value:shortHours(Number(data[hovered!]?.[k.key]||0))+suffix,color:k.color}));
   return <div className="aa-chart-scroll"><svg className="aa-chart" viewBox={'0 0 '+W+' '+H} role="img" aria-label="Bar chart">
     {ticks.map(t=><g key={t}><line x1={L} x2={W-R} y1={T+innerH-t/Math.max(1,max)*innerH} y2={T+innerH-t/Math.max(1,max)*innerH} stroke="rgba(148,163,184,.15)" strokeDasharray="3 5"/><text x={L-8} y={T+innerH-t/Math.max(1,max)*innerH+4} textAnchor="end" className="aa-axis-text">{t}{suffix}</text></g>)}
-    {data.map((d,i)=><g key={d.label}>{keys.map((k,j)=>{const v=Math.max(0,Number(d[k.key]||0)),h=v/Math.max(1,max)*innerH,x=L+i*groupW+groupW/2+(j-(keys.length-1)/2)*barW-barW/2,y=T+innerH-h;return <rect key={k.key} x={x} y={y} width={barW-3} height={h} rx="5" fill={k.color} opacity=".92"/>})}<text x={L+i*groupW+groupW/2} y={H-8} textAnchor="middle" className="aa-axis-text">{d.label}</text></g>)}
+    {data.map((d,i)=><g key={d.label}>{keys.map((k,j)=>{const v=Math.max(0,Number(d[k.key]||0)),h=v/Math.max(1,max)*innerH,x=L+i*groupW+groupW/2+(j-(keys.length-1)/2)*barW-barW/2,y=T+innerH-h;return <rect key={k.key} x={x} y={y} width={barW-3} height={h} rx="5" fill={k.color} opacity={hovered===null||hovered===i?".92":".55"}/>})}<text x={xAt(i)} y={H-8} textAnchor="middle" className="aa-axis-text">{d.label}</text><rect x={L+i*groupW} y={T} width={groupW} height={innerH} fill="transparent" onMouseEnter={()=>setHovered(i)} onMouseMove={()=>setHovered(i)} onMouseLeave={()=>setHovered(null)} onFocus={()=>setHovered(i)} tabIndex={0} role="button" aria-label={d.label+': '+keys.map(k=>k.label+' '+Number(d[k.key]||0)+suffix).join(', ')}/></g>)}
+    {hovered!==null&&data[hovered]&&<ChartTooltip x={xAt(hovered)} y={T+innerH/2} title={data[hovered].label} rows={rows}/>}
   </svg></div>;
 }
 function RadarGraph({ a, b }: { a: Subject[]; b?: Subject[] }) {
