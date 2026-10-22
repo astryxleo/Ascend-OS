@@ -15,7 +15,7 @@ export default function ConquestMapPanel({supabase,setNotice}:Props){
  const initializedView=useRef(false);
  const regionLoader=useRef<()=>void>(()=>{});
  const regionTimer=useRef<number|null>(null);
- const zoomAt=(delta:number)=>setZoom(v=>Math.max(.35,Math.min(3.2,Number((v+delta).toFixed(2)))));
+ const zoomAt=(delta:number)=>{setZoom(v=>Math.max(.35,Math.min(3.2,Number((v+delta).toFixed(2)))));if(regionTimer.current!==null)window.clearTimeout(regionTimer.current);regionTimer.current=window.setTimeout(()=>regionLoader.current(),240);};
  const onMapPointerDown=(e:React.PointerEvent<HTMLDivElement>)=>{if((e.target as HTMLElement).closest('button'))return;dragRef.current={x:e.clientX,y:e.clientY,px:pan.x,py:pan.y};setDragging(true);e.currentTarget.setPointerCapture(e.pointerId);};
  const onMapPointerMove=(e:React.PointerEvent<HTMLDivElement>)=>{if(!dragRef.current)return;setPan({x:dragRef.current.px+e.clientX-dragRef.current.x,y:dragRef.current.py+e.clientY-dragRef.current.y});};
  const onMapPointerUp=()=>{dragRef.current=null;setDragging(false);if(regionTimer.current!==null)window.clearTimeout(regionTimer.current);regionTimer.current=window.setTimeout(()=>regionLoader.current(),160);};
