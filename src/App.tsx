@@ -40,8 +40,8 @@ const nav = [
   {label:'Achievements',icon:Award},
   {label:'Analytics',icon:ChartNoAxesColumn},
   {label:'Notifications',icon:Bell},
-  {label:'Contact Operator',icon:MessageSquareText},
   {label:'Help center',icon:CircleHelp},
+  {label:'Contact Operator',icon:MessageSquareText},
 ];
 
 const routeByLabel: Record<string, string> = {
@@ -495,7 +495,7 @@ function App() {
         {activeNav==='Achievements'&&<AchievementsPanel supabase={supabase} userId={session.user.id}/>}
         {activeNav==='Analytics'&&<AnalyticsPanel supabase={supabase} userId={session.user.id} initialTab="analytics"/>}
         {activeNav==='Control center'&&isOperator&&<OperatorPanel supabase={supabase} setNotice={setNotice}/>}
-        {activeNav==='Settings'&&<SettingsPanel supabase={supabase} profile={profile} userId={session.user.id} onSaved={setProfile} setNotice={setNotice}/>}
+        {activeNav==='Settings'&&<SettingsPanel supabase={supabase} profile={profile} userId={session.user.id} onSaved={setProfile} setNotice={setNotice} onContactOperator={()=>navigate('Contact Operator')}/>}
         {activeNav==='Contact Operator'&&<ContactOperatorPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
         {activeNav==='Notifications'&&<NotificationsPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
         {activeNav==='Help center'&&<section className="panel ascend-help-center"><span className="eyebrow">ASCEND FIELD MANUAL · HELP CENTER</span><h2>Everything you need to <em>ascend.</em></h2><p className="help-lead">A practical guide to your workspace, progression, economy, combat, and getting support.</p><div className="help-guide-grid"><article><b>01 · Study workspace</b><p>Use Overview for daily progress and lifetime XP. Syllabus tracks checkpoints; Planner organizes tasks; Focus room records focused sessions; Exams & marks keeps academic results together.</p></article><article><b>02 · XP, levels & souls</b><p>XP reflects earned experience. Combat attributes use Ascend Souls; army expansion costs coins. Always review the displayed cost and next level before upgrading.</p></article><article><b>03 · Combat & conquest</b><p>Review your fighter stats, army power, territory owner, shield and cooldown before committing. A conquest attempt costs 1,000 coins when confirmed; check the battle summary and possible risk first.</p></article><article><b>04 · Squads & challenges</b><p>Open your squad dashboard for member activity, shared challenges, analytics and standings. Squad leaders should review a challenge carefully before deleting it for everyone.</p></article><article><b>05 · Cursor marketplace</b><p>Settings contains the cursor armory. Preview available designs, check your coin balance, purchase a cursor, then equip it. Cursor choice is saved to your account.</p></article><article><b>06 · Notifications</b><p>Operator decisions and important account messages appear in Notifications. New messages can trigger a live in-app alert; revisit the notification feed for the full history.</p></article><article><b>07 · Contact Operator</b><p>Submit a categorized request with a descriptive subject and detailed Markdown message. Track Awaiting, Accepted, In progress, Rejected or Resolved, and read any operator remark in the request card.</p><button onClick={()=>navigate('Contact Operator')}>Contact Operator <ArrowUpRight size={14}/></button></article><article><b>08 · Safety & account</b><p>Never share passwords or private credentials in a request. Report account-access issues promptly. Operator actions should be reviewed carefully and are recorded by the system.</p><button onClick={()=>navigate('Notifications')}>Open Notifications <ArrowUpRight size={14}/></button></article></div></section>}
