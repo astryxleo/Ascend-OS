@@ -101,6 +101,16 @@ export default function OperatorPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase]);
 
+  useEffect(() => {
+    const onRealtime = (event: Event) => {
+      const table = (event as CustomEvent<any>).detail?.table;
+      if (['profiles','wallets','wallet_transactions','broadcasts','activity_events','combat_matches','study_duels','study_squads','study_squad_members'].includes(table)) void refresh();
+    };
+    window.addEventListener('ascend:realtime', onRealtime);
+    return () => window.removeEventListener('ascend:realtime', onRealtime);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [supabase]);
+
   async function searchUsers(event: FormEvent) {
     event.preventDefault();
     if (!supabase) return;
