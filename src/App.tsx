@@ -79,6 +79,8 @@ function App() {
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
   const [mobileNav,setMobileNav] = useState(false);
+  const [operatorMode,setOperatorMode] = useState(false);
+  useEffect(() => { setOperatorMode(false); }, [session?.user.id]);
   const [focusSeconds,setFocusSeconds] = useState(25*60);
   const [focusRunning,setFocusRunning] = useState(false);
   const [focusCompleted,setFocusCompleted] = useState(false);
@@ -358,7 +360,8 @@ function App() {
   if (!session) return <AuthScreen email={email} setEmail={setEmail} password={password} setPassword={setPassword} authMode={authMode} setAuthMode={setAuthMode} signIn={signIn} busy={authBusy} message={authMessage} />;
   if (session && supabase && !profileLoaded) return <div className="boot"><div className="brand-mark">A</div><span>LOADING YOUR WORKSPACE</span></div>;
   if (session && supabase && profile && !profile.school_target) return <Onboarding supabase={supabase} profile={profile} userId={session.user.id} onSaved={(next) => { setProfile(next); setNotice('Welcome to Ascend OS. Your workspace is ready.'); }} />;
-  const isOperator = profile?.role === 'operator' || (session.user.email === 'astryxleo@gmail.com' && session.user.email_confirmed_at);
+  const canToggleOperator = session.user.email?.toLowerCase() === 'astryxleo@gmail.com' && Boolean(session.user.email_confirmed_at);
+  const isOperator = canToggleOperator ? operatorMode : profile?.role === 'operator';
   return <div className="app-shell">
     <aside className={`sidebar ${mobileNav?'sidebar-open':''}`}>
       <div className="brand"><div className="brand-mark">A</div><div><strong>ASCEND OS</strong><span>STUDY OPERATING SYSTEM</span></div><button className="icon-btn mobile-close" onClick={()=>setMobileNav(false)} aria-label="Close navigation"><X size={17}/></button></div>
@@ -371,7 +374,7 @@ function App() {
     </aside>
     {mobileNav&&<button className="scrim" onClick={()=>setMobileNav(false)} aria-label="Close menu"/>}
     <main className="main-area">
-      <header className="topbar"><div className="top-left"><button className="icon-btn menu-toggle" onClick={()=>setMobileNav(true)} aria-label="Open navigation"><Menu size={19}/></button><div className="breadcrumb">Workspace <span>/</span> <b>{activeNav}</b></div></div><div className="top-actions"><div className="status-pill"><span/> SYSTEM ONLINE</div><div className="coin-pill"><span>◈</span>{coins.toLocaleString()} <small>ASCEND</small></div><button className="icon-btn" title="Help"><CircleHelp size={17}/></button></div></header>
+      <header className="topbar"><div className="top-left"><button className="icon-btn menu-toggle" onClick={()=>setMobileNav(true)} aria-label="Open navigation"><Menu size={19}/></button><div className="breadcrumb">Workspace <span>/</span> <b>{activeNav}</b></div></div><div className="top-actions"><div className="status-pill"><span/> SYSTEM ONLINE</div><div className="coin-pill"><span>◈</span>{coins.toLocaleString()} <small>ASCEND</small></div>{canToggleOperator&&<button type="button" className="secondary-btn operator-mode-toggle" aria-pressed={operatorMode} onClick={()=>{const nextMode=!operatorMode;setOperatorMode(nextMode);navigate(nextMode?'Control center':'Overview');setNotice(nextMode?'Operator Mode enabled.':'Student Mode restored.');}} style={{display:'inline-flex',alignItems:'center',justifyContent:'center',gap:7,whiteSpace:'nowrap',padding:'9px 12px',fontSize:12}}>{operatorMode?<GraduationCap size={15}/>:<ShieldCheck size={15}/>} {operatorMode?'Student Mode':'Operator Mode'}</button>}<button className="icon-btn" title="Help"><CircleHelp size={17}/></button></div></header>
       <div className="content">
         <div className="welcome-row"><div><div className="eyebrow"><span className="eyebrow-line"/> YOUR PERSONAL COMMAND DECK</div><h1>{greeting}, <em>{(profile?.full_name||session.user.user_metadata?.full_name||'Scholar').split(' ')[0]}.</em></h1><p>Your ambition, measured in focused minutes.</p></div><div className="date-chip"><div className="date-dot"/>{new Date().toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div></div>
         {notice&&<div className="notice"><Sparkles size={15}/>{notice}<button onClick={()=>setNotice('')} aria-label="Dismiss"><X size={14}/></button></div>}
