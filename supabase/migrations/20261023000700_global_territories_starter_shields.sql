@@ -49,7 +49,7 @@ begin
  fighter:=public.combat_build_snapshot(u);
  select max(b.created_at)+interval '2 hours' into cooldown_until
  from public.conquest_battles b where b.created_at>now()-interval '2 hours' and (b.attacker_id=u or b.defender_id=u);
- cooldown_seconds:=greatest(0,ceil(extract(epoch from (coalesce(cooldown_until,now())-now())))::integer;
+ cooldown_seconds:=greatest(0,ceil(extract(epoch from (coalesce(cooldown_until,now())-now())))::integer);
  select coalesce(jsonb_agg(jsonb_build_object(
    'id',t.id,'name',t.name,'region',t.region,'x',t.x,'y',t.y,'level',t.level,'owner_id',t.owner_id,
    'owner_name',coalesce(nullif(p.username,''),nullif(p.full_name,''),'Unclaimed'),'is_mine',t.owner_id=u,
