@@ -81,6 +81,9 @@ function App() {
   const [mobileNav,setMobileNav] = useState(false);
   const [operatorMode,setOperatorMode] = useState(false);
   useEffect(() => { setOperatorMode(false); }, [session?.user.id]);
+  useEffect(() => {
+    if (activeNav === 'Control center' && !operatorMode && session?.user.email?.toLowerCase() === 'astryxleo@gmail.com') navigate('Overview');
+  }, [activeNav, operatorMode, session?.user.email]);
   const [focusSeconds,setFocusSeconds] = useState(25*60);
   const [focusRunning,setFocusRunning] = useState(false);
   const [focusCompleted,setFocusCompleted] = useState(false);
