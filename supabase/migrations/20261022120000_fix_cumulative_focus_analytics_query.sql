@@ -92,10 +92,10 @@ begin
     group by e.subject order by score desc, e.subject limit 1
   ),
   task_summary as (
-    select count(*) filter (where t.study_day >= b.today-29)::int as created_30,
-      count(*) filter (where t.study_day >= b.today-29 and t.completed)::int as completed_30,
-      count(*) filter (where t.study_day >= b.today-6)::int as created_7,
-      count(*) filter (where t.study_day >= b.today-6 and t.completed)::int as completed_7,
+    select count(*) filter (where t.study_day between b.today-29 and b.today)::int as created_30,
+      count(*) filter (where t.study_day between b.today-29 and b.today and t.completed)::int as completed_30,
+      count(*) filter (where t.study_day between b.today-6 and b.today)::int as created_7,
+      count(*) filter (where t.study_day between b.today-6 and b.today and t.completed)::int as completed_7,
       count(*) filter (where t.completed)::int as all_completed,
       count(*)::int as all_created
     from public.planner_tasks t cross join bounds b where t.user_id=p_user_id
