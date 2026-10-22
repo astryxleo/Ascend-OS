@@ -60,6 +60,10 @@ export default function OperatorPanel({
   const [readRequest,setReadRequest]=useState<Record<string,boolean>>({});
   const [remarks,setRemarks]=useState<Record<string,string>>({});
   const [requestBusy,setRequestBusy]=useState('');
+  const [notifyTarget,setNotifyTarget]=useState('');
+  const [notifyTitle,setNotifyTitle]=useState('');
+  const [notifyMessage,setNotifyMessage]=useState('');
+  const [notifyKind,setNotifyKind]=useState('operator');
   const usersRequestId = useRef(0);
   const dashboardRequestId = useRef(0);
   const walletAuditRequestId = useRef(0);
@@ -269,6 +273,7 @@ export default function OperatorPanel({
     finally { if (request === walletAuditRequestId.current) setBusy(false); }
   }
   useEffect(() => { if (tab === 'Wallet audit') void loadWalletAudit(); else walletAuditRequestId.current += 1; }, [tab, supabase]);
+  async function sendDirectNotification(event:FormEvent){event.preventDefault();if(!supabase||busy||!notifyTarget)return;setBusy(true);const {error}=await supabase.rpc('operator_send_notification',{p_user_id:notifyTarget,p_title:notifyTitle.trim(),p_message:notifyMessage.trim(),p_kind:notifyKind});if(error)setNotice('Notification could not be sent: '+error.message);else{setNotice('Notification delivered to the selected user in real time.');setNotifyTitle('');setNotifyMessage('');}setBusy(false);}
   const loadContactRequests=async()=>{if(!supabase)return;const {data,error}=await supabase.from('operator_contact_requests').select('*').order('created_at',{ascending:false}).limit(100);if(error){setNotice('Contact requests failed to load: '+error.message);return;}setContactRequests((data||[]) as ContactRequest[]);};
   useEffect(()=>{if(tab!=='Contact requests'||!supabase)return;void loadContactRequests();const ch=supabase.channel('operator-contact-inbox').on('postgres_changes',{event:'*',schema:'public',table:'operator_contact_requests'},()=>void loadContactRequests()).subscribe();return()=>{void supabase.removeChannel(ch)};},[tab,supabase]);
   async function updateContactRequest(row:ContactRequest,status:string){if(!supabase||requestBusy)return;if(!readRequest[row.id]){setNotice('Read the complete request card and confirm before changing its status.');return;}setRequestBusy(row.id);const remark=remarks[row.id]??row.operator_remark??'';const {error}=await supabase.rpc('operator_manage_contact_request',{p_request_id:row.id,p_status:status,p_remark:remark,p_read_confirmed:true});if(error)setNotice('Could not update request: '+error.message);else{setNotice('Request status updated. The user has been notified.');await loadContactRequests();}setRequestBusy('');}
@@ -277,7 +282,7 @@ export default function OperatorPanel({
     return [row.reason, row.source, row.currency, row.user_id, row.username ?? '', row.full_name ?? ''].join(' ').toLowerCase().includes(walletAuditQuery.toLowerCase());
   });
 
-  const tabs = ['Overview', 'Users', 'Wallet', 'Wallet audit', 'Broadcasts', 'Contact requests'];
+  const tabs = ['Overview', 'Users', 'Wallet', 'Wallet audit', 'Broadcasts', 'Contact requests', 'Notifications'];
 
   return (
     <section className="panel operator-panel">
@@ -409,6 +414,20 @@ export default function OperatorPanel({
             <div className="operator-contact-actions"><button disabled={!readRequest[row.id]||!!requestBusy} onClick={()=>void updateContactRequest(row,'accepted')}><CheckCircle2 size={14}/> Accept</button><button disabled={!readRequest[row.id]||!!requestBusy} onClick={()=>void updateContactRequest(row,'in_progress')}><Clock3 size={14}/> In progress</button><button disabled={!readRequest[row.id]||!!requestBusy} onClick={()=>void updateContactRequest(row,'rejected')}>Reject</button><button disabled={!readRequest[row.id]||!!requestBusy} onClick={()=>void updateContactRequest(row,'resolved')}>Resolve</button>{requestBusy===row.id&&<span>Saving…</span>}</div>
             <small className="operator-contact-updated">Last updated {new Date(row.updated_at).toLocaleString()} · Current status: {row.status.replaceAll('_',' ')}</small>
           </article>)}{!filteredContactRequests.length&&<p className="operator-help">No requests in this view. New user messages will appear here live.</p>}</div>
+        </section>
+      )}
+
+      {tab === 'Notifications' && (
+        <section className="operator-contact-inbox">
+          <div className="operator-warning"><Bell size={18}/><div><b>Direct notification terminal</b><span>Send a private in-app message to one account. The user receives a live popup and the message remains in their Notifications history.</span></div></div>
+          <form className="operator-direct-notification" onSubmit={sendDirectNotification}>
+            <label>RECIPIENT<select value={notifyTarget} onChange={e=>setNotifyTarget(e.target.value)} required><option value="">Choose a user account…</option>{users.map(user=><option key={user.user_id} value={user.user_id}>{user.full_name} · @{user.username} · {user.email}</option>)}</select></label>
+            <label>MESSAGE TYPE<select value={notifyKind} onChange={e=>setNotifyKind(e.target.value)}><option value="operator">Operator message</option><option value="info">Information</option><option value="success">Success / positive update</option><option value="warning">Important / action needed</option></select></label>
+            <label>HEADLINE<input value={notifyTitle} onChange={e=>setNotifyTitle(e.target.value)} minLength={3} maxLength={120} required placeholder="A concise notification title"/></label>
+            <label>MESSAGE <span>Markdown supported</span><textarea value={notifyMessage} onChange={e=>setNotifyMessage(e.target.value)} minLength={3} maxLength={4000} rows={7} required placeholder={'Write your message…\n\n**Important details**\n- Next step or context'}/></label>
+            <div className="operator-direct-preview"><b>LIVE MESSAGE PREVIEW</b><h3>{notifyTitle||'Your notification headline'}</h3><MarkdownMessage value={notifyMessage||'Your formatted message will appear here.'}/></div>
+            <button className="operator-primary" disabled={busy||!notifyTarget||notifyTitle.trim().length<3||notifyMessage.trim().length<3}><Send size={14}/>{busy?'Sending securely…':'Send notification'}</button>
+          </form>
         </section>
       )}
 
