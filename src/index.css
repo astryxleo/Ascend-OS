@@ -801,3 +801,121 @@ input:focus,select:focus,textarea:focus{border-color:#f0c8758c!important;box-sha
 .aa-radar-rival{display:flex;justify-content:space-between;gap:8px;border-top:1px solid #ffffff12;margin-top:9px;padding-top:8px;font-size:10px;color:#a4a8b6}
 .aa-radar-rival b{color:#83eaff}
 @media(max-width:520px){.aa-radar-hover-card{top:8px;right:8px;width:150px;padding:10px}.aa-radar-hover-card>strong{font-size:21px}}
+
+
+/* ASCEND UI OVERDRIVE — competitive surfaces, squad analytics and combat duels */
+.ascend-rankings,.squad-page,.duels-panel{isolation:isolate}
+.ascend-rankings{position:relative;overflow:hidden;border:1px solid #d9b75b2b!important;background:radial-gradient(ellipse at 95% 0%,#b58b3920,transparent 36%),linear-gradient(145deg,#111116f7,#09090df7)!important;box-shadow:0 28px 90px #0008,inset 0 1px #ffffff08}
+.ascend-rankings:before,.duels-panel:before{content:"";position:absolute;inset:0 0 auto;height:1px;background:linear-gradient(90deg,transparent,#e8c66b99,#8edfff66,transparent);pointer-events:none}
+.ascend-rank-mode{display:flex;gap:8px;margin:18px 0 14px;padding:5px;border:1px solid #ffffff12;border-radius:14px;background:#050507aa;width:max-content;max-width:100%}
+.ascend-rank-mode button{display:flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid transparent;border-radius:10px;background:transparent;color:#90909d;font-weight:800;font-size:12px;cursor:pointer;transition:all .22s ease}
+.ascend-rank-mode button:hover{color:#fff;background:#ffffff08}
+.ascend-rank-mode button.active{color:#ffe7a0;border-color:#e5c36b4d;background:linear-gradient(120deg,#b58b392c,#e7c66b12);box-shadow:inset 0 1px #fff1,0 5px 20px #c59c3512}
+.ascend-category-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:14px 0 18px}
+.ascend-category-card{min-width:0;display:flex;align-items:center;gap:10px;padding:12px;border:1px solid #ffffff10;border-radius:14px;text-align:left;background:linear-gradient(145deg,#ffffff06,#ffffff02);color:#f5f5f8;cursor:pointer;transition:transform .22s,border-color .22s,background .22s,box-shadow .22s}
+.ascend-category-card:hover{transform:translateY(-2px);border-color:#d8b65b55;background:linear-gradient(145deg,#c5a04415,#ffffff04)}
+.ascend-category-card.active{border-color:#dfbd6580;background:linear-gradient(135deg,#c5a04425,#4d3a191a);box-shadow:0 0 0 1px #dfbd6510,inset 0 1px #fff1,0 8px 25px #0003}
+.ascend-category-icon{flex:0 0 35px;width:35px;height:35px;display:grid;place-items:center;border:1px solid #dfbd6530;border-radius:11px;background:linear-gradient(145deg,#c5a04420,#ffffff03);color:#e7c66b}
+.ascend-category-copy{min-width:0;display:grid;gap:4px;flex:1}
+.ascend-category-copy b{font-size:11px;white-space:normal;line-height:1.3}
+.ascend-category-copy small{font-size:9px;color:#8d8d9b;line-height:1.35}
+.ascend-category-arrow{color:#6f6b5f;transform:rotate(45deg)}
+.ascend-category-card.active .ascend-category-arrow{color:#e7c66b;transform:rotate(90deg)}
+.ascend-you{border-color:#dfbd6545!important;background:linear-gradient(100deg,#d4ad4b15,#ffffff03)!important}
+.ascend-rank-section-heading{display:flex;justify-content:space-between;align-items:end;gap:14px;margin:22px 0 12px}
+.ascend-rank-section-heading h3{font-size:20px;margin:5px 0 0;letter-spacing:-.04em}
+.ascend-rank-section-heading>span{font-size:11px;color:#aaa8b4}
+.ascend-podium .leaderboard-podium-card{position:relative;overflow:hidden;transition:transform .24s,border-color .24s,box-shadow .24s}
+.ascend-podium .leaderboard-podium-card:hover{transform:translateY(-5px);box-shadow:0 18px 42px #0006}
+.ascend-podium .leaderboard-podium-card:after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,#ffffff07,transparent 40%);pointer-events:none}
+.ascend-rank-table{min-width:780px}
+.ascend-metric-value{color:#f2d98c;font-variant-numeric:tabular-nums}
+.ascend-squad-banner{display:flex;align-items:center;gap:16px;padding:20px;margin:16px 0;border:1px solid #8dcbff25;border-radius:18px;background:radial-gradient(ellipse at 0 50%,#287dc52b,transparent 48%),linear-gradient(120deg,#101b2b,#0b0c12)}
+.ascend-squad-banner-icon{flex:0 0 52px;width:52px;height:52px;display:grid;place-items:center;border:1px solid #7dc5ff42;border-radius:16px;background:#287dc51a;color:#8bd3ff;box-shadow:0 0 30px #287dc51c}
+.ascend-squad-banner>div:nth-child(2){flex:1}
+.ascend-squad-banner>div:nth-child(2)>span{font-size:9px;letter-spacing:.2em;color:#8bd3ff;font-weight:900}
+.ascend-squad-banner h3{margin:5px 0;font-size:21px;letter-spacing:-.04em}
+.ascend-squad-banner p{margin:0;color:#929fb3;font-size:11px;line-height:1.6}
+.ascend-squad-total{display:grid;text-align:right;gap:4px}
+.ascend-squad-total b{font-size:28px;letter-spacing:-.05em}
+.ascend-squad-total span{font-size:9px;letter-spacing:.15em;color:#8bd3ff}
+.ascend-squad-podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0 22px}
+.ascend-squad-top-card{position:relative;overflow:hidden;min-width:0;padding:20px 16px;border:1px solid #ffffff13;border-radius:19px;background:linear-gradient(145deg,#171720,#0c0c12);text-align:center;box-shadow:inset 0 1px #ffffff07;transition:transform .22s,border-color .22s}
+.ascend-squad-top-card:hover{transform:translateY(-4px);border-color:#d9b75b55}
+.ascend-squad-top-card.place-1{border-color:#e8c86b6b;background:radial-gradient(ellipse at 50% 0,#c9a34320,transparent 65%),linear-gradient(145deg,#1b1914,#0c0c12);box-shadow:0 10px 35px #c59c3510,inset 0 1px #fff2}
+.ascend-squad-place{display:flex;justify-content:center;align-items:center;gap:6px;color:#e4c66f;font-size:9px;letter-spacing:.13em;font-weight:900}
+.ascend-squad-emblem{width:54px;height:54px;display:grid;place-items:center;margin:16px auto 12px;border-radius:17px;border:1px solid #d7b45b44;background:linear-gradient(145deg,#c5a04420,#ffffff04);color:#e7c66b}
+.place-1 .ascend-squad-emblem{box-shadow:0 0 30px #c5a0441c}
+.ascend-squad-top-card h3{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0 0 7px;font-size:17px}
+.ascend-squad-top-card p{min-height:30px;margin:0 auto 13px;max-width:260px;color:#898997;font-size:10px;line-height:1.5}
+.ascend-squad-top-card>strong{display:block;font-size:26px;color:#f1d68b;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.ascend-squad-top-card>small{display:block;margin-top:3px;font-size:8px;letter-spacing:.17em;color:#888896}
+.ascend-squad-stats{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:17px;padding-top:12px;border-top:1px solid #ffffff0d}
+.ascend-squad-stats span{display:flex;align-items:center;gap:5px;font-size:10px;color:#a6a5b2}
+.ascend-squad-name-cell{display:flex;align-items:center;gap:9px}
+.ascend-squad-name-cell>span{width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:#d2ae4b15;border:1px solid #d2ae4b28;color:#e6c66f}
+.ascend-squad-name-cell>div{display:grid;gap:3px}
+.ascend-squad-name-cell b{color:#f1f0f5}
+.ascend-squad-name-cell small{font-size:8px;color:#aaa;letter-spacing:.12em}
+.squad-analytics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+.squad-analytics-feature{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;gap:7px;min-width:0;padding:16px;border:1px solid #d8b65b20;border-radius:15px;background:radial-gradient(ellipse at 100% 0,#c59c3510,transparent 60%),linear-gradient(145deg,#15151b,#0c0c11);transition:transform .22s,border-color .22s}
+.squad-analytics-feature:hover{transform:translateY(-3px);border-color:#d8b65b59}
+.squad-analytics-icon{width:31px;height:31px;display:grid;place-items:center;border-radius:10px;border:1px solid #d8b65b30;background:#d8b65b12;color:#e7c66b}
+.squad-analytics-feature>small{font-size:8px;letter-spacing:.15em;color:#9c9aa7;font-weight:900}
+.squad-analytics-feature>b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:#f3f1f7}
+.squad-analytics-feature>strong{font-size:20px;letter-spacing:-.04em;color:#f0d48a;font-variant-numeric:tabular-nums}
+.squad-analytics-feature>span:last-child{font-size:9px;color:#898895;line-height:1.4}
+.squad-activity-panel{margin-top:13px;padding:18px;border:1px solid #ffffff12;border-radius:17px;background:linear-gradient(145deg,#111116,#0b0b10)}
+.squad-activity-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.squad-activity-heading h4{margin:5px 0 0;font-size:17px}
+.squad-activity-row{display:grid;grid-template-columns:25px 32px minmax(0,1fr) auto;align-items:center;gap:11px;padding:12px 2px;border-bottom:1px solid #ffffff0b}
+.squad-activity-row:last-child{border-bottom:0}
+.squad-activity-rank{font:10px 'DM Mono',monospace;color:#d8b65b}
+.squad-activity-avatar{width:31px;height:31px;display:grid;place-items:center;overflow:hidden;border-radius:10px;background:#d8b65b15;color:#e9ce7c;font-size:10px;font-weight:900}
+.squad-activity-avatar img{width:100%;height:100%;object-fit:cover}
+.squad-activity-name{display:grid;gap:5px;min-width:0}
+.squad-activity-name>b,.squad-activity-name b{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.squad-activity-name small{font-size:9px;color:#92919e}
+.squad-activity-name i{display:block;height:4px;overflow:hidden;border-radius:99px;background:#ffffff0b}
+.squad-activity-name i em{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#b58b39,#ffe7a0,#79d9ff);box-shadow:0 0 12px #e5c36b2e;transition:width .4s ease}
+.squad-activity-row>strong{font-size:13px;color:#f0d48a;font-variant-numeric:tabular-nums}
+.squad-activity-row>strong small{display:block;margin-top:3px;font-size:7px;letter-spacing:.12em;color:#8b8997;text-align:right}
+.squad-dashboard{scroll-margin-top:25px}
+.squad-dashboard.dashboard-highlight{animation:squad-dashboard-arrive 1.3s ease}
+@keyframes squad-dashboard-arrive{0%{filter:brightness(1.8);transform:translateY(5px)}100%{filter:brightness(1);transform:translateY(0)}}
+.squad-challenge-delete{display:grid;place-items:center;width:33px;height:33px;border:1px solid #ff7c7c30;border-radius:10px;background:#ff62620b;color:#ff9696;cursor:pointer;transition:all .2s}
+.squad-challenge-delete:hover{background:#ff62621b;border-color:#ff7777a0;transform:scale(1.05)}
+.duels-panel{position:relative;overflow:hidden;border:1px solid #70bfff24!important;background:radial-gradient(ellipse at 0 0,#1c65a41c,transparent 36%),radial-gradient(ellipse at 100% 100%,#a67c3011,transparent 38%),linear-gradient(145deg,#11131b,#090a0f)!important;box-shadow:0 28px 80px #0007,inset 0 1px #ffffff08}
+.duels-panel .section-heading h2{letter-spacing:-.05em}
+.duels-intro{max-width:700px;color:#9aa5b6!important;line-height:1.75}
+.duel-create{position:relative;overflow:hidden;padding:17px;border:1px solid #72c5ff26!important;border-radius:17px!important;background:linear-gradient(115deg,#1021369c,#11131a)!important;box-shadow:inset 0 1px #ffffff08}
+.duel-create label{color:#aebdd0!important;letter-spacing:.13em}
+.duel-create input,.duel-create select{border-color:#ffffff17!important;background:#080d15!important;transition:border-color .2s,box-shadow .2s}
+.duel-create input:focus,.duel-create select:focus{border-color:#68bdff99!important;box-shadow:0 0 0 3px #38a5ff16!important;outline:none}
+.duel-create .primary-btn{background:linear-gradient(110deg,#2165c8,#399fe9)!important;box-shadow:0 8px 24px #147de12b}
+.duel-card{position:relative;overflow:hidden;border:1px solid #ffffff13!important;border-radius:19px!important;background:radial-gradient(ellipse at 50% 0,#2878ba12,transparent 58%),linear-gradient(145deg,#141720,#0a0c12)!important;box-shadow:0 12px 30px #0003,inset 0 1px #ffffff08!important;transition:transform .22s,border-color .22s,box-shadow .22s!important}
+.duel-card:hover{transform:translateY(-3px);border-color:#6fbfff4d!important;box-shadow:0 20px 45px #0005,inset 0 1px #ffffff0a!important}
+.duel-card-top{margin-bottom:18px}
+.duel-status.active{border-color:#55d8a34d!important;background:#2ac78b12!important;color:#78efbb!important}
+.duel-live-dot{box-shadow:0 0 12px #4be3a2}
+.duel-matchup{gap:12px!important}
+.duel-person{min-width:0;padding:15px 8px;border:1px solid #ffffff0b;border-radius:14px;background:#ffffff03;transition:background .2s,border-color .2s}
+.duel-person:hover{background:#ffffff07;border-color:#ffffff18}
+.duel-avatar{box-shadow:0 0 0 3px #ffffff08,0 8px 22px #0004}
+.duel-versus{position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;min-width:36px;color:#7fc9ff!important}
+.duel-versus:before,.duel-versus:after{content:"";width:25px;height:1px;background:linear-gradient(90deg,transparent,#6bbfff75,transparent)}
+.duel-combat-metrics{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin-top:9px}
+.duel-combat-metrics span{padding:5px 6px;border:1px solid #70bfff21;border-radius:7px;background:#287dc50c;color:#8b9eb5;font-size:8px;letter-spacing:.05em}
+.duel-combat-metrics b{color:#9dd9ff;font-size:9px}
+.duel-progress-label{margin-top:15px}
+.duel-card .progress-track{height:7px!important;background:#ffffff0d!important;border-radius:99px!important;overflow:hidden}
+.duel-card .progress-track>div{border-radius:99px!important;background:linear-gradient(90deg,#2165c8,#51c7ff)!important;box-shadow:0 0 16px #279eff3a}
+.duel-result{border:1px solid #e4c76b30!important;border-radius:12px;background:#d6b24a0d;color:#f0d48a!important;padding:12px!important}
+.focus-pip-card{border:1px solid #6dbdff35;background:radial-gradient(ellipse at 100% 0,#277ce72c,transparent 45%),linear-gradient(145deg,#111724,#07090f);box-shadow:inset 0 1px #ffffff10}
+.focus-pip-card button{transition:transform .18s,filter .18s}
+.focus-pip-card button:hover{filter:brightness(1.15);transform:translateY(-1px)}
+.focus-pip-card strong{font-feature-settings:"tnum";text-shadow:0 0 28px #63baff20}
+.boot-cinema-input-lock,.boot-cinema-input-lock *{cursor:none!important;pointer-events:none!important;-webkit-user-select:none!important;user-select:none!important}
+@media(max-width:1100px){.ascend-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.squad-analytics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.ascend-rank-mode{width:100%}.ascend-rank-mode button{flex:1;justify-content:center;padding:10px 8px;font-size:10px}.ascend-category-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.ascend-category-card{padding:10px;gap:8px}.ascend-category-icon{flex-basis:30px;width:30px;height:30px}.ascend-category-copy b{font-size:10px}.ascend-category-copy small{font-size:8px}.ascend-squad-banner{align-items:flex-start;padding:14px;gap:11px}.ascend-squad-banner-icon{flex-basis:40px;width:40px;height:40px}.ascend-squad-banner h3{font-size:17px}.ascend-squad-banner p{font-size:10px}.ascend-squad-total b{font-size:21px}.ascend-squad-podium{grid-template-columns:1fr;gap:9px}.ascend-squad-top-card{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:4px 10px;text-align:left;padding:12px}.ascend-squad-place{grid-column:1/-1;justify-content:flex-start}.ascend-squad-emblem{grid-row:2/5;width:40px;height:40px;margin:0;border-radius:12px}.ascend-squad-top-card h3{margin:0;grid-column:2}.ascend-squad-top-card p{grid-column:2;min-height:0;margin:0}.ascend-squad-top-card>strong{grid-column:3;grid-row:2}.ascend-squad-top-card>small{grid-column:3;grid-row:3;font-size:7px}.ascend-squad-stats{grid-column:2/-1;justify-content:flex-start;margin-top:4px;padding-top:7px}.squad-analytics-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.squad-analytics-feature{padding:12px}.squad-analytics-feature>strong{font-size:17px}.squad-activity-panel{padding:12px}.squad-activity-row{grid-template-columns:20px 28px minmax(0,1fr) auto;gap:7px}.squad-activity-avatar{width:28px;height:28px}.duel-matchup{grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr)!important;gap:6px!important}.duel-person{padding:11px 4px}.duel-combat-metrics{gap:3px}.duel-combat-metrics span{font-size:7px;padding:4px}.ascend-rank-section-heading h3{font-size:17px}}
+@media(prefers-reduced-motion:reduce){.ascend-category-card,.ascend-squad-top-card,.squad-analytics-feature,.squad-activity-name i em,.duel-card{transition:none!important;animation:none!important}}
