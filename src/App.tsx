@@ -6,7 +6,6 @@ import OperatorPanel from './OperatorPanel';
 import SettingsPanel from './SettingsPanel';
 import UpdatesPanel from './UpdatesPanel';
 import LeaderboardPanel from './LeaderboardPanel';
-import DuelsPanel from './DuelsPanel';
 import AchievementsPanel from './AchievementsPanel';
 import AnalyticsPanel from './AnalyticsPanel';
 import { Activity, ArrowUpRight, Bell, BookOpen, ChartNoAxesColumn, CarFront, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, Award, Sparkles, Swords, Target, Trophy, Wallet, X } from 'lucide-react';
@@ -355,9 +354,9 @@ function App() {
         {activeNav==='Garage'&&<Garage supabase={supabase} userId={session?.user.id??null} coins={coins} setCoins={setCoins} setNotice={setNotice}/>}
         {activeNav==='Updates'&&<UpdatesPanel supabase={supabase}/>}
         {activeNav==='Leaderboard'&&<LeaderboardPanel supabase={supabase} userId={session?.user.id??''}/>}
-        {activeNav==='Duels'&&<DuelsPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
+        {activeNav==='Duels'&&<AnalyticsPanel supabase={supabase} userId={session.user.id} initialTab="duels"/>}
         {activeNav==='Achievements'&&<AchievementsPanel supabase={supabase} userId={session.user.id}/>}
-        {activeNav==='Analytics'&&<AnalyticsPanel supabase={supabase} userId={session.user.id}/>}
+        {activeNav==='Analytics'&&<AnalyticsPanel supabase={supabase} userId={session.user.id} initialTab="analytics"/>}
         {activeNav==='Control center'&&isOperator&&<OperatorPanel supabase={supabase} setNotice={setNotice}/>}
         {activeNav==='Settings'&&<SettingsPanel supabase={supabase} profile={profile} userId={session.user.id} onSaved={setProfile} setNotice={setNotice}/>}
         <footer className="footer"><span>◈ ASCEND OS <i>STUDY OS</i></span><span>BUILT FOR THE LONG GAME <span className="footer-dot">●</span></span></footer>
