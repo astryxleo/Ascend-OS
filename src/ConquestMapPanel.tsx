@@ -13,14 +13,16 @@ export default function ConquestMapPanel({supabase,setNotice}:Props){
  const mapRef=useRef<HTMLDivElement|null>(null);
  const dragRef=useRef<{x:number;y:number;px:number;py:number}|null>(null);
  const initializedView=useRef(false);
+ const regionLoader=useRef<()=>void>(()=>{});
+ const regionTimer=useRef<number|null>(null);
  const zoomAt=(delta:number)=>setZoom(v=>Math.max(.35,Math.min(3.2,Number((v+delta).toFixed(2)))));
  const onMapPointerDown=(e:React.PointerEvent<HTMLDivElement>)=>{if((e.target as HTMLElement).closest('button'))return;dragRef.current={x:e.clientX,y:e.clientY,px:pan.x,py:pan.y};setDragging(true);e.currentTarget.setPointerCapture(e.pointerId);};
  const onMapPointerMove=(e:React.PointerEvent<HTMLDivElement>)=>{if(!dragRef.current)return;setPan({x:dragRef.current.px+e.clientX-dragRef.current.x,y:dragRef.current.py+e.clientY-dragRef.current.y});};
- const onMapPointerUp=()=>{dragRef.current=null;setDragging(false);};
+ const onMapPointerUp=()=>{dragRef.current=null;setDragging(false);if(regionTimer.current!==null)window.clearTimeout(regionTimer.current);regionTimer.current=window.setTimeout(()=>regionLoader.current(),160);};
  const load=useCallback(async()=>{if(!supabase){setLoading(false);return;}const {data,error}=await supabase.rpc('get_conquest_map');if(error){setNotice('Conquest map could not load: '+error.message);setLoading(false);return;}setData(data as Payload);setCooldownSeconds(Number((data as Payload).cooldown_seconds||0));setLoading(false);},[supabase,setNotice]);
  useEffect(()=>{void load();},[load]);
  useEffect(()=>{if(cooldownSeconds<=0)return;const id=window.setInterval(()=>setCooldownSeconds(v=>Math.max(0,v-1)),1000);return()=>window.clearInterval(id);},[cooldownSeconds>0]);
- useEffect(()=>{const el=mapRef.current;if(!el)return;const wheel=(event:WheelEvent)=>{event.preventDefault();event.stopPropagation();setZoom(v=>Math.max(.35,Math.min(3.2,Number((v+(event.deltaY<0?.12:-.12)).toFixed(2)))));};el.addEventListener('wheel',wheel,{passive:false});return()=>el.removeEventListener('wheel',wheel);},[]);
+ useEffect(()=>{const el=mapRef.current;if(!el)return;const wheel=(event:WheelEvent)=>{event.preventDefault();event.stopPropagation();setZoom(v=>Math.max(.35,Math.min(3.2,Number((v+(event.deltaY<0?.12:-.12)).toFixed(2)))));if(regionTimer.current!==null)window.clearTimeout(regionTimer.current);regionTimer.current=window.setTimeout(()=>regionLoader.current(),240);};el.addEventListener('wheel',wheel,{passive:false});return()=>{el.removeEventListener('wheel',wheel);if(regionTimer.current!==null)window.clearTimeout(regionTimer.current);};},[]);
  const chosen=data?.territories.find(t=>t.id===selected)||null;
  const mapTerritories=data?.territories||[];
  const sortedX=mapTerritories.map(t=>t.x).sort((a,b)=>a-b);
@@ -29,7 +31,21 @@ export default function ConquestMapPanel({supabase,setNotice}:Props){
  const centerY=sortedY.length?sortedY[Math.floor(sortedY.length/2)]:200;
  const mapX=(t:Territory)=>t.x*4;
  const mapY=(t:Territory)=>t.y*4;
- useEffect(()=>{if(!data||initializedView.current)return;initializedView.current=true;setPan({x:(250-centerX)*4*.82,y:(200-centerY)*4*.82});},[data,centerX,centerY]);
+ const loadRegion=useCallback(async()=>{
+   const el=mapRef.current;
+   if(!supabase||!el)return;
+   const cx=Math.max(0,Math.min(499,Math.round((1000-pan.x/zoom)/4)));
+   const cy=Math.max(0,Math.min(399,Math.round((800-pan.y/zoom)/4)));
+   const radius=Math.max(18,Math.min(150,Math.ceil(Math.max(el.clientWidth,el.clientHeight)/(8*zoom))+8));
+   const {data:region,error}=await supabase.rpc('get_conquest_map_region',{p_center_x:cx,p_center_y:cy,p_radius:radius});
+   if(error){setNotice('Unable to chart this map region. Try syncing the map.');return;}
+   if(Array.isArray(region)){
+     setData(current=>current?{...current,territories:region as Territory[]}:current);
+     setSelected(current=>current!==null&&region.some((t:any)=>t.id===current)?current:null);
+   }
+ },[supabase,pan,zoom,setNotice]);
+ useEffect(()=>{regionLoader.current=()=>{void loadRegion();};},[loadRegion]);
+ useEffect(()=>{if(!data||initializedView.current)return;initializedView.current=true;setPan({x:(250-centerX)*4*.82,y:(200-centerY)*4*.82});window.setTimeout(()=>regionLoader.current(),180);},[data,centerX,centerY]);
  const attack=async()=>{if(!supabase||!chosen||busy)return;setBusy(true);setReport(null);const {data:result,error}=await supabase.rpc('attack_conquest_territory',{p_territory_id:chosen.id});if(error)setNotice(error.message);else{setReport(result);setNotice(result?.outcome==='captured'?'Territory conquered! Coins awarded.':'Attack repelled. Battle report saved.');}await load();setBusy(false);};
  if(!supabase)return <section className="conquest"><p>Sign in to deploy your army.</p></section>;
  return <section className="conquest">
