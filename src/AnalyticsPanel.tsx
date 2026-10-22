@@ -93,7 +93,7 @@ export default function AnalyticsPanel({ supabase, userId, initialTab = 'analyti
 
   const loadPeople=useCallback(async()=>{
     if(!supabase||!userId){setOpponents([]);return;}
-    const {data,error:queryError}=await supabase.from('profiles').select('id,username,full_name,avatar_url').neq('id',userId).order('full_name',{ascending:true}).limit(200);
+    const {data,error:queryError}=await supabase.rpc('list_study_opponents');
     if(queryError)throw queryError;
     const people=(data??[]) as Person[];
     setOpponents(people);
