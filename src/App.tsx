@@ -49,12 +49,23 @@ function labelFromPath(path: string) {
 
 function studyDay() { const d = new Date(Date.now() - 4 * 60 * 60 * 1000); const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(d); const part = (type: string) => parts.find(item => item.type === type)?.value ?? ''; return `${part('year')}-${part('month')}-${part('day')}`; }
 function shiftStudyDay(day: string, amount: number) { const d = new Date(`${day}T12:00:00.000Z`); d.setUTCDate(d.getUTCDate() + amount); return d.toISOString().slice(0, 10); }
+function shouldShowBootIntro() {
+  const key = 'ascend-os:last-pagehide-at';
+  try {
+    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+    const lastClosedAt = Number(localStorage.getItem(key) || 0);
+    if (navigation?.type === 'reload') { localStorage.removeItem(key); return false; }
+    localStorage.removeItem(key);
+    return !lastClosedAt || Date.now() - lastClosedAt > 10_000;
+  } catch { return true; }
+}
+
 function App() {
   const [session,setSession] = useState<Session|null>(null);
   const activeUserIdRef = useRef<string | null>(null);
   activeUserIdRef.current = session?.user.id ?? null;
   const [authReady,setAuthReady] = useState(!supabase);
-  const [bootIntroDone,setBootIntroDone] = useState(false);
+  const [bootIntroDone,setBootIntroDone] = useState(() => !shouldShowBootIntro());
   const [authMode,setAuthMode] = useState<'login'|'signup'>('login');
   const [password,setPassword] = useState('');
   const [email,setEmail] = useState('');
@@ -101,6 +112,12 @@ function App() {
   const [newTaskOpen,setNewTaskOpen] = useState(false);
 
   useEffect(() => {
+    const key = 'ascend-os:last-pagehide-at';
+    const onPageHide = () => { try { localStorage.setItem(key, String(Date.now())); } catch { /* storage can be disabled */ } };
+    window.addEventListener('pagehide', onPageHide);
+    return () => window.removeEventListener('pagehide', onPageHide);
+  }, []);
+  useEffect(() => {
     if (!supabase) return;
     // A newer auth event must win over a slower initial session restore.
     let authEventSeen = false;
@@ -124,6 +141,26 @@ function App() {
     });
     return () => subscription.unsubscribe();
   },[]);
+  useEffect(() => {
+    if (!supabase || !session?.user.id) return;
+    const actorId = session.user.id;
+    const channel = supabase.channel('ascend-live-workspace-' + actorId)
+      .on('postgres_changes', { event: '*', schema: 'public', table: '*' }, (payload) => {
+        window.dispatchEvent(new CustomEvent('ascend:realtime', { detail: payload }));
+        const table = payload.table;
+        const row = (payload.new && Object.keys(payload.new).length ? payload.new : payload.old) as Record<string, any>;
+        if (table === 'wallets' && row.user_id === actorId && Number.isFinite(Number(row.coins))) setCoins(Number(row.coins));
+        if (table === 'planner_tasks' && row.user_id === actorId && row.study_day === activePlannerDayRef.current) {
+          void supabase.from('planner_tasks').select('*').eq('user_id', actorId).eq('study_day', activePlannerDayRef.current).order('created_at')
+            .then(({data,error})=>{if(!error&&activeUserIdRef.current===actorId&&data)setTasks(data as Task[])});
+        }
+        if (table === 'chapter_progress') void supabase.from('chapter_progress').select('*',{count:'exact',head:true}).eq('user_id',actorId).eq('completed',true)
+          .then(({count,error})=>{if(!error&&activeUserIdRef.current===actorId&&count!==null)setCompletedSteps(count)});
+        if (table === 'profiles' && row.id === actorId) void supabase.from('profiles').select('*').eq('id',actorId).maybeSingle()
+          .then(({data,error})=>{if(!error&&activeUserIdRef.current===actorId&&data)setProfile(data)});
+      }).subscribe();
+    return () => { void supabase.removeChannel(channel); };
+  }, [session?.user.id]);
   useEffect(() => {
     let cancelled = false;
     // Clear account-scoped UI immediately on sign-out or account switch. Never
