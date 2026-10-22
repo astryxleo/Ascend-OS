@@ -11,6 +11,7 @@ import AchievementsPanel from './AchievementsPanel';
 import AnalyticsPanel from './AnalyticsPanel';
 import SquadPanel from './SquadPanel';
 import CombatPanel from './CombatPanel';
+import SquadWarsPanel from './SquadWarsPanel';
 import { Activity, ArrowUpRight, Bell, BookOpen, ChartNoAxesColumn, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, Award, Sparkles, Swords, Target, Trophy, Wallet, Users, X } from 'lucide-react';
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
@@ -31,6 +32,7 @@ const nav = [
   {label:'Combat Arena',icon:Swords},
   {label:'Duels',icon:Swords},
   {label:'Squads',icon:Users},
+  {label:'Squad Wars',icon:Swords},
   {label:'Achievements',icon:Award},
   {label:'Analytics',icon:ChartNoAxesColumn},
 ];
@@ -39,7 +41,7 @@ const routeByLabel: Record<string, string> = {
   'Overview': '/', 'Syllabus': '/syllabus', 'Focus room': '/focus',
   'Planner': '/planner', 'Exams & marks': '/exams', 'Updates': '/updates',
   'Leaderboard': '/leaderboard', 'Combat Arena': '/combat', 'Duels': '/duels',
-  'Squads': '/squads', 'Achievements': '/achievements', 'Analytics': '/analytics',
+  'Squads': '/squads', 'Squad Wars': '/squad-wars', 'Achievements': '/achievements', 'Analytics': '/analytics',
   'Control center': '/operator', 'Settings': '/settings',
 };
 const labelByRoute = Object.fromEntries(Object.entries(routeByLabel).map(([label, route]) => [route, label])) as Record<string, string>;
