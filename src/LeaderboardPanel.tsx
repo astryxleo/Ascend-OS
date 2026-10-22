@@ -74,7 +74,8 @@ export default function LeaderboardPanel({supabase,userId}:Props){
   const key=categories.find(c=>c.id===category)?.metric??'power_score';
   return [...users].sort((a,b)=>{
    if(category==='overall')return number(b.power_score)+number(b.focus_minutes)+number(b.completed_steps)*20+number(b.completed_tasks)*10-number(a.power_score)-number(a.focus_minutes)-number(a.completed_steps)*20-number(a.completed_tasks)*10;
-   if(category==='wealth')return number(b.coins)+number(b.cash)-number(a.coins)-number(a.cash);\n   return number(b[key as keyof UserEntry] as number|string)-number(a[key as keyof UserEntry] as number|string);
+   if(category==='wealth')return number(b.coins)+number(b.cash)-number(a.coins)-number(a.cash);
+   return number(b[key as keyof UserEntry] as number|string)-number(a[key as keyof UserEntry] as number|string);
   });
  },[users,category]);
  const selected=categories.find(c=>c.id===category)??categories[0];
