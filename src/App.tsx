@@ -337,9 +337,11 @@ function App() {
   return <div className="app-shell">
     <aside className={`sidebar ${mobileNav?'sidebar-open':''}`}>
       <div className="brand"><div className="brand-mark">A</div><div><strong>ASCEND OS</strong><span>STUDY OPERATING SYSTEM</span></div><button className="icon-btn mobile-close" onClick={()=>setMobileNav(false)} aria-label="Close navigation"><X size={17}/></button></div>
-      <div className="workspace-label">WORKSPACE <ChevronDown size={12}/></div>
-      <div className="nav-list">{nav.map(item=><button key={item.label} className={`nav-item ${activeNav===item.label?'active':''}`} onClick={()=>{setActiveNav(item.label);setMobileNav(false);}}><item.icon size={17}/><span>{item.label}</span>{item.label==='Focus room'&&<span className="nav-dot"/>}</button>)}</div>
-      {isOperator&&<><div className="workspace-label operator-label">OPERATOR</div><button className={`nav-item ${activeNav==='Control center'?'active':''}`} onClick={()=>{setActiveNav('Control center');setMobileNav(false);}}><ShieldCheck size={17}/><span>Control center</span><span className="operator-chip">ROOT</span></button></>}
+      <div className="sidebar-navigation">
+        <div className="workspace-label">WORKSPACE <ChevronDown size={12}/></div>
+        <div className="nav-list">{nav.map(item=><button key={item.label} className={`nav-item ${activeNav===item.label?'active':''}`} onClick={()=>{setActiveNav(item.label);setMobileNav(false);}}><item.icon size={17}/><span>{item.label}</span>{item.label==='Focus room'&&<span className="nav-dot"/>}</button>)}</div>
+        {isOperator&&<><div className="workspace-label operator-label">OPERATOR</div><button className={`nav-item ${activeNav==='Control center'?'active':''}`} onClick={()=>{setActiveNav('Control center');setMobileNav(false);}}><ShieldCheck size={17}/><span>Control center</span><span className="operator-chip">ROOT</span></button></>}
+      </div>
       <div className="sidebar-bottom"><div className="streak-card"><div className="streak-icon"><Flame size={17}/></div><div><b>Build your streak</b><span>One session at a time.</span></div><ArrowUpRight size={15}/></div><button className="nav-item" onClick={()=>setActiveNav('Settings')}><Settings2 size={17}/><span>Settings</span></button><div className="user-card"><div className="avatar">{profile?.avatar_url?<img src={profile.avatar_url} alt="" />:(profile?.full_name||session.user.email||'L').slice(0,1).toUpperCase()}</div><div className="user-meta"><b>{profile?.full_name||session.user.user_metadata?.full_name||'Student'}</b><span>{isOperator?'OPERATOR ACCESS':'CLASS XII · STUDENT'}</span></div><button className="icon-btn" title="Sign out" onClick={signOut}><LogOut size={16}/></button></div></div>
     </aside>
     {mobileNav&&<button className="scrim" onClick={()=>setMobileNav(false)} aria-label="Close menu"/>}
