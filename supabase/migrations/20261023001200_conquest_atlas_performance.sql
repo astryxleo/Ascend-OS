@@ -30,7 +30,7 @@ begin
  select max(b.created_at)+interval '2 hours' into cooldown_until
  from public.conquest_battles b where b.created_at>now()-interval '2 hours'
  and (b.attacker_id=u or b.defender_id=u);
- cooldown_seconds:=greatest(0,ceil(extract(epoch from (coalesce(cooldown_until,now())-now())))::integer;
+ cooldown_seconds:=greatest(0,ceil(extract(epoch from (coalesce(cooldown_until,now())-now())))::integer);
  select coalesce(jsonb_agg(jsonb_build_object('id',b.id,'territory_id',b.territory_id,'territory_name',t.name,'outcome',b.outcome,
    'attack_score',b.attack_score,'defense_score',b.defense_score,'win_probability',b.win_probability,'reward_coins',b.reward_coins,
    'report',b.report,'created_at',b.created_at) order by b.created_at desc),'[]'::jsonb) into recent
