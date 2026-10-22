@@ -12,6 +12,7 @@ import AnalyticsPanel from './AnalyticsPanel';
 import SquadPanel from './SquadPanel';
 import CombatPanel from './CombatPanel';
 import SquadWarsPanel from './SquadWarsPanel';
+import IndividualDuelsPanel from './IndividualDuelsPanel';
 import { Activity, ArrowUpRight, Bell, BookOpen, ChartNoAxesColumn, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, Award, Sparkles, Swords, Target, Trophy, Wallet, Users, X } from 'lucide-react';
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
@@ -30,6 +31,7 @@ const nav = [
   {label:'Updates',icon:Bell},
   {label:'Leaderboard',icon:Trophy},
   {label:'Combat Arena',icon:Swords},
+  {label:'1v1 Arena',icon:Swords},
   {label:'Duels',icon:Swords},
   {label:'Squads',icon:Users},
   {label:'Squad Wars',icon:Swords},
@@ -40,7 +42,7 @@ const nav = [
 const routeByLabel: Record<string, string> = {
   'Overview': '/', 'Syllabus': '/syllabus', 'Focus room': '/focus',
   'Planner': '/planner', 'Exams & marks': '/exams', 'Updates': '/updates',
-  'Leaderboard': '/leaderboard', 'Combat Arena': '/combat', 'Duels': '/duels',
+  'Leaderboard': '/leaderboard', 'Combat Arena': '/combat', '1v1 Arena': '/1v1', 'Duels': '/duels',
   'Squads': '/squads', 'Squad Wars': '/squad-wars', 'Achievements': '/achievements', 'Analytics': '/analytics',
   'Control center': '/operator', 'Settings': '/settings',
 };
@@ -464,6 +466,7 @@ function App() {
         {activeNav==='Updates'&&<UpdatesPanel supabase={supabase}/>}
         {activeNav==='Leaderboard'&&<LeaderboardPanel supabase={supabase} userId={session?.user.id??''}/>}
         {activeNav==='Combat Arena'&&<CombatPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
+        {activeNav==='1v1 Arena'&&<IndividualDuelsPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
         {activeNav==='Duels'&&<AnalyticsPanel supabase={supabase} userId={session.user.id} initialTab="duels"/>}
         {activeNav==='Squads'&&<SquadPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
         {activeNav==='Squad Wars'&&<SquadWarsPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
