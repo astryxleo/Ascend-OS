@@ -324,3 +324,13 @@ input:focus,select:focus,textarea:focus{border-color:rgba(167,139,250,.72)!impor
 @media(max-width:600px){.ascend-hero{grid-template-columns:minmax(0,1fr);gap:0;min-height:0;padding:22px 17px 0;border-radius:18px}.ascend-hero-copy{padding-bottom:4px}.ascend-hero h2{font-size:clamp(36px,10vw,48px)}.ascend-hero-copy>p{max-width:280px}.ascend-hero-art{position:absolute;right:-31px;top:15px;width:155px;height:175px;min-height:0;opacity:.43;transform:scale(.84);transform-origin:center}.ascend-hero-art .ascend-art-caption{display:none}.ascend-core{width:100px;height:100px}.ascend-core-inner{font-size:52px}.ascend-hero-actions{margin-top:18px;position:relative;z-index:4}.ascend-cta,.ascend-ghost-cta{min-height:40px;padding:0 10px;font-size:9px}.ascend-hero-footer{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:19px -17px 0;padding:13px 14px 15px}.ascend-hero-footer>div>span{font-size:7px;letter-spacing:.045em;line-height:1.4}.ascend-hero-footer b{font-size:12px}.ascend-hero-footer b i{display:block;margin-top:2px;font-size:8px}.ascend-hero-footer .ascend-mini-track{margin-top:0}}
 @media(max-width:390px){.ascend-hero-art{right:-48px;opacity:.28}.ascend-hero-footer{gap:7px;padding-left:11px;padding-right:11px}.ascend-hero-footer>div>span{font-size:6.5px}.ascend-hero-footer b{font-size:11px}.ascend-cta,.ascend-ghost-cta{gap:6px}}
 @media(prefers-reduced-motion:reduce){.ascend-hero:after,.ascend-hero-orb,.ascend-core,.ascend-orbit,.ascend-live-label>span{animation:none!important}}
+
+
+/* Official Ascend brand asset — GitHub repository logo */
+.brand-mark{overflow:hidden;display:grid;place-items:center;padding:0;background:linear-gradient(145deg,#16131f,#08080d)}
+.brand-mark .ascend-logo-image{display:block;width:100%;height:100%;object-fit:contain;border-radius:inherit}
+.brand-mark:after{z-index:2}
+.brand.auth-brand .brand-mark{width:48px;height:48px;flex:0 0 48px}
+.boot .brand-mark{width:44px;height:44px}
+.sidebar .brand-mark{width:40px;height:40px;flex:0 0 40px}
+@media(prefers-reduced-motion:reduce){.brand-mark:after{animation:none!important}}
