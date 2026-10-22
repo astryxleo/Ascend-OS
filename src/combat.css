@@ -172,3 +172,71 @@
 .stick-svg.weapon-spear.lunge{animation:astral-thrust 1.15s ease-in-out infinite}
 .stick-svg.weapon-gauntlets.lunge{animation:rift-combo .8s ease-in-out infinite}
 @media(max-width:780px){.forge-stage .stick-svg.preview{width:92px;height:148px}.forge-mini-army .stick-svg.preview{width:38px;height:62px}}
+
+
+/* SVG fighter v2: keep armour and weapon geometry inside the SVG coordinate system. */
+.stick-svg .fighter-drawing .fighter-armor,
+.stick-svg .fighter-drawing .fighter-limbs,
+.stick-svg .fighter-drawing .fighter-head,
+.stick-svg .fighter-drawing .fighter-weapon { transition: transform .24s ease, opacity .24s ease, filter .24s ease; }
+.stick-svg .fighter-drawing .armor-plate,
+.stick-svg .fighter-drawing .shoulder-plate,
+.stick-svg .fighter-drawing .shin-plate { width:auto!important;height:auto!important;left:auto!important;top:auto!important;border:0!important;border-radius:0!important;background:none!important; }
+.stick-svg .fighter-drawing .armor-plate { stroke-width:2.2; filter:drop-shadow(0 2px 2px #0009); }
+.stick-svg.plate-light .fighter-drawing .armor-plate { opacity:.72; }
+.stick-svg.plate-ronin .fighter-drawing .armor-plate { opacity:1; }
+.stick-svg.plate-heavy .fighter-drawing .armor-plate { stroke-width:3.4; filter:drop-shadow(0 2px 3px #000); }
+.stick-svg.plate-heavy .fighter-drawing .shoulder-plate { stroke-width:2.8; }
+.stick-svg.plate-tech .fighter-drawing .armor-plate { fill:var(--fighter-core)!important; fill-opacity:.42; stroke-width:2.5; }
+.stick-svg.plate-tech .fighter-drawing .armor-detail { stroke-width:2.2; }
+.stick-svg.armor-variant-carbon_weave .fighter-drawing .armor-plate,
+.stick-svg.armor-variant-ceramic_shell .fighter-drawing .armor-plate,
+.stick-svg.armor-variant-titanium_frame .fighter-drawing .armor-plate,
+.stick-svg.armor-variant-cerberus .fighter-drawing .armor-plate,
+.stick-svg.armor-variant-aegis_prime .fighter-drawing .armor-plate,
+.stick-svg.armor-variant-vector_suit .fighter-drawing .armor-plate,
+.stick-svg.armor-variant-exoframe .fighter-drawing .armor-plate,
+.stick-svg.armor-variant-atlas_rig .fighter-drawing .armor-plate,
+.stick-svg.armor-variant-imperial_frame .fighter-drawing .armor-plate,
+.stick-svg.armor-variant-sovereign_plate .fighter-drawing .armor-plate { stroke-width:3; filter:drop-shadow(0 0 3px var(--fighter-glow)); }
+.stick-svg.pose-guard .fighter-drawing .fighter-limbs { transform:translate(-1px,1px) rotate(-5deg);transform-origin:50px 65px; }
+.stick-svg.pose-guard .fighter-drawing .fighter-armor { transform:translate(-1px,1px) rotate(-5deg);transform-origin:50px 55px; }
+.stick-svg.pose-guard .fighter-drawing .fighter-weapon { transform:translate(75px,45px) rotate(-8deg); }
+.stick-svg.pose-agile .fighter-drawing .fighter-limbs { transform:translate(-2px,-1px) rotate(-9deg);transform-origin:50px 65px; }
+.stick-svg.pose-agile .fighter-drawing .fighter-armor { transform:translate(-2px,-1px) rotate(-7deg);transform-origin:50px 55px; }
+.stick-svg.pose-agile .fighter-drawing .fighter-head { transform:translate(-2px,-1px) rotate(-5deg);transform-origin:50px 20px; }
+.stick-svg.pose-agile .fighter-drawing .fighter-weapon { transform:translate(75px,45px) rotate(-55deg); }
+.stick-svg.pose-power .fighter-drawing .fighter-limbs { transform:translate(1px,0) rotate(6deg) scale(1.02);transform-origin:50px 65px; }
+.stick-svg.pose-power .fighter-drawing .fighter-armor { transform:translate(1px,0) rotate(6deg) scale(1.04);transform-origin:50px 55px; }
+.stick-svg.pose-power .fighter-drawing .shoulder-plate { stroke-width:3; }
+.stick-svg.pose-power .fighter-drawing .fighter-weapon { transform:translate(75px,45px) rotate(-62deg); }
+.stick-svg.pose-ready .fighter-drawing .fighter-limbs,
+.stick-svg.pose-ready .fighter-drawing .fighter-armor,
+.stick-svg.pose-ready .fighter-drawing .fighter-head { transform:none; }
+.stick-svg.pose-ready .fighter-drawing .fighter-weapon { transform:translate(75px,45px) rotate(-28deg); }
+.stick-svg .fighter-drawing .fighter-weapon { transform-box:view-box;transform-origin:75px 45px; }
+.combat-tabs { display:flex;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:#725a36 #100e12;padding-bottom:5px; }
+.combat-tabs button { flex:0 0 auto;white-space:nowrap; }
+.army-panel { display:grid;gap:18px; }
+.army-overview { display:grid;grid-template-columns:minmax(170px,.7fr) minmax(0,1.3fr);gap:16px;align-items:stretch; }
+.army-number { padding:20px;border:1px solid #403529;border-radius:12px;background:linear-gradient(145deg,#1a1712,#0b0b0f); }
+.army-number>span { display:block;color:#b4a68f;font:9px 'DM Mono',monospace;letter-spacing:.12em; }
+.army-number>strong { display:block;margin-top:12px;color:#f2d58f;font:700 38px Inter,system-ui,sans-serif; }
+.army-number>strong small { color:#99909e;font-size:12px;font-weight:500; }
+.army-number p { margin:12px 0 0;color:#928a98;font-size:11px;line-height:1.5; }
+.army-capacity { height:7px;margin-top:12px;border-radius:99px;background:#29242d;overflow:hidden; }
+.army-capacity i { display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#a67c39,#f4d68b);transition:width .25s ease; }
+.army-formation-preview { min-height:150px;padding:16px;display:flex;align-items:flex-end;justify-content:center;align-content:center;flex-wrap:wrap;gap:4px;border:1px solid #302a35;border-radius:12px;background:radial-gradient(ellipse at 50% 100%,#d7a24d12,transparent 65%),#0b0a0f; }
+.army-formation-preview .stick.preview { position:relative;inset:auto;width:34px;height:58px;transform:scale(.62);transform-origin:50% 100%;margin:0 -6px -2px; }
+.army-formation-preview.formation-wedge .stick:nth-child(2n) { transform:translateY(4px) scale(.58); }
+.army-formation-preview.formation-v_shape .stick:nth-child(3n) { transform:translateY(-5px) scale(.62); }
+.army-formation-preview.formation-circle .stick:nth-child(odd) { transform:translateY(-5px) scale(.55); }
+.army-overflow { align-self:center;color:#f2d58f;font:700 14px 'DM Mono',monospace;padding:6px; }
+.army-actions { display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px;border:1px solid #302a35;border-radius:10px;background:#0d0c11; }
+.army-actions>span { color:#b8adbd;font:10px 'DM Mono',monospace; }
+.army-actions .combat-primary { display:flex;align-items:center;gap:10px; }
+.army-actions .combat-primary span { padding-left:9px;border-left:1px solid #70572e;white-space:nowrap; }
+.army-doctrine { gap:13px; }
+.army-doctrine>.combat-primary { justify-self:start; }
+.forge-swatches button:disabled { opacity:.42;cursor:not-allowed; }
+@media(max-width:680px) { .army-overview { grid-template-columns:1fr; } .army-actions { align-items:stretch;flex-direction:column; } .army-actions .combat-primary { justify-content:center; } .army-formation-preview { min-height:120px;padding:10px; } }
