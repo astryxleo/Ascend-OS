@@ -9,6 +9,7 @@ import LeaderboardPanel from './LeaderboardPanel';
 import AchievementsPanel from './AchievementsPanel';
 import AnalyticsPanel from './AnalyticsPanel';
 import SquadPanel from './SquadPanel';
+import CombatPanel from './CombatPanel';
 import { Activity, ArrowUpRight, Bell, BookOpen, ChartNoAxesColumn, CarFront, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, Award, Sparkles, Swords, Target, Trophy, Wallet, Users, X } from 'lucide-react';
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
@@ -26,6 +27,7 @@ const nav = [
   {label:'Garage',icon:CarFront},
   {label:'Updates',icon:Bell},
   {label:'Leaderboard',icon:Trophy},
+  {label:'Combat Arena',icon:Swords},
   {label:'Duels',icon:Swords},
   {label:'Squads',icon:Users},
   {label:'Achievements',icon:Award},
@@ -356,6 +358,7 @@ function App() {
         {activeNav==='Garage'&&<Garage supabase={supabase} userId={session?.user.id??null} coins={coins} setCoins={setCoins} setNotice={setNotice}/>}
         {activeNav==='Updates'&&<UpdatesPanel supabase={supabase}/>}
         {activeNav==='Leaderboard'&&<LeaderboardPanel supabase={supabase} userId={session?.user.id??''}/>}
+        {activeNav==='Combat Arena'&&<CombatPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
         {activeNav==='Duels'&&<AnalyticsPanel supabase={supabase} userId={session.user.id} initialTab="duels"/>}
         {activeNav==='Squads'&&<SquadPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
         {activeNav==='Achievements'&&<AchievementsPanel supabase={supabase} userId={session.user.id}/>}
