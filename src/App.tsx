@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type Dispatch, type FormEvent, type SetStateAction } from 'react';
 import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js';
 import Onboarding from './Onboarding';
-import Garage from './Garage';
 import OperatorPanel from './OperatorPanel';
 import SettingsPanel from './SettingsPanel';
 import UpdatesPanel from './UpdatesPanel';
@@ -10,7 +9,7 @@ import AchievementsPanel from './AchievementsPanel';
 import AnalyticsPanel from './AnalyticsPanel';
 import SquadPanel from './SquadPanel';
 import CombatPanel from './CombatPanel';
-import { Activity, ArrowUpRight, Bell, BookOpen, ChartNoAxesColumn, CarFront, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, Award, Sparkles, Swords, Target, Trophy, Wallet, Users, X } from 'lucide-react';
+import { Activity, ArrowUpRight, Bell, BookOpen, ChartNoAxesColumn, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, Award, Sparkles, Swords, Target, Trophy, Wallet, Users, X } from 'lucide-react';
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
@@ -24,7 +23,6 @@ const nav = [
   {label:'Focus room',icon:Focus},
   {label:'Planner',icon:Target},
   {label:'Exams & marks',icon:GraduationCap},
-  {label:'Garage',icon:CarFront},
   {label:'Updates',icon:Bell},
   {label:'Leaderboard',icon:Trophy},
   {label:'Combat Arena',icon:Swords},
@@ -355,7 +353,6 @@ function App() {
         {activeNav==='Focus room'&&<FocusRoom focusSeconds={focusSeconds} fmt={fmt} setFocusSeconds={setFocusSeconds} focusRunning={focusRunning} focusMode={focusMode} setFocusMode={setFocusMode} customFocusMinutes={customFocusMinutes} setCustomFocusMinutes={setCustomFocusMinutes} focusCompleted={focusCompleted} settleFocus={settleFocus} focusSaving={focusSaving} startFocus={startFocus} resetFocus={resetFocus} pauseFocus={pauseFocus} focusPaused={focusPaused} sessionActive={!!focusRunId}/>}
         {activeNav==='Syllabus'&&<Syllabus supabase={supabase} userId={session?.user.id??null} completedSteps={completedSteps} setCompletedSteps={setCompletedSteps} setNotice={setNotice}/>}
         {activeNav==='Exams & marks'&&<ExamCommand supabase={supabase} userId={session?.user.id??null} setNotice={setNotice}/>}
-        {activeNav==='Garage'&&<Garage supabase={supabase} userId={session?.user.id??null} coins={coins} setCoins={setCoins} setNotice={setNotice}/>}
         {activeNav==='Updates'&&<UpdatesPanel supabase={supabase}/>}
         {activeNav==='Leaderboard'&&<LeaderboardPanel supabase={supabase} userId={session?.user.id??''}/>}
         {activeNav==='Combat Arena'&&<CombatPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
