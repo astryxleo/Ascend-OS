@@ -50,3 +50,10 @@
 .cq-side{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);align-items:stretch}
 .cq-detail,.cq-report{min-height:100%}
 @media(max-width:760px){.cq-atlas-wrap{height:680px;min-height:680px}.cq-side{grid-template-columns:1fr}}
+
+
+/* Starter protection is visually distinct from a territory that can be attacked. */
+.cq-atlas-territory.shielded{border-color:#79c9ffad;background:linear-gradient(145deg,#12324bea,#101c2bec);box-shadow:inset 0 0 0 1px #7acbff18,0 0 18px #3ca8ff12}
+.cq-atlas-territory.shielded .cq-territory-mark{color:#8bd6ff;border-color:#448bbd;background:#174065}
+.cq-atlas-territory.shielded .cq-territory-owner{color:#9ad9ff}
+.cq-starter-shield{border-color:#63b9f55c!important;background:linear-gradient(135deg,#15314a,#101823)!important;color:#b9e4ff!important;line-height:1.65}
