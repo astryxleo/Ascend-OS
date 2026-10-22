@@ -71,7 +71,7 @@ function App() {
   useEffect(() => {
     const style = document.createElement('style');
     style.id = 'ascend-resizable-cursor-style';
-    style.textContent = 'html.ascend-custom-cursor, html.ascend-custom-cursor * { cursor: none !important; } #ascend-resizable-cursor { position: fixed; left: 0; top: 0; z-index: 2147483647; pointer-events: none; user-select: none; object-fit: contain; transform: translate(-2px,-2px); } @media (pointer: coarse) { #ascend-resizable-cursor { display:none !important; } html.ascend-custom-cursor, html.ascend-custom-cursor * { cursor:auto !important; } }';
+    style.textContent = 'html.ascend-custom-cursor, html.ascend-custom-cursor *, html.ascend-custom-cursor *::before, html.ascend-custom-cursor *::after, html.ascend-custom-cursor *::-webkit-scrollbar, html.ascend-custom-cursor *::-webkit-scrollbar-thumb, html.ascend-custom-cursor *::-webkit-scrollbar-track { cursor: none !important; } html.ascend-custom-cursor::-webkit-scrollbar, html.ascend-custom-cursor::-webkit-scrollbar-thumb, html.ascend-custom-cursor::-webkit-scrollbar-track { cursor: none !important; } #ascend-resizable-cursor { position: fixed; left: 0; top: 0; z-index: 2147483647; pointer-events: none; user-select: none; object-fit: contain; transform: translate(-5px,-4px); will-change: left,top; } @media (pointer: coarse) { #ascend-resizable-cursor { display:none !important; } html.ascend-custom-cursor, html.ascend-custom-cursor * { cursor:auto !important; } }';
     document.head.appendChild(style);
     const pointer = document.createElement('img');
     pointer.id = 'ascend-resizable-cursor'; pointer.alt = ''; pointer.draggable = false; pointer.style.visibility = 'hidden'; pointer.setAttribute('aria-hidden','true'); document.body.appendChild(pointer);
@@ -84,8 +84,8 @@ function App() {
     const move = (event:PointerEvent) => { pointer.style.left = event.clientX + 'px'; pointer.style.top = event.clientY + 'px'; pointer.style.visibility = 'visible'; };
     const change = (event:Event) => { const detail = (event as CustomEvent<{id:number;size:number}>).detail; if (!detail) return; try { localStorage.setItem('ascend-cursor-id',String(detail.id)); localStorage.setItem('ascend-cursor-size',String(detail.size)); } catch {} apply(detail.id,detail.size); };
     let id = 6, size = 23; try { id = Number(localStorage.getItem('ascend-cursor-id') || 6); size = Number(localStorage.getItem('ascend-cursor-size') || 23); } catch {}
-    apply(id,size); document.addEventListener('pointermove',move,{passive:true}); window.addEventListener('ascend-cursor-settings-change',change);
-    return () => { document.removeEventListener('pointermove',move); window.removeEventListener('ascend-cursor-settings-change',change); document.documentElement.classList.remove('ascend-custom-cursor'); pointer.remove(); style.remove(); };
+    apply(id,size); window.addEventListener('pointermove',move,{passive:true,capture:true}); window.addEventListener('mousemove',move,{passive:true,capture:true}); window.addEventListener('ascend-cursor-settings-change',change);
+    return () => { window.removeEventListener('pointermove',move,true); window.removeEventListener('mousemove',move,true); window.removeEventListener('ascend-cursor-settings-change',change); document.documentElement.classList.remove('ascend-custom-cursor'); pointer.remove(); style.remove(); };
   }, []);
   const [session,setSession] = useState<Session|null>(null);
   const activeUserIdRef = useRef<string | null>(null);
