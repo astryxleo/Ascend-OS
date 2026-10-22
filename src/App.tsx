@@ -15,6 +15,7 @@ import { Activity, ArrowUpRight, Bell, BookOpen, ChartNoAxesColumn, Check, Chevr
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
 const supabase: SupabaseClient | null = url && key && !key.includes('your_supabase') ? createClient(url, key) : null;
+const ascendBootVideo = new URL('../AscendBoot.mp4', import.meta.url).href;
 
 type Task = { id: string; title: string; subject: string | null; priority: 'P1'|'P2'|'P3'; estimated_minutes: number; completed: boolean; study_day: string };
 const subjects = ['Mathematics','Physics','Chemistry','English Core','Computer Science','Yoga'];
@@ -53,6 +54,7 @@ function App() {
   const activeUserIdRef = useRef<string | null>(null);
   activeUserIdRef.current = session?.user.id ?? null;
   const [authReady,setAuthReady] = useState(!supabase);
+  const [bootIntroDone,setBootIntroDone] = useState(() => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [authMode,setAuthMode] = useState<'login'|'signup'>('login');
   const [password,setPassword] = useState('');
   const [email,setEmail] = useState('');
@@ -360,6 +362,12 @@ function App() {
       if (activeUserIdRef.current === actorId) setFocusSaving(false);
     }
   }
+  if (!bootIntroDone) return <div className="boot-cinema" role="status" aria-label="Loading Ascend OS">
+    <video className="boot-cinema-video" src={ascendBootVideo} autoPlay muted playsInline preload="auto" aria-hidden="true" onEnded={() => setBootIntroDone(true)} onError={() => setBootIntroDone(true)} />
+    <div className="boot-cinema-vignette" />
+    <div className="boot-cinema-status"><span className="boot-cinema-status-dot" /> ASCEND OS <i /> INITIALIZING</div>
+    <button type="button" className="boot-cinema-skip" onClick={() => setBootIntroDone(true)}>SKIP INTRO <span>↗</span></button>
+  </div>;
   if (!authReady) return <div className="boot"><div className="brand-mark"><img className="ascend-logo-image" src={ascendLogo} alt="Ascend OS logo" /></div><span>INITIALIZING ASCEND OS</span></div>;
   if (!session) return <AuthScreen email={email} setEmail={setEmail} password={password} setPassword={setPassword} authMode={authMode} setAuthMode={setAuthMode} signIn={signIn} busy={authBusy} message={authMessage} />;
   if (session && supabase && !profileLoaded) return <div className="boot"><div className="brand-mark"><img className="ascend-logo-image" src={ascendLogo} alt="Ascend OS logo" /></div><span>LOADING YOUR WORKSPACE</span></div>;
