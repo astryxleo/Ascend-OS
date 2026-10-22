@@ -49,13 +49,13 @@ export default function ConquestMapPanel({supabase,setNotice}:Props){
  const sortedY=mapTerritories.map(t=>t.y).sort((a,b)=>a-b);
  const centerX=sortedX.length?sortedX[Math.floor(sortedX.length/2)]:(data?.home_x??250);
  const centerY=sortedY.length?sortedY[Math.floor(sortedY.length/2)]:(data?.home_y??200);
- const mapX=(t:Territory)=>t.x*4;
- const mapY=(t:Territory)=>t.y*4;
+ const mapX=(t:Territory)=>t.x*24;
+ const mapY=(t:Territory)=>t.y*24;
  const loadRegion=useCallback(async()=>{
    const el=mapRef.current;
    if(!supabase||!el)return;
-   const cx=Math.max(0,Math.min(499,Math.round((1000-pan.x/zoom)/4)));
-   const cy=Math.max(0,Math.min(399,Math.round((800-pan.y/zoom)/4)));
+   const cx=Math.max(0,Math.min(499,Math.round((6000-pan.x/zoom)/24)));
+   const cy=Math.max(0,Math.min(399,Math.round((4800-pan.y/zoom)/24)));
    const radius=Math.max(12,Math.min(45,Math.ceil(Math.max(el.clientWidth,el.clientHeight)/(24*zoom))+5));
    const {data:region,error}=await supabase.rpc('get_conquest_map_region',{p_center_x:cx,p_center_y:cy,p_radius:radius});
    if(error){setNotice('Unable to chart this map region. Try syncing the map.');return;}
