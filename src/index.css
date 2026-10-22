@@ -1069,3 +1069,11 @@ input:focus,select:focus,textarea:focus{border-color:#a99aff75!important;box-sha
 @keyframes ascend-aurora-breathe{0%{transform:translate3d(2%, -1%,0) scale(1);opacity:.32}100%{transform:translate3d(-2%,2%,0) scale(1.12);opacity:.56}}
 @media(max-width:760px){body:before{filter:blur(68px) saturate(125%);opacity:.65}body:after{filter:blur(80px);opacity:.35}.metric-card,.panel,.focus-card{backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}body:before,body:after{animation:none!important}.nav-item,.metric-card,.panel,.focus-card,.primary-btn{transition:none!important}}
+
+
+/* Overview · Deep Work Protocol floating timer control must contain its label */
+.focus-card-top{min-width:0}
+.focus-card-top>div{min-width:0;flex:1}
+.focus-float-trigger{flex:0 0 auto;width:auto!important;min-width:76px;max-width:100%;min-height:48px;height:auto!important;padding:7px 9px;gap:4px;border-radius:11px;white-space:nowrap}
+.focus-float-hint{display:block;max-width:100%;font-size:7px;line-height:1.2;letter-spacing:.07em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:380px){.focus-card-top{gap:8px}.focus-float-trigger{min-width:68px;padding:7px 6px}.focus-float-hint{font-size:6px;letter-spacing:.04em}}
