@@ -1,20 +1,19 @@
 import {useCallback,useEffect,useState} from 'react';
 import type {SupabaseClient} from '@supabase/supabase-js';
-import {Castle,Compass,Coins,RefreshCw,Shield,Skull,Swords,Trophy,Zap,MapPinned,Flag,LockKeyhole} from 'lucide-react';
+import {Castle,Compass,Coins,RefreshCw,Shield,Skull,Swords ,Zap,MapPinned,Flag,LockKeyhole} from 'lucide-react';
 import './conquest-map.css';
 type Territory={id:number;name:string;region:string;x:number;y:number;level:number;owner_id:string|null;owner_name:string;is_mine:boolean;is_adjacent:boolean;income:number};
 type Battle={id:string;territory_id:number;territory_name:string;outcome:'captured'|'repelled';attack_score:number;defense_score:number;win_probability:number;reward_coins:number;report:any;created_at:string};
 type Payload={territories:Territory[];coins:number;fighter:any;recent:Battle[];owned_count:number;total_count:number};
-type Props={supabase:SupabaseClient|null;userId:string;setNotice:(s:string)=>void};
+type Props={supabase:SupabaseClient|null;setNotice:(s:string)=>void};
 const n=(v:any)=>Number(v||0).toLocaleString('en-IN');
-export default function ConquestMapPanel({supabase,userId,setNotice}:Props){
+export default function ConquestMapPanel({supabase,setNotice}:Props){
  const [data,setData]=useState<Payload|null>(null),[selected,setSelected]=useState<number|null>(null),[busy,setBusy]=useState(false),[loading,setLoading]=useState(true),[report,setReport]=useState<any>(null);
  const load=useCallback(async()=>{if(!supabase){setLoading(false);return;}const {data,error}=await supabase.rpc('get_conquest_map');if(error){setNotice('Conquest map could not load: '+error.message);setLoading(false);return;}setData(data as Payload);setLoading(false);},[supabase,setNotice]);
  useEffect(()=>{void load();},[load]);
  const chosen=data?.territories.find(t=>t.id===selected)||null;
  const attack=async()=>{if(!supabase||!chosen||busy)return;setBusy(true);setReport(null);const {data:result,error}=await supabase.rpc('attack_conquest_territory',{p_territory_id:chosen.id});if(error)setNotice(error.message);else{setReport(result);setNotice(result?.outcome==='captured'?'Territory conquered! Coins awarded.':'Attack repelled. Battle report saved.');}await load();setBusy(false);};
  if(!supabase)return <section className="conquest"><p>Sign in to deploy your army.</p></section>;
- const maxLevel=Math.max(1,...(data?.territories||[]).map(t=>t.level));
  return <section className="conquest">
   <header className="cq-hero"><div className="cq-orbit cq-orbit-a"/><div className="cq-orbit cq-orbit-b"/><div className="cq-hero-top"><span><i/> SOLO CAMPAIGN · LIVE FRONTIER</span><button onClick={()=>void load()} disabled={loading}><RefreshCw size={14}/> SYNC MAP</button></div><div className="cq-title"><div><h2>THE <em>CONQUEST</em> MAP</h2><p>Capture the frontier. Hold the line. Build your own empire.</p></div><div className="cq-crown"><Castle size={29}/></div></div><div className="cq-hero-metrics"><div><span>TERRITORIES CONTROLLED</span><b>{n(data?.owned_count)}/{n(data?.total_count)}</b><div className="cq-progress"><i style={{width:((data?.owned_count||0)/Math.max(1,data?.total_count||12)*100)+'%'}}/></div></div><div><span>AVAILABLE COINS</span><b><Coins size={16}/> {n(data?.coins)}</b></div><div><span>YOUR COMBAT POWER</span><b><Zap size={16}/> {n(data?.fighter?.composite_power)}</b></div></div></header>
   <div className="cq-layout"><main className="cq-map-panel"><div className="cq-section-head"><div><span>TACTICAL OVERVIEW</span><h3>Frontier grid</h3></div><div className="cq-map-legend"><span><i className="mine"/> YOURS</span><span><i className="open"/> OPEN</span><span><i className="enemy"/> RIVAL</span></div></div>
