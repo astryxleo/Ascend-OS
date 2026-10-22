@@ -144,21 +144,26 @@ function App() {
   useEffect(() => {
     if (!supabase || !session?.user.id) return;
     const actorId = session.user.id;
-    const channel = supabase.channel('ascend-live-workspace-' + actorId)
-      .on('postgres_changes', { event: '*', schema: 'public', table: '*' }, (payload) => {
-        window.dispatchEvent(new CustomEvent('ascend:realtime', { detail: payload }));
-        const table = payload.table;
-        const row = (payload.new && Object.keys(payload.new).length ? payload.new : payload.old) as Record<string, any>;
-        if (table === 'wallets' && row.user_id === actorId && Number.isFinite(Number(row.coins))) setCoins(Number(row.coins));
-        if (table === 'planner_tasks' && row.user_id === actorId && row.study_day === activePlannerDayRef.current) {
-          void supabase.from('planner_tasks').select('*').eq('user_id', actorId).eq('study_day', activePlannerDayRef.current).order('created_at')
-            .then(({data,error})=>{if(!error&&activeUserIdRef.current===actorId&&data)setTasks(data as Task[])});
-        }
-        if (table === 'chapter_progress') void supabase.from('chapter_progress').select('*',{count:'exact',head:true}).eq('user_id',actorId).eq('completed',true)
-          .then(({count,error})=>{if(!error&&activeUserIdRef.current===actorId&&count!==null)setCompletedSteps(count)});
-        if (table === 'profiles' && row.id === actorId) void supabase.from('profiles').select('*').eq('id',actorId).maybeSingle()
-          .then(({data,error})=>{if(!error&&activeUserIdRef.current===actorId&&data)setProfile(data)});
-      }).subscribe();
+    const onDatabaseChange = (payload: any) => {
+      window.dispatchEvent(new CustomEvent('ascend:realtime', { detail: payload }));
+      const table = payload.table;
+      const row = (payload.new && Object.keys(payload.new).length ? payload.new : payload.old) as Record<string, any>;
+      if (table === 'wallets' && row.user_id === actorId && Number.isFinite(Number(row.coins))) setCoins(Number(row.coins));
+      if (table === 'planner_tasks' && row.user_id === actorId && row.study_day === activePlannerDayRef.current) {
+        void supabase.from('planner_tasks').select('*').eq('user_id', actorId).eq('study_day', activePlannerDayRef.current).order('created_at')
+          .then(({data,error})=>{if(!error&&activeUserIdRef.current===actorId&&data)setTasks(data as Task[])});
+      }
+      if (table === 'chapter_progress') void supabase.from('chapter_progress').select('*',{count:'exact',head:true}).eq('user_id',actorId).eq('completed',true)
+        .then(({count,error})=>{if(!error&&activeUserIdRef.current===actorId&&count!==null)setCompletedSteps(count)});
+      if (table === 'profiles' && row.id === actorId) void supabase.from('profiles').select('*').eq('id',actorId).maybeSingle()
+        .then(({data,error})=>{if(!error&&activeUserIdRef.current===actorId&&data)setProfile(data)});
+    };
+    const realtimeTables = ['activity_events','broadcasts','chapter_progress','combat_cosmetic_catalog','combat_cosmetic_owned','combat_customizations','combat_fighters','combat_matches','combat_weapon_skill_catalog','exams','focus_session_runs','focus_sessions','planner_tasks','profiles','study_duels','study_squad_challenges','study_squad_members','study_squads','syllabus_steps','wallet_transactions','wallets'];
+    let channel = supabase.channel('ascend-live-workspace-' + actorId);
+    for (const table of realtimeTables) {
+      channel = channel.on('postgres_changes', { event: '*', schema: 'public', table }, onDatabaseChange);
+    }
+    channel.subscribe();
     return () => { void supabase.removeChannel(channel); };
   }, [session?.user.id]);
   useEffect(() => {
