@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent, type ChangeEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { Save, ShieldCheck, Upload, UserRound } from 'lucide-react';
+import { Save, ShieldCheck, Upload, UserRound, MousePointer2, ShoppingBag, Check, Sparkles } from 'lucide-react';
 
 type Profile = {
   full_name?: string | null;
@@ -52,6 +52,14 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
   const [avatarPreview, setAvatarPreview] = useState(profile?.avatar_url ?? '');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [cursorStore,setCursorStore] = useState<{selected_cursor_id:number;owned_cursor_ids:number[];coins:number;price:number}>({selected_cursor_id:6,owned_cursor_ids:[6],coins:0,price:50000});
+  const [cursorBusy,setCursorBusy] = useState<number|null>(null);
+  const [cursorError,setCursorError] = useState('');
+  const cursorUrl = (id:number) => id===0 ? 'https://raw.githubusercontent.com/astryxleo/Ascend-OS/main/cursor/cursor.cur' : 'https://raw.githubusercontent.com/astryxleo/Ascend-OS/main/cursor/cursor%20('+id+').cur';
+  async function loadCursorStore(){ if(!supabase)return; const {data,error}=await supabase.rpc('get_ascend_cursor_store'); if(error){setCursorError(error.message);return;} if(data)setCursorStore(data as typeof cursorStore); }
+  useEffect(()=>{void loadCursorStore();},[userId,supabase]);
+  async function unlockCursor(id:number){ if(!supabase)return; setCursorBusy(id);setCursorError('');try{const {data,error}=await supabase.rpc('purchase_ascend_cursor',{p_cursor_id:id});if(error)throw error;if(data)setCursorStore(data as typeof cursorStore);setNotice('Cursor unlocked and equipped!');}catch(e){setCursorError(e instanceof Error?e.message:'Could not unlock cursor.');}finally{setCursorBusy(null);} }
+  async function equipCursor(id:number){ if(!supabase)return;setCursorBusy(id);setCursorError('');try{const {data,error}=await supabase.rpc('select_ascend_cursor',{p_cursor_id:id});if(error)throw error;if(data)setCursorStore(data as typeof cursorStore);setNotice('Cursor selection saved to your account.');}catch(e){setCursorError(e instanceof Error?e.message:'Could not equip cursor.');}finally{setCursorBusy(null);} }
   const currentUserId = useRef(userId);
   currentUserId.current = userId;
 
@@ -175,5 +183,15 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
       {error && <div className="settings-error" role="alert">{error}</div>}
       <div className="settings-actions"><span>Changes apply after a successful save.</span><button className="primary-btn" disabled={busy}><Save size={15}/>{busy ? 'Saving settings…' : 'Save settings'}</button></div>
     </form>
+    <section className="cursor-market">
+      <div className="cursor-market-head"><div><span className="eyebrow"><MousePointer2 size={13}/> ASCEND CUSTOMIZATION</span><h2>Cursor armory</h2><p>One signature cursor across your entire Ascend workspace. Purchases stay on your account.</p></div><div className="cursor-balance"><span>YOUR BALANCE</span><b>◈ {cursorStore.coins.toLocaleString()}</b><small>50,000 ◈ per cursor</small></div></div>
+      <div className="cursor-showcase"><div className="cursor-showcase-preview" style={{cursor:`url("${cursorUrl(cursorStore.selected_cursor_id)}"), auto`}}><span>LIVE PREVIEW</span><div className="cursor-orbit"><MousePointer2 size={35}/></div><b>Move over the cards to preview</b><small>System cursor hotspot is preserved from each .cur file.</small></div><div className="cursor-equipped"><span>NOW EQUIPPED</span><b>CURSOR ({cursorStore.selected_cursor_id===0?'ORIGINAL':cursorStore.selected_cursor_id})</b><small>{cursorStore.selected_cursor_id===6?'Default · always free':'Owned · saved to your profile'}</small></div></div>
+      {cursorError&&<div className="settings-error" role="alert">{cursorError}</div>}
+      <div className="cursor-grid">{Array.from({length:21},(_,id)=><article key={id} className={`cursor-item ${cursorStore.selected_cursor_id===id?'is-equipped':''}`} style={{cursor:`url("${cursorUrl(id)}"), auto`}}>
+        <div className="cursor-preview-stage" style={{cursor:`url("${cursorUrl(id)}"), auto`}}><span>PREVIEW</span><div className="cursor-art" style={{cursor:`url("${cursorUrl(id)}"), auto`}}/><small>{id===0?'ORIGINAL':`CURSOR ${id}`}</small></div>
+        <div className="cursor-item-info"><div><b>{id===6?'Ascend Classic':id===0?'Original Pointer':`Cursor ${id}`}</b><span>{id===6?'Included forever':cursorStore.owned_cursor_ids.includes(id)?'In your collection':'Legendary drop'}</span></div>{cursorStore.selected_cursor_id===id?<span className="cursor-state"><Check size={13}/> EQUIPPED</span>:cursorStore.owned_cursor_ids.includes(id)?<button className="cursor-action" disabled={cursorBusy!==null} onClick={()=>void equipCursor(id)}>Equip</button>:<button className="cursor-action buy" disabled={cursorBusy!==null||cursorStore.coins<50000} onClick={()=>void unlockCursor(id)}>{cursorBusy===id?'Unlocking…':<><ShoppingBag size={13}/> 50,000 ◈</>}</button>}</div>
+      </article>)}</div>
+      <div className="cursor-market-foot"><Sparkles size={15}/><span>All 21 cursor files are available to preview. Cursor 6 is your free default; every other cursor costs exactly 50,000 Ascend Coins.</span></div>
+    </section>
   </section>;
 }
