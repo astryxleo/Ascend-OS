@@ -54,7 +54,7 @@ function App() {
   const activeUserIdRef = useRef<string | null>(null);
   activeUserIdRef.current = session?.user.id ?? null;
   const [authReady,setAuthReady] = useState(!supabase);
-  const [bootIntroDone,setBootIntroDone] = useState(() => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const [bootIntroDone,setBootIntroDone] = useState(false);
   const [authMode,setAuthMode] = useState<'login'|'signup'>('login');
   const [password,setPassword] = useState('');
   const [email,setEmail] = useState('');
@@ -366,7 +366,7 @@ function App() {
     <video className="boot-cinema-video" src={ascendBootVideo} autoPlay muted playsInline preload="auto" aria-hidden="true" onEnded={() => setBootIntroDone(true)} onError={() => setBootIntroDone(true)} />
     <div className="boot-cinema-vignette" />
     <div className="boot-cinema-status"><span className="boot-cinema-status-dot" /> ASCEND OS <i /> INITIALIZING</div>
-    <button type="button" className="boot-cinema-skip" onClick={() => setBootIntroDone(true)}>SKIP INTRO <span>↗</span></button>
+    
   </div>;
   if (!authReady) return <div className="boot"><div className="brand-mark"><img className="ascend-logo-image" src={ascendLogo} alt="Ascend OS logo" /></div><span>INITIALIZING ASCEND OS</span></div>;
   if (!session) return <AuthScreen email={email} setEmail={setEmail} password={password} setPassword={setPassword} authMode={authMode} setAuthMode={setAuthMode} signIn={signIn} busy={authBusy} message={authMessage} />;
