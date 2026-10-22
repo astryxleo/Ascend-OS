@@ -60,6 +60,7 @@ function App() {
   const [focusRunId,setFocusRunId] = useState<string|null>(null);
   const [focusPaused,setFocusPaused] = useState(false);
   const [focusMode,setFocusMode] = useState('Pomodoro');
+  const [customFocusMinutes,setCustomFocusMinutes] = useState(60);
   const [coins,setCoins] = useState(1000);
   const [completedSteps,setCompletedSteps] = useState(0);
   const [notice,setNotice] = useState('');
@@ -128,7 +129,8 @@ function App() {
         const remaining = Math.max(0,activeRun.target_minutes*60-elapsedSeconds);
         setFocusPaused(Boolean(activeRun.paused_at));
         setFocusRunId(activeRun.id);
-        setFocusMode(activeRun.mode==='pomodoro'?'Pomodoro':activeRun.mode==='deep_sprint'?'Deep Sprint':activeRun.mode==='extreme_grind'?'Extreme Grind':'Pomodoro');
+        setFocusMode(activeRun.mode==='pomodoro'?'Pomodoro':activeRun.mode==='deep_sprint'?'Deep Sprint':activeRun.mode==='extreme_grind'?'Extreme Grind':activeRun.mode==='custom'?'Custom':'Pomodoro');
+        if (activeRun.mode==='custom') setCustomFocusMinutes(activeRun.target_minutes);
         setFocusSeconds(remaining);
         if (remaining===0 && !activeRun.paused_at) { setFocusCompleted(true); setFocusRunning(false); }
         else if (activeRun.paused_at) { setFocusCompleted(false); setFocusRunning(false); }
@@ -231,8 +233,10 @@ function App() {
     }
     setFocusSaving(true);
     try {
-      const mode = focusMode === 'Pomodoro' ? 'pomodoro' : focusMode === 'Deep Sprint' ? 'deep_sprint' : 'extreme_grind';
-      const {data,error} = await supabase.rpc('start_focus_session',{subject_name:taskSubject,mode_name:mode});
+      const mode = focusMode === 'Pomodoro' ? 'pomodoro' : focusMode === 'Deep Sprint' ? 'deep_sprint' : focusMode === 'Custom' ? 'custom' : 'extreme_grind';
+      const {data,error} = mode === 'custom'
+        ? await supabase.rpc('start_custom_focus_session',{subject_name:taskSubject,target_minutes:Math.max(1,Math.min(120,Math.floor(customFocusMinutes)))})
+        : await supabase.rpc('start_focus_session',{subject_name:taskSubject,mode_name:mode});
       if (activeUserIdRef.current !== actorId) return;
       if (error) setNotice('Could not start focus session: '+error.message);
       else if (data && typeof (data as {session_id?:unknown}).session_id === 'string') {
@@ -280,7 +284,7 @@ function App() {
       setFocusRunId(null);
       setFocusPaused(false);
       setFocusCompleted(false);
-      setFocusSeconds(focusMode==='Pomodoro'?1500:focusMode==='Deep Sprint'?3000:5400);
+      setFocusSeconds(focusMode==='Pomodoro'?1500:focusMode==='Deep Sprint'?3000:focusMode==='Custom'?customFocusMinutes*60:5400);
     } catch (error) {
       if (activeUserIdRef.current === actorId) {
         setFocusRunning(wasRunning);
@@ -293,7 +297,7 @@ function App() {
   async function settleFocus() {
     if (!supabase || !session || !focusCompleted || focusSaving) return;
     const actorId = session.user.id;
-    const mode = focusMode === 'Pomodoro' ? 'pomodoro' : focusMode === 'Deep Sprint' ? 'deep_sprint' : focusMode === 'Extreme Grind' ? 'extreme_grind' : 'stopwatch';
+    const mode = focusMode === 'Pomodoro' ? 'pomodoro' : focusMode === 'Deep Sprint' ? 'deep_sprint' : focusMode === 'Custom' ? 'custom' : 'extreme_grind';
     if (!focusRunId) { setNotice('Start a focus session before claiming rewards.'); return; }
     setFocusSaving(true);
     try {
@@ -314,7 +318,7 @@ function App() {
           setFocusCompleted(false);
           setFocusRunId(null);
           setFocusPaused(false);
-          setFocusSeconds(mode==='pomodoro'?1500:mode==='deep_sprint'?3000:5400);
+          setFocusSeconds(mode==='pomodoro'?1500:mode==='deep_sprint'?3000:mode==='custom'?customFocusMinutes*60:5400);
           setNotice('Session saved · +'+reward.coins_earned+' Lumen Coins · +'+reward.xp_earned+' XP');
         }
       }
@@ -345,7 +349,7 @@ function App() {
         {notice&&<div className="notice"><Sparkles size={15}/>{notice}<button onClick={()=>setNotice('')} aria-label="Dismiss"><X size={14}/></button></div>}
         {activeNav==='Overview'&&<Overview tasks={tasks} done={done} percent={percent} focusSeconds={focusSeconds} fmt={fmt} setFocusSeconds={setFocusSeconds} focusRunning={focusRunning} setFocusRunning={setFocusRunning} focusMode={focusMode} setFocusMode={setFocusMode} setActiveNav={setActiveNav} completedSteps={completedSteps} coins={coins} startFocus={startFocus} resetFocus={resetFocus} pauseFocus={pauseFocus} focusPaused={focusPaused} focusCompleted={focusCompleted} focusSaving={focusSaving} sessionActive={!!focusRunId} />}
         {activeNav==='Planner'&&<section className="panel task-panel"><div className="section-heading"><div><span className="eyebrow">DAILY EXECUTION · 4 AM IST RESET</span><h2>Study board</h2></div><button className="primary-btn" onClick={()=>setNewTaskOpen(v=>!v)}><Plus size={16}/> New task</button></div><div className="planner-datebar"><button onClick={()=>{setPlannerDay(shiftStudyDay(plannerDay,-1));}}>← Previous</button><label>Study day<input type="date" value={plannerDay} max={studyDay()} onChange={e=>e.target.value&&e.target.value<=studyDay()&&setPlannerDay(e.target.value)}/></label><button disabled={plannerDay===studyDay()} onClick={()=>setPlannerDay(studyDay())}>Today ↗</button></div><div className="progress-row"><span>{done} of {tasks.length} tasks complete</span><b>{percent}%</b></div><div className="progress-track"><div style={{width:percent+'%'}}/></div>{tasks.length?<TaskList tasks={tasks} toggleTask={toggleTask}/>:<div className="planner-empty">{plannerDay===studyDay()?'No tasks planned yet. Add one small win.':'No archived tasks for this study day.'}</div>}{newTaskOpen&&<form className="task-form" onSubmit={addTask}><input value={taskTitle} onChange={e=>setTaskTitle(e.target.value)} placeholder="What will you work on?" autoFocus/><select value={taskSubject} onChange={e=>setTaskSubject(e.target.value)}>{subjects.map(s=><option key={s}>{s}</option>)}</select><select value={taskPriority} onChange={e=>setTaskPriority(e.target.value as 'P1'|'P2'|'P3')}><option value="P1">P1 · High</option><option value="P2">P2 · Normal</option><option value="P3">P3 · Low</option></select><button className="primary-btn" type="submit">Add task</button></form>}</section>}
-        {activeNav==='Focus room'&&<FocusRoom focusSeconds={focusSeconds} fmt={fmt} setFocusSeconds={setFocusSeconds} focusRunning={focusRunning} setFocusRunning={setFocusRunning} focusMode={focusMode} setFocusMode={setFocusMode} focusCompleted={focusCompleted} settleFocus={settleFocus} focusSaving={focusSaving} startFocus={startFocus} resetFocus={resetFocus} pauseFocus={pauseFocus} focusPaused={focusPaused} sessionActive={!!focusRunId}/>}
+        {activeNav==='Focus room'&&<FocusRoom focusSeconds={focusSeconds} fmt={fmt} setFocusSeconds={setFocusSeconds} focusRunning={focusRunning} setFocusRunning={setFocusRunning} focusMode={focusMode} setFocusMode={setFocusMode} customFocusMinutes={customFocusMinutes} setCustomFocusMinutes={setCustomFocusMinutes} focusCompleted={focusCompleted} settleFocus={settleFocus} focusSaving={focusSaving} startFocus={startFocus} resetFocus={resetFocus} pauseFocus={pauseFocus} focusPaused={focusPaused} sessionActive={!!focusRunId}/>}
         {activeNav==='Syllabus'&&<Syllabus supabase={supabase} userId={session?.user.id??null} completedSteps={completedSteps} setCompletedSteps={setCompletedSteps} setNotice={setNotice}/>}
         {activeNav==='Exams & marks'&&<ExamCommand supabase={supabase} userId={session?.user.id??null} setNotice={setNotice}/>}
         {activeNav==='Garage'&&<Garage supabase={supabase} userId={session?.user.id??null} coins={coins} setCoins={setCoins} setNotice={setNotice}/>}
@@ -370,7 +374,10 @@ function Overview({tasks,done,percent,focusSeconds,fmt,setFocusSeconds,focusRunn
 }
 function Metric({label,value,suffix,note,icon:Icon,tone}:{label:string;value:string;suffix?:string;note:string;icon:any;tone:string}) { return <div className="metric-card"><div className="metric-top"><span>{label}</span><div className={'metric-icon '+tone}><Icon size={16}/></div></div><div className="metric-value">{value}<small>{suffix}</small></div><div className="metric-note"><span className="metric-dot"/> {note}</div></div>; }
 function TaskList({tasks,toggleTask}:{tasks:Task[];toggleTask:(task:Task)=>void}) { return <div className="task-list">{tasks.map(task=><div className={'task-row '+(task.completed?'task-done':'')} key={task.id}><button className={'task-check '+(task.completed?'checked':'')} onClick={()=>toggleTask(task)} aria-label={task.completed?'Mark incomplete':'Mark complete'}>{task.completed&&<Check size={12}/>}</button><div className="task-info"><b>{task.title}</b><span>{task.subject||'General study'} · {task.estimated_minutes} min</span></div><span className={'priority '+task.priority.toLowerCase()}>{task.priority}</span></div>)}</div>; }
-function FocusRoom({focusSeconds,fmt,setFocusSeconds,focusRunning,setFocusRunning,focusMode,setFocusMode,focusCompleted,settleFocus,focusSaving,startFocus,resetFocus,pauseFocus,focusPaused,sessionActive}:{focusSeconds:number;fmt:(s:number)=>string;setFocusSeconds:(s:number)=>void;focusRunning:boolean;setFocusRunning:(b:boolean)=>void;focusMode:string;setFocusMode:(s:string)=>void;focusCompleted:boolean;settleFocus:()=>void;focusSaving:boolean;startFocus:()=>void;resetFocus:()=>void;pauseFocus:()=>void;focusPaused:boolean;sessionActive:boolean}) { return <section className="focus-room panel"><span className="eyebrow">ATTENTION IS YOUR ADVANTAGE</span><h2>One thing. Fully.</h2><p>Choose a protocol, set your intention, and begin.</p><div className="focus-modes">{['Pomodoro','Deep Sprint','Extreme Grind'].map(m=><button className={focusMode===m?'chosen':''} key={m} disabled={sessionActive} onClick={()=>{setFocusMode(m);setFocusRunning(false);void resetFocus();setFocusSeconds(m==='Pomodoro'?1500:m==='Deep Sprint'?3000:5400);}}>{m}</button>)}</div><div className="big-timer">{fmt(focusSeconds)}</div><div className="timer-controls"><button className="primary-btn" disabled={focusCompleted||focusSaving} onClick={()=>{if(focusRunning)void pauseFocus();else startFocus();}}>{focusRunning?'Pause':sessionActive?(focusPaused?'Resume focus':'Continue focus'):'Begin focus'} <ArrowUpRight size={15}/></button><button className="secondary-btn" disabled={focusSaving} onClick={resetFocus}>Reset</button></div>{focusCompleted&&<button className="primary-btn focus-claim" disabled={focusSaving} onClick={settleFocus}>{focusSaving?'Saving session…':'Save session · claim coins'}</button>}<div className="focus-warning"><Clock3 size={15}/> The server anchors each session start and rejects early reward claims. Keep this tab open for the current timer.</div></section>; }
+function FocusRoom({focusSeconds,fmt,setFocusSeconds,focusRunning,setFocusRunning,focusMode,setFocusMode,customFocusMinutes,setCustomFocusMinutes,focusCompleted,settleFocus,focusSaving,startFocus,resetFocus,pauseFocus,focusPaused,sessionActive}:{focusSeconds:number;fmt:(s:number)=>string;setFocusSeconds:(s:number)=>void;focusRunning:boolean;setFocusRunning:(b:boolean)=>void;focusMode:string;setFocusMode:(s:string)=>void;customFocusMinutes:number;setCustomFocusMinutes:(n:number)=>void;focusCompleted:boolean;settleFocus:()=>void;focusSaving:boolean;startFocus:()=>void;resetFocus:()=>void;pauseFocus:()=>void;focusPaused:boolean;sessionActive:boolean}) {
+ const chooseMode=(m:string)=>{if(sessionActive)return;setFocusMode(m);void resetFocus();setFocusSeconds(m==='Pomodoro'?1500:m==='Deep Sprint'?3000:m==='Extreme Grind'?5400:Math.max(1,Math.min(120,customFocusMinutes))*60);};
+ return <section className="focus-room panel"><span className="eyebrow">ATTENTION IS YOUR ADVANTAGE</span><h2>One thing. Fully.</h2><p>Choose a protocol, set your intention, and begin.</p><div className="focus-modes">{['Pomodoro','Deep Sprint','Extreme Grind','Custom'].map(m=><button className={focusMode===m?'chosen':''} key={m} disabled={sessionActive} onClick={()=>chooseMode(m)}>{m}</button>)}</div>{focusMode==='Custom'&&<label className="field-label" style={{display:'block',maxWidth:260,margin:'18px auto'}}>CUSTOM DURATION · 1–120 MINUTES<input type="number" min={1} max={120} step={1} value={customFocusMinutes} disabled={sessionActive} onChange={e=>{const raw=e.target.value;const n=Number(raw);if(raw!==''&&Number.isFinite(n)){const safe=Math.max(1,Math.min(120,Math.floor(n)));setCustomFocusMinutes(safe);if(!sessionActive&&!focusRunning)setFocusSeconds(safe*60);}}}/></label>}<div className="big-timer">{fmt(focusSeconds)}</div><div className="timer-controls"><button className="primary-btn" disabled={focusCompleted||focusSaving} onClick={()=>{if(focusRunning)void pauseFocus();else startFocus();}}>{focusRunning?'Pause':sessionActive?(focusPaused?'Resume focus':'Continue focus'):'Begin focus'} <ArrowUpRight size={15}/></button><button className="secondary-btn" disabled={focusSaving} onClick={resetFocus}>Reset</button></div>{focusCompleted&&<button className="primary-btn focus-claim" disabled={focusSaving} onClick={settleFocus}>{focusSaving?'Saving session…':'Save session · claim coins'}</button>}<div className="focus-warning"><Clock3 size={15}/> Timer uses server-recorded start time, so closing this page won't reset elapsed time. On return, the countdown catches up. You can set a custom duration up to 2 hours.</div></section>;
+}
 type SyllabusStep = {id:string;subject_id:string;chapter_id:string;chapter_title:string;step_title:string;step_order:number};
 type SyllabusProgress = {subject_id:string;chapter_id:string;step_id:string;completed:boolean};
 function Syllabus({supabase,userId,completedSteps,setCompletedSteps,setNotice}:{supabase:SupabaseClient|null;userId:string|null;completedSteps:number;setCompletedSteps:Dispatch<SetStateAction<number>>;setNotice:(s:string)=>void}) {
