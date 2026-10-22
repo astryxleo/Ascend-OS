@@ -1,0 +1,1 @@
+alter table public.combat_customizations alter column eye_glow set default 'none'; update public.combat_customizations c set eye_glow='none' where not exists(select 1 from public.combat_cosmetic_owned o where o.user_id=c.user_id and o.cosmetic_id like 'eye_glow:%');
