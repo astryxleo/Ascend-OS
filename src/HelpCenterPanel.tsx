@@ -1,4 +1,5 @@
 import {useMemo,useState} from 'react';
+import './help-center.css';
 import {Activity,ArrowRight,BookOpen,CalendarDays,ChartNoAxesColumn,CheckCircle2,ChevronDown,CircleHelp,Clock3,Coins,Compass,Flame,GraduationCap,LockKeyhole,Search,ShieldCheck,Sparkles,Swords,Target,Trophy,Users,Bell,Settings2,MessageSquareText,Flag,Wallet} from 'lucide-react';
 
 type Props={onNavigate:(label:string)=>void};
