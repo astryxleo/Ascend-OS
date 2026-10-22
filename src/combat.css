@@ -112,3 +112,63 @@
 .stick.weapon-variant-zero_point .weapon,.stick.weapon-variant-sovereign_edge .weapon,.stick.weapon-variant-nova_halberd .weapon{height:4px;box-shadow:0 0 12px #f6d58c,0 0 23px #d8a94b}
 .atelier-filters{display:flex;gap:7px;overflow-x:auto;padding:12px 2px 13px;scrollbar-width:thin;scrollbar-color:#665333 #0a0a0e}.atelier-filters button{flex:0 0 auto;border:1px solid #302b34;border-radius:8px;background:#0c0b10;color:#a8a0ad;padding:10px 13px;font:8px 'DM Mono',monospace;letter-spacing:.08em}.atelier-filters button.active{background:linear-gradient(120deg,#2c2415,#15120e);border-color:#9b7b43;color:#f2d58f}.atelier-count{font:8px 'DM Mono',monospace;letter-spacing:.12em;color:#a59a86;margin:7px 0 3px}.atelier-art.eye-glow{overflow:hidden}.atelier-art.eye-glow span{animation:eyeIconBurn .8s ease-in-out infinite alternate;text-shadow:0 0 8px currentColor,0 0 20px currentColor,0 0 36px currentColor}.eye-art-inferno,.eye-art-dragon_breath,.eye-art-nova_burn{background:radial-gradient(ellipse at center,#ff3c3030,transparent 65%),linear-gradient(130deg,#211012,#0b0b10)}@keyframes eyeIconBurn{from{transform:scale(.94);filter:brightness(1)}to{transform:scale(1.12);filter:brightness(1.8)}}
 .weapon-skill-library{margin-top:34px;padding-top:24px;border-top:1px solid #302a36}.skill-library-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.skill-library-card{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px;border:1px solid #2b2730;border-radius:10px;background:linear-gradient(130deg,#141219,#0a0a0e);min-width:0}.skill-library-card>div{min-width:0}.skill-library-card small,.skill-library-card b,.skill-library-card p{display:block}.skill-library-card small{font:7px 'DM Mono',monospace;color:#a9946b;letter-spacing:.08em}.skill-library-card b{font-size:10px;color:#ece7f0;margin-top:6px}.skill-library-card p{font-size:9px;line-height:1.5;color:#817b88;margin:5px 0 0}.skill-library-card strong{font:8px 'DM Mono',monospace;color:#e5c77f;white-space:nowrap}.skill-library-card.locked{opacity:.72}.skill-library-card.unlocked{border-color:#6e5934;background:linear-gradient(130deg,#211a10,#0b0b0e)}@media(max-width:760px){.skill-library-grid{grid-template-columns:1fr}.atelier-filters button{padding:9px 11px}}
+
+
+/* Structural fighter rebuild: SVG keeps joints connected at every preview size. */
+.stick-svg{width:80px;height:130px;overflow:visible;filter:drop-shadow(0 5px 9px #0008);--fighter-edge:#f2d9df}
+.stick-svg .fighter-drawing{display:block;width:100%;height:100%;overflow:visible;position:relative;z-index:1}
+.stick-svg .fighter-drawing .head,.stick-svg .fighter-drawing .helmet,.stick-svg .fighter-drawing .visor,.stick-svg .fighter-drawing .body,.stick-svg .fighter-drawing .arm,.stick-svg .fighter-drawing .leg,.stick-svg .fighter-drawing .joint,.stick-svg .fighter-drawing .weapon{position:static;left:auto;top:auto;width:auto;height:auto;border:0;border-radius:0;transform:none;opacity:1;box-shadow:none}
+.stick-svg .fighter-drawing .head{fill:url(#fighter-metal);stroke:#f8dce2;stroke-width:2.4}
+.stick-svg .fighter-drawing .armor-plate{fill:url(#fighter-metal);stroke:var(--fighter-glow);stroke-width:1.7}
+.stick-svg .fighter-drawing .eye-fire{opacity:.65;filter:drop-shadow(0 0 3px var(--eye-fire,var(--fighter-glow)))}
+.stick-svg .fighter-drawing .fighter-shadow{fill:#0008;filter:blur(2px)}
+.stick-svg .fighter-drawing .fighter-weapon{transform-origin:75px 45px;filter:drop-shadow(0 0 3px var(--fighter-glow))}
+.stick-svg .fighter-drawing .weapon-blade{stroke-linejoin:round}
+.stick-svg .fighter-drawing .weapon-shaft{stroke-linecap:round}
+.stick-svg .fighter-drawing .weapon-grip{stroke:#5b3b2e}
+.stick-svg .fighter-drawing .weapon-hilt,.stick-svg .fighter-drawing .weapon-guard{stroke:#e4c77d}
+.stick-svg .fighter-drawing .second-blade{filter:drop-shadow(0 0 3px var(--fighter-glow))}
+.stick-svg .fighter-drawing .shoulder-plate,.stick-svg .fighter-drawing .shin-plate{filter:drop-shadow(0 1px 2px #000)}
+.stick-svg .fighter-drawing .armor-detail{opacity:.75}
+.stick-svg.enemy{--fighter-core:#8ed6e0;--fighter-edge:#d5fbff;--fighter-glow:#63e5f5}
+.stick-svg.enemy .fighter-drawing .fighter-weapon{transform:translate(0 0) scaleX(-1) rotate(8deg);transform-origin:75px 45px}
+.stick-svg.tone-cyan{--fighter-core:#42d8f2;--fighter-edge:#c8fbff;--fighter-glow:#42d8f2}
+.stick-svg.tone-gold{--fighter-core:#e9c777;--fighter-edge:#fff1c2;--fighter-glow:#e9c777}
+.stick-svg.tone-violet{--fighter-core:#b18cff;--fighter-edge:#eee0ff;--fighter-glow:#b18cff}
+.stick-svg.tone-emerald{--fighter-core:#55d6a3;--fighter-edge:#c6ffdf;--fighter-glow:#55d6a3}
+.stick-svg.skin-steel{--fighter-glow:#d5e1ed;--fighter-edge:#f5fbff}
+.stick-svg.skin-void{--fighter-glow:#9c86ff;--fighter-edge:#c9c0ff}
+.stick-svg.skin-plasma{--fighter-glow:#ff693e;--fighter-edge:#ffd0b5}
+.stick-svg.armor-guardian{--fighter-core:#f2ce80;--fighter-edge:#fff0bd;--fighter-glow:#ffc85b}
+.stick-svg.armor-phantom{--fighter-core:#c4a8ff;--fighter-edge:#eee0ff;--fighter-glow:#a78bfa}
+.stick-svg.armor-bastion{--fighter-core:#b8c2d1;--fighter-edge:#edf2fa;--fighter-glow:#93a4bc}
+.stick-svg.plate-heavy .fighter-drawing .shoulder-plate{transform:scale(1.25);transform-box:fill-box;transform-origin:center}
+.stick-svg.plate-tech .fighter-drawing .armor-detail{stroke:#f2d58f;stroke-width:2}
+.stick-svg.helmet-none .fighter-drawing .helmet{display:none}
+.stick-svg.helmet-tactical .fighter-drawing .helmet{fill:#424653}
+.stick-svg.helmet-horned .fighter-drawing .helmet{fill:#bda36b}
+.stick-svg.visor-none .fighter-drawing .visor{display:none}
+.stick-svg.visor-cross .fighter-drawing .visor{stroke-width:2.4}
+.stick-svg.eye-glow-none .fighter-drawing .eye-fire{display:none}
+.stick-svg.aura-on .fighter-drawing{filter:drop-shadow(0 0 5px var(--fighter-glow)) drop-shadow(0 0 13px var(--fighter-glow))}
+.stick-svg.pose-guard .fighter-drawing .fighter-limbs{transform:translateY(1px)}
+.stick-svg.pose-agile .fighter-drawing .fighter-limbs{transform:rotate(-5deg);transform-origin:50px 80px}
+.stick-svg.pose-power .fighter-drawing .fighter-limbs{transform:scale(1.035);transform-origin:50px 90px}
+.stick-svg.weapon-greatsword .fighter-drawing .fighter-weapon{transform:rotate(-18deg);transform-origin:75px 45px}
+.stick-svg.weapon-spear .fighter-drawing .fighter-weapon{transform:rotate(-25deg);transform-origin:75px 45px}
+.stick-svg.weapon-dual_blades .fighter-drawing .fighter-weapon{transform:rotate(-35deg);transform-origin:75px 45px}
+.stick-svg.weapon-gauntlets .fighter-drawing .fighter-weapon{transform:rotate(5deg);transform-origin:75px 45px}
+.stick-svg.weapon-variant-zero_point .fighter-drawing .weapon-blade,.stick-svg.weapon-variant-sovereign_edge .fighter-drawing .weapon-blade,.stick-svg.weapon-variant-nova_halberd .fighter-drawing .weapon-blade{fill:#f6d58c;stroke:#fff3ca;filter:drop-shadow(0 0 5px #d8a94b)}
+.stick-svg.mini-stick{width:45px;height:72px}
+.stick-svg.mini-stick .fighter-drawing{width:100%;height:100%}
+.stick-svg.preview{top:auto;left:auto;position:relative;transform:scale(1);transform-origin:center}
+.forge-stage .stick-svg.preview{width:100px;height:160px}
+.forge-mini-army .stick-svg.preview{width:45px;height:72px;transform:scale(.82);transform-origin:50% 100%;margin:0 -4px -1px}
+.preview-stage .stick-svg.preview{width:70px;height:114px;transform:scale(.9);margin-top:0}
+.stick-svg.lunge{animation:lunge 1.35s ease-in-out infinite}
+.stick-svg.weapon-katana.lunge{animation:katana-draw 1.25s ease-in-out infinite}
+.stick-svg.weapon-dual_blades.lunge{animation:twin-fang-flurry .95s ease-in-out infinite}
+.stick-svg.weapon-greatsword.lunge{animation:colossus-crash 1.6s cubic-bezier(.2,.8,.2,1) infinite}
+.stick-svg.weapon-spear.lunge{animation:astral-thrust 1.15s ease-in-out infinite}
+.stick-svg.weapon-gauntlets.lunge{animation:rift-combo .8s ease-in-out infinite}
+@media(max-width:780px){.forge-stage .stick-svg.preview{width:92px;height:148px}.forge-mini-army .stick-svg.preview{width:38px;height:62px}}
