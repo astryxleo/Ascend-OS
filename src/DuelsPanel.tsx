@@ -14,7 +14,8 @@ type Props = { supabase: SupabaseClient|null; userId: string; setNotice: (messag
 
 export default function DuelsPanel({supabase,userId,setNotice}:Props) {
   const [duels,setDuels] = useState<Duel[]>([]);
-  const [people,setPeople] = useState<Record<string,Person>>({});\n  const [combatStats,setCombatStats] = useState<Record<string,CombatStat>>({});
+  const [people,setPeople] = useState<Record<string,Person>>({});
+  const [combatStats,setCombatStats] = useState<Record<string,CombatStat>>({});
   const [username,setUsername] = useState('');
   const [goal,setGoal] = useState('120');
   const [loading,setLoading] = useState(true);
