@@ -49,7 +49,7 @@ function LineGraph({ data, series, max, ticks, suffix = '', area = false }: { da
     {data.map((d,i)=>i%5===0||i===data.length-1?<text key={String(d.date)} x={L+(data.length<=1?0:i/(data.length-1))*innerW} y={H-8} textAnchor="middle" className="aa-axis-text">{dateLabel(String(d.date))}</text>:null)}
   </svg></div>;
 }
-function BarGraph({ data, keys, max, ticks, suffix = '', labels = false }: { data: { label: string; [key: string]: string | number }[]; keys: { key: string; label: string; color: string }[]; max: number; ticks: number[]; suffix?: string; labels?: boolean }) {
+function BarGraph({ data, keys, max, ticks, suffix = '' }: { data: { label: string; [key: string]: string | number }[]; keys: { key: string; label: string; color: string }[]; max: number; ticks: number[]; suffix?: string; labels?: boolean }) {
   const W=760,H=238,L=42,R=12,T=12,B=32,innerW=W-L-R,innerH=H-T-B,groupW=innerW/Math.max(1,data.length),barW=Math.min(24,groupW/(keys.length+1));
   return <div className="aa-chart-scroll"><svg className="aa-chart" viewBox={'0 0 '+W+' '+H} role="img" aria-label="Bar chart">
     {ticks.map(t=><g key={t}><line x1={L} x2={W-R} y1={T+innerH-t/Math.max(1,max)*innerH} y2={T+innerH-t/Math.max(1,max)*innerH} stroke="rgba(148,163,184,.15)" strokeDasharray="3 5"/><text x={L-8} y={T+innerH-t/Math.max(1,max)*innerH+4} textAnchor="end" className="aa-axis-text">{t}{suffix}</text></g>)}
