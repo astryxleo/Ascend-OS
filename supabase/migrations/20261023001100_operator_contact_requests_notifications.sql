@@ -70,3 +70,7 @@ do $$ begin
  if not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='operator_contact_requests') then alter publication supabase_realtime add table public.operator_contact_requests; end if;
  if not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='ascend_notifications') then alter publication supabase_realtime add table public.ascend_notifications; end if;
 end $$;
+revoke all on table public.operator_contact_requests from public, anon, authenticated;
+revoke all on table public.ascend_notifications from public, anon, authenticated;
+grant select on table public.operator_contact_requests, public.ascend_notifications to authenticated;
+grant update(read_at) on table public.ascend_notifications to authenticated;
