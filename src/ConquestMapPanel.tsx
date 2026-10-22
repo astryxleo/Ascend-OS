@@ -1,6 +1,6 @@
 import {useCallback,useEffect,useRef,useState} from 'react';
 import type {SupabaseClient} from '@supabase/supabase-js';
-import {Castle,Compass,Coins,RefreshCw,Shield,Skull,Swords,Zap,MapPinned,Flag,LockKeyhole} from 'lucide-react';
+import {Castle,Compass,Coins,RefreshCw,Shield,Skull,Swords,Zap,MapPinned,Flag,LockKeyhole,X,TrendingUp,AlertTriangle} from 'lucide-react';
 import './conquest-map.css';
 type Territory={id:number;name:string;region:string;x:number;y:number;level:number;owner_id:string|null;owner_name:string;is_mine:boolean;is_adjacent:boolean;income:number;owner_level?:number;is_shielded?:boolean};
 type Battle={id:string;territory_id:number;territory_name:string;outcome:'captured'|'repelled';attack_score:number;defense_score:number;win_probability:number;reward_coins:number;report:any;created_at:string};
