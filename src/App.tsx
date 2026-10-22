@@ -136,6 +136,20 @@ function App() {
   },[focusPipWindow]);
 
   const [coins,setCoins] = useState(1000);
+  useEffect(() => {
+    const styleId = 'ascend-account-cursor';
+    document.getElementById(styleId)?.remove();
+    if (!supabase || !session?.user.id) { document.documentElement.style.removeProperty('cursor'); return; }
+    let alive = true;
+    const applyCursor = (id:number) => {
+      const src = id===0 ? 'https://raw.githubusercontent.com/astryxleo/Ascend-OS/main/cursor/cursor.cur' : 'https://raw.githubusercontent.com/astryxleo/Ascend-OS/main/cursor/cursor%20('+id+').cur';
+      const style = document.createElement('style'); style.id=styleId;
+      style.textContent = '*{cursor:url("'+src+'"), auto !important} a,button,[role="button"],input,select,textarea{cursor:url("'+src+'"), auto !important}';
+      document.head.appendChild(style);
+    };
+    void supabase.rpc('get_ascend_cursor_store').then(({data,error}) => { if(alive&&!error) applyCursor(Number(data?.selected_cursor_id??6)); });
+    return () => { alive=false; document.getElementById(styleId)?.remove(); };
+  },[session?.user.id]);
   const [completedSteps,setCompletedSteps] = useState(0);
   const [totalSyllabusSteps,setTotalSyllabusSteps] = useState(0);
   const [notice,setNotice] = useState('');
