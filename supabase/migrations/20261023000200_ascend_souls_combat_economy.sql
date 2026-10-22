@@ -66,13 +66,13 @@ begin
  qty:=coalesce(c.army_quantity,5); v:=coalesce(c.vitality_level,1);
  cmd:=coalesce(c.command_level,1); dis:=coalesce(c.discipline_level,1);
  a:=18+least(f.level,100)+coalesce(c.attack_level,1)*3+cmd*2+dis
-   +case c.weapon_class when 'greatsword' then 15 when 'dual_blades' then 5 when 'gauntlets' then 9 when 'spear' then 8 else 10 end;
+   +case f.weapon_class when 'greatsword' then 15 when 'dual_blades' then 5 when 'gauntlets' then 9 when 'spear' then 8 else 10 end;
  d:=10+least(f.level,100)/2+coalesce(c.defense_level,1)*3+v*2+dis
-   +case c.armor_class when 'guardian' then 18 when 'bastion' then 24 when 'phantom' then 5 else 12 end;
- s:=case c.weapon_class when 'dual_blades' then 27 when 'gauntlets' then 22 when 'spear' then 18 when 'katana' then 20 else 11 end
-   +case c.armor_class when 'phantom' then 12 when 'bastion' then -6 else 0 end+cmd+dis*2;
+   +case f.armor_class when 'guardian' then 18 when 'bastion' then 24 when 'phantom' then 5 else 12 end;
+ s:=case f.weapon_class when 'dual_blades' then 27 when 'gauntlets' then 22 when 'spear' then 18 when 'katana' then 20 else 11 end
+   +case f.armor_class when 'phantom' then 12 when 'bastion' then -6 else 0 end+cmd+dis*2;
  return jsonb_build_object('user_id',p_user,'username',un,'name',fn,'level',f.level,'rating',f.rating,
- 'weapon',c.weapon_class,'armor',c.armor_class,'skill_one',c.skill_one,'skill_two',c.skill_two,'ultimate',c.ultimate,
+ 'weapon',f.weapon_class,'armor',f.armor_class,'skill_one',f.skill_one,'skill_two',f.skill_two,'ultimate',f.ultimate,
  'army_quantity',qty,'attack',a,'defense',d,'speed',s,'vitality',v,'command',cmd,'discipline',dis,
  'max_hp',180+d*2+v*4,'ascend_souls',f.ascend_souls);
 end $$;
