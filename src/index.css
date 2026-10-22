@@ -685,3 +685,36 @@ input:focus,select:focus,textarea:focus{border-color:#f0c8758c!important;box-sha
 .focus-float-hint{font:7px 'DM Mono',monospace;letter-spacing:.11em;white-space:nowrap;color:#93c5fd}
 .focus-float-trigger:focus-visible{outline:2px solid #60a5fa;outline-offset:3px}
 @media(prefers-reduced-motion:reduce){.focus-float-trigger{transition:none}}
+
+
+/* Ascend duels: arena-grade tab treatment and combat matchup cards */
+.aa-tabs{position:relative;isolation:isolate;overflow:hidden;padding:7px!important;gap:8px!important;border:1px solid #f59e0b2c!important;border-radius:17px!important;background:radial-gradient(ellipse at 8% 0%,#ef444418,transparent 42%),radial-gradient(ellipse at 100% 100%,#38bdf818,transparent 42%),linear-gradient(135deg,#101117,#0a0b10)!important;box-shadow:inset 0 1px #ffffff08,0 14px 45px #0005}
+.aa-tabs:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(105deg,transparent 15%,#ffffff04 48%,transparent 80%);pointer-events:none}
+.aa-tabs>button{position:relative;display:inline-flex!important;align-items:center;justify-content:center;gap:9px!important;min-height:44px;padding:0 17px!important;border:1px solid transparent!important;border-radius:11px!important;background:transparent!important;color:#9297a6!important;font-weight:800!important;letter-spacing:.01em;transition:transform .2s,border-color .2s,background .2s,color .2s,box-shadow .2s}
+.aa-tabs>button:hover{transform:translateY(-1px);color:#f8fafc!important;background:#ffffff08!important}
+.aa-tabs>button.active{color:#fff!important;border-color:#fbbf244d!important;background:linear-gradient(110deg,#ef444425,#f59e0b12 55%,#38bdf80b)!important;box-shadow:inset 0 1px #ffffff0b,0 5px 22px #ef444411}
+.aa-tabs>button.active:after{content:"";position:absolute;left:18%;right:18%;bottom:-7px;height:2px;border-radius:4px;background:linear-gradient(90deg,#fb7185,#fbbf24,#38bdf8);box-shadow:0 0 14px #f59e0b88}
+.aa-tabs>button.duel-tab{color:#fca5a5!important}
+.aa-tabs>button.duel-tab.active{border-color:#f8717180!important;background:linear-gradient(110deg,#ef444433,#f9731615 58%,#38bdf818)!important;box-shadow:inset 0 1px #ffffff10,0 0 24px #ef444418}
+.aa-tabs>button span{display:inline-flex;align-items:center;border:1px solid #f8717140;border-radius:5px;padding:2px 5px;background:#ef44441c;color:#fca5a5;font:9px 'DM Mono',monospace;letter-spacing:.08em}
+.aa-tab-live{margin-left:auto;display:flex;align-items:center;gap:7px;padding:0 10px;color:#a6a8b5;font:9px 'DM Mono',monospace;letter-spacing:.1em}
+.aa-tab-live i{width:6px;height:6px;border-radius:50%;background:#4ade80;box-shadow:0 0 11px #4ade8090;animation:aaLivePulse 1.8s infinite}
+@keyframes aaLivePulse{50%{opacity:.45;box-shadow:0 0 2px #4ade8030}}
+.aa-combat-duel-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.aa-combat-duel-card{position:relative;overflow:hidden;min-width:0;padding:18px;border:1px solid color-mix(in srgb,var(--duel-accent) 36%,transparent);border-radius:15px;background:radial-gradient(ellipse at 100% 0%,color-mix(in srgb,var(--duel-accent) 13%,transparent),transparent 48%),linear-gradient(145deg,#13151d,#0b0c11);box-shadow:inset 0 1px #ffffff08}
+.aa-combat-duel-card:before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:2px;border-radius:3px;background:var(--duel-accent);box-shadow:0 0 16px var(--duel-accent)}
+.aa-combat-duel-title{display:flex;align-items:center;gap:10px}
+.aa-combat-duel-title>span{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:color-mix(in srgb,var(--duel-accent) 13%,transparent);color:var(--duel-accent)}
+.aa-combat-duel-title b,.aa-combat-duel-title small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.aa-combat-duel-title b{font-size:13px;color:#f7f7fb}.aa-combat-duel-title small{margin-top:4px;font:8px 'DM Mono',monospace;letter-spacing:.1em;color:#82899b}
+.aa-combat-main-power{margin:19px 0 15px;padding:14px;border:1px solid #ffffff0d;border-radius:11px;background:#0003}
+.aa-combat-main-power small{display:block;font:9px 'DM Mono',monospace;letter-spacing:.13em;color:#9ba2b2}
+.aa-combat-main-power strong{display:block;margin-top:6px;color:var(--duel-accent);font-size:clamp(27px,4vw,38px);letter-spacing:-.06em;font-variant-numeric:tabular-nums;text-shadow:0 0 22px color-mix(in srgb,var(--duel-accent) 22%,transparent);overflow-wrap:anywhere}
+.aa-combat-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.aa-combat-stat-grid>div{min-width:0;padding:9px 7px;border:1px solid #ffffff0a;border-radius:9px;background:#ffffff04}
+.aa-combat-stat-grid span{display:block;color:#82899b;font:8px 'DM Mono',monospace;letter-spacing:.06em}
+.aa-combat-stat-grid b{display:block;margin-top:6px;color:#f3f4f6;font-size:15px;overflow-wrap:anywhere}
+.aa-combat-note{display:flex;align-items:flex-start;gap:7px;margin:12px 0 0;color:#81889a;font-size:10px;line-height:1.6}
+.aa-combat-note svg{flex:0 0 auto;color:#60a5fa}
+@media(max-width:760px){.aa-tabs{flex-wrap:wrap}.aa-tabs>button{flex:1;padding:0 10px!important}.aa-tab-live{width:100%;justify-content:center;min-height:24px;margin-left:0}.aa-combat-duel-grid{grid-template-columns:1fr}.aa-combat-stat-grid b{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.aa-tabs>button,.aa-tab-live i{transition:none;animation:none}}
