@@ -57,3 +57,40 @@
 .cq-atlas-territory.shielded .cq-territory-mark{color:#8bd6ff;border-color:#448bbd;background:#174065}
 .cq-atlas-territory.shielded .cq-territory-owner{color:#9ad9ff}
 .cq-starter-shield{border-color:#63b9f55c!important;background:linear-gradient(135deg,#15314a,#101823)!important;color:#b9e4ff!important;line-height:1.65}
+
+
+/* CONQUEST ATLAS v2 — expansive world, individual sectors, map-only wheel zoom */
+.cq-layout{grid-template-columns:minmax(0,1fr)!important;gap:20px}
+.cq-map-panel-large{width:100%;padding:clamp(16px,2vw,30px);border-color:#344d48}
+.cq-atlas-wrap{height:92vh;min-height:780px;max-height:1240px;overscroll-behavior:contain;overscroll-behavior-y:contain;touch-action:none;isolation:isolate;background-color:#0b1719;background-image:radial-gradient(ellipse at 18% 24%,#315d3f70,transparent 24%),radial-gradient(ellipse at 78% 27%,#4b3e6a66,transparent 26%),radial-gradient(ellipse at 58% 78%,#315a6559,transparent 29%),radial-gradient(ellipse at 35% 68%,#70533a55,transparent 22%),linear-gradient(145deg,#0d211e,#111c2b 52%,#211b2c)}
+.cq-atlas-wrap:before{background-image:linear-gradient(#d9e8dc20 1px,transparent 1px),linear-gradient(90deg,#d9e8dc20 1px,transparent 1px);background-size:4px 4px;opacity:.7}
+.cq-atlas-wrap:after{content:"200,000 TERRITORY WORLD GRID";position:absolute;left:18px;bottom:45px;z-index:7;pointer-events:none;font:800 10px 'DM Mono',monospace;letter-spacing:.2em;color:#b4cbb7a8;text-shadow:0 2px 12px #000}
+.cq-atlas-canvas{width:2000px;height:1600px;margin-left:-1000px;margin-top:-800px;transform-origin:center center;transition:transform .12s ease-out}
+.cq-atlas-wrap.is-dragging .cq-atlas-canvas{transition:none}
+.cq-terrain-art{opacity:.58;mix-blend-mode:screen}
+.cq-boundary-lines{opacity:.85}
+.cq-atlas-territory{width:30px;height:28px;min-height:28px;min-width:30px;display:flex;align-items:center;justify-content:center;gap:0;padding:0;border-radius:6px;transform:translate(-50%,-50%);backdrop-filter:none;box-shadow:0 1px 6px #0009,inset 0 1px #ffffff1b;background:#b7b0d226;border-color:#d6d1f055;overflow:visible}
+.cq-atlas-territory .cq-territory-mark{width:100%;height:100%;border-radius:5px;background:transparent;color:#d6d2ef}
+.cq-atlas-territory .cq-territory-mark svg{width:12px;height:12px}
+.cq-atlas-territory> b,.cq-atlas-territory>.cq-territory-owner,.cq-atlas-territory>.cq-territory-level,.cq-atlas-territory>small{display:none}
+.cq-atlas-territory.owned{background:#36d6a255;border-color:#6af0c2;box-shadow:0 0 10px #48e0b23b}
+.cq-atlas-territory.rival{background:#ff526b4d;border-color:#ff718a;box-shadow:0 0 10px #ff526b2b}
+.cq-atlas-territory.unclaimed{background:#b7addc2e;border-color:#d2c6f277}
+.cq-atlas-territory.attackable{box-shadow:0 0 0 1px #c2a6ff,0 0 13px #b19cff55}
+.cq-atlas-territory:hover,.cq-atlas-territory.selected{width:172px;height:auto;min-height:118px;align-items:flex-start;justify-content:flex-start;gap:7px;padding:12px 13px;border-radius:13px;transform:translate(-50%,-50%);backdrop-filter:blur(12px);box-shadow:0 12px 34px #000b,inset 0 1px #ffffff18;z-index:30;overflow:hidden}
+.cq-atlas-territory:hover> b,.cq-atlas-territory:hover>.cq-territory-owner,.cq-atlas-territory:hover>.cq-territory-level,.cq-atlas-territory:hover>small,.cq-atlas-territory.selected> b,.cq-atlas-territory.selected>.cq-territory-owner,.cq-atlas-territory.selected>.cq-territory-level,.cq-atlas-territory.selected>small{display:block}
+.cq-atlas-territory:hover .cq-territory-mark,.cq-atlas-territory.selected .cq-territory-mark{width:30px;height:30px;background:#ffffff0c}
+.cq-atlas-territory b{font-size:12px;line-height:1.3;color:#fff}
+.cq-atlas-territory .cq-territory-owner{font-size:8px;max-width:100%}
+.cq-atlas-territory .cq-territory-level{font-size:9px}
+.cq-atlas-controls{top:16px;left:16px;right:16px}
+.cq-atlas-controls>span{padding:10px 13px;border:1px solid #c5dbc533;border-radius:10px;background:#07100edb;backdrop-filter:blur(14px);color:#b9d5c6}
+.cq-atlas-controls>div{display:flex;gap:7px;padding:5px;border:1px solid #c5dbc533;border-radius:12px;background:#07100edb;backdrop-filter:blur(14px)}
+.cq-atlas-controls button{width:38px;height:38px;border:1px solid #ffffff1c;border-radius:8px;background:#ffffff0b;color:#e7f1e9;font-size:20px;cursor:pointer}
+.cq-atlas-controls button:hover{background:#62dfb42b;border-color:#62dfb4}
+.cq-map-compass,.cq-atlas-hint{position:relative;z-index:4}
+.cq-atlas-hint{bottom:12px;left:16px;padding:8px 11px;border-radius:9px;background:#07100edb;color:#a4b9ad}
+.cq-side{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+.cq-history{margin-top:4px}
+@media(max-width:900px){.cq-atlas-wrap{height:78vh;min-height:650px}.cq-side{grid-template-columns:1fr}.cq-atlas-territory:hover,.cq-atlas-territory.selected{width:150px;min-height:110px}}
+@media(max-width:560px){.cq-atlas-wrap{height:72vh;min-height:560px}.cq-atlas-canvas{width:2000px;height:1600px}.cq-atlas-controls>span{font-size:8px}.cq-atlas-controls button{width:32px;height:32px}.cq-atlas-hint{font-size:7px;letter-spacing:.08em}.cq-atlas-territory:hover,.cq-atlas-territory.selected{width:132px;min-height:102px;padding:9px}}
