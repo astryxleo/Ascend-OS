@@ -74,14 +74,14 @@ function App() {
     style.textContent = 'html.ascend-custom-cursor, html.ascend-custom-cursor * { cursor: none !important; } #ascend-resizable-cursor { position: fixed; left: 0; top: 0; z-index: 2147483647; pointer-events: none; user-select: none; object-fit: contain; transform: translate(-2px,-2px); } @media (pointer: coarse) { #ascend-resizable-cursor { display:none !important; } html.ascend-custom-cursor, html.ascend-custom-cursor * { cursor:auto !important; } }';
     document.head.appendChild(style);
     const pointer = document.createElement('img');
-    pointer.id = 'ascend-resizable-cursor'; pointer.alt = ''; pointer.draggable = false; pointer.setAttribute('aria-hidden','true'); document.body.appendChild(pointer);
+    pointer.id = 'ascend-resizable-cursor'; pointer.alt = ''; pointer.draggable = false; pointer.style.visibility = 'hidden'; pointer.setAttribute('aria-hidden','true'); document.body.appendChild(pointer);
     const apply = (id:number, size:number) => {
       const safeId = Math.max(0, Math.min(21, Math.round(Number(id) || 0)));
       const safeSize = Math.max(12, Math.min(48, Math.round(Number(size) || 23)));
       pointer.src = safeId === 0 ? 'https://raw.githubusercontent.com/astryxleo/Ascend-OS/main/cursor/cursor.png' : safeId === 21 ? 'https://raw.githubusercontent.com/astryxleo/Ascend-OS/main/cursor/cursor(21).png' : 'https://raw.githubusercontent.com/astryxleo/Ascend-OS/main/cursor/cursor%20(' + safeId + ').png';
       pointer.style.width = safeSize + 'px'; pointer.style.height = safeSize + 'px'; document.documentElement.classList.add('ascend-custom-cursor');
     };
-    const move = (event:PointerEvent) => { pointer.style.left = event.clientX + 'px'; pointer.style.top = event.clientY + 'px'; };
+    const move = (event:PointerEvent) => { pointer.style.left = event.clientX + 'px'; pointer.style.top = event.clientY + 'px'; pointer.style.visibility = 'visible'; };
     const change = (event:Event) => { const detail = (event as CustomEvent<{id:number;size:number}>).detail; if (!detail) return; try { localStorage.setItem('ascend-cursor-id',String(detail.id)); localStorage.setItem('ascend-cursor-size',String(detail.size)); } catch {} apply(detail.id,detail.size); };
     let id = 6, size = 23; try { id = Number(localStorage.getItem('ascend-cursor-id') || 6); size = Number(localStorage.getItem('ascend-cursor-size') || 23); } catch {}
     apply(id,size); document.addEventListener('pointermove',move,{passive:true}); window.addEventListener('ascend-cursor-settings-change',change);
