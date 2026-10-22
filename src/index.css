@@ -464,9 +464,4 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .boot-cinema-status{position:absolute;left:clamp(18px,4vw,52px);bottom:clamp(18px,4vh,42px);display:flex;align-items:center;gap:10px;color:rgba(245,245,247,.76);font:600 10px/1.4 'DM Mono',ui-monospace,monospace;letter-spacing:.17em;text-shadow:0 1px 12px #000}
 .boot-cinema-status i{display:block;width:3px;height:3px;border-radius:50%;background:#e8d5a3;box-shadow:0 0 10px rgba(232,213,163,.65)}
 .boot-cinema-status-dot{width:6px;height:6px;border-radius:50%;background:#9a83ff;box-shadow:0 0 12px rgba(154,131,255,.9);animation:boot-cinema-pulse 1.8s ease-in-out infinite}
-.boot-cinema-skip{position:absolute;right:clamp(18px,4vw,52px);bottom:clamp(16px,3.7vh,38px);display:flex;align-items:center;gap:10px;padding:10px 13px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(9,9,15,.45);backdrop-filter:blur(14px);color:rgba(255,255,255,.85);font:600 9px/1 'DM Mono',ui-monospace,monospace;letter-spacing:.12em;cursor:pointer;transition:background .2s ease,border-color .2s ease}
-.boot-cinema-skip:hover{background:rgba(154,131,255,.16);border-color:rgba(183,160,255,.55)}
-.boot-cinema-skip span{color:#e8d5a3;font-size:13px}
 @keyframes boot-cinema-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
-@media(max-width:600px){.boot-cinema-video{object-fit:contain}.boot-cinema-status{font-size:8px;letter-spacing:.1em;bottom:18px;left:14px}.boot-cinema-skip{right:14px;bottom:14px;font-size:8px;padding:9px 11px}}
-@media(prefers-reduced-motion:reduce){.boot-cinema-status-dot{animation:none}.boot-cinema-skip{transition:none}}
