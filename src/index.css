@@ -520,3 +520,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
  .syllabus-workspace .syllabus-step>small{padding:4px 6px;font-size:7px}
 }
 @media(prefers-reduced-motion:reduce){.syllabus-workspace .syllabus-step,.syllabus-workspace .syllabus-step input,.syllabus-workspace .syllabus-tile{animation:none!important;transition:none!important}}
+
+
+/* App-wide anti-text-selection polish; interactive controls remain functional. */
+html,body,#root{ -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+img,svg,video,canvas{ -webkit-user-drag:none; user-select:none; }
+input,textarea,[contenteditable="true"],[contenteditable=""],[role="textbox"]{
+  -webkit-user-select:text;user-select:text;-webkit-touch-callout:default;
+}
