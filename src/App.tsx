@@ -37,7 +37,8 @@ function App() {
   const activeUserIdRef = useRef<string | null>(null);
   activeUserIdRef.current = session?.user.id ?? null;
   const [authReady,setAuthReady] = useState(!supabase);
-  const [authMode,setAuthMode] = useState<'magic'|'google'>('magic');
+  const [authMode,setAuthMode] = useState<'login'|'signup'>('login');
+  const [password,setPassword] = useState('');
   const [email,setEmail] = useState('');
   const [authMessage,setAuthMessage] = useState('');
   const [authBusy,setAuthBusy] = useState(false);
@@ -158,16 +159,18 @@ function App() {
     if (!supabase) { setAuthMessage('Add your Supabase URL and publishable key to .env.local, then restart the dev server.'); return; }
     setAuthBusy(true); setAuthMessage('');
     try {
-      if (authMode === 'google') {
-        const {error} = await supabase.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin}});
+      if (!email.includes('@')) throw new Error('Enter a valid email address.');
+      if (password.length < 8) throw new Error('Password must be at least 8 characters.');
+      if (authMode === 'signup') {
+        const {data,error} = await supabase.auth.signUp({email,password,options:{emailRedirectTo:window.location.origin}});
         if (error) throw error;
+        if (!data.session) setAuthMessage('Account created. Check your email to confirm your account, then sign in.');
+        else setAuthMessage('Account created successfully. Welcome to Lumen.');
       } else {
-        if (!email.includes('@')) throw new Error('Enter a valid email address.');
-        const {error} = await supabase.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.origin}});
+        const {error} = await supabase.auth.signInWithPassword({email,password});
         if (error) throw error;
-        setAuthMessage('Magic link sent. Check your inbox to finish signing in.');
       }
-    } catch(e) { setAuthMessage(e instanceof Error?e.message:'Sign-in failed. Please try again.'); }
+    } catch(e) { setAuthMessage(e instanceof Error?e.message:'Authentication failed. Please try again.'); }
     finally { setAuthBusy(false); }
   }
   async function addTask(e:FormEvent) {
@@ -322,7 +325,7 @@ function App() {
     }
   }
   if (!authReady) return <div className="boot"><div className="brand-mark">L</div><span>INITIALIZING LUMEN</span></div>;
-  if (!session) return <AuthScreen email={email} setEmail={setEmail} authMode={authMode} setAuthMode={setAuthMode} signIn={signIn} busy={authBusy} message={authMessage} />;
+  if (!session) return <AuthScreen email={email} setEmail={setEmail} password={password} setPassword={setPassword} authMode={authMode} setAuthMode={setAuthMode} signIn={signIn} busy={authBusy} message={authMessage} />;
   if (session && supabase && !profileLoaded) return <div className="boot"><div className="brand-mark">L</div><span>LOADING YOUR WORKSPACE</span></div>;
   if (session && supabase && profile && !profile.school_target) return <Onboarding supabase={supabase} profile={profile} userId={session.user.id} onSaved={(next) => { setProfile(next); setNotice('Welcome to Lumen. Your workspace is ready.'); }} />;
   const isOperator = profile?.role === 'operator' || (session.user.email === 'astryxleo@gmail.com' && session.user.email_confirmed_at);
@@ -358,8 +361,8 @@ function App() {
     </main>
   </div>;
 }
-function AuthScreen({email,setEmail,authMode,setAuthMode,signIn,busy,message}:{email:string;setEmail:(s:string)=>void;authMode:'magic'|'google';setAuthMode:(s:'magic'|'google')=>void;signIn:()=>void;busy:boolean;message:string}) {
- return <div className="auth-shell"><div className="auth-ambient ambient-one"/><div className="auth-ambient ambient-two"/><div className="auth-card"><div className="brand auth-brand"><div className="brand-mark">L</div><div><strong>LUMEN</strong><span>STUDY OPERATING SYSTEM</span></div></div><div className="auth-kicker"><span/> YOUR NEXT CHAPTER STARTS HERE</div><h1>Make focus<br/>your <em>superpower.</em></h1><p className="auth-copy">One place for your syllabus, deep work, and the future you're building.</p><div className="auth-tabs"><button className={authMode==='magic'?'selected':''} onClick={()=>setAuthMode('magic')}>Email link</button><button className={authMode==='google'?'selected':''} onClick={()=>setAuthMode('google')}>Google</button></div>{authMode==='magic'&&<label className="field-label">EMAIL ADDRESS<input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email"/></label>}<button className="auth-submit" onClick={signIn} disabled={busy}>{busy?'Connecting…':authMode==='google'?'Continue with Google':'Send secure sign-in link'} <ArrowUpRight size={16}/></button>{message&&<div className="auth-message">{message}</div>}<div className="auth-security"><ShieldCheck size={15}/> Your study data stays private to your account.</div><div className="auth-foot">DESIGNED FOR DISCIPLINE <span>·</span> POWERED BY YOU</div></div></div>;
+function AuthScreen({email,setEmail,password,setPassword,authMode,setAuthMode,signIn,busy,message}:{email:string;setEmail:(s:string)=>void;password:string;setPassword:(s:string)=>void;authMode:'login'|'signup';setAuthMode:(s:'login'|'signup')=>void;signIn:()=>void;busy:boolean;message:string}) {
+ return <div className="auth-shell"><div className="auth-ambient ambient-one"/><div className="auth-ambient ambient-two"/><div className="auth-card"><div className="brand auth-brand"><div className="brand-mark">L</div><div><strong>LUMEN</strong><span>STUDY OPERATING SYSTEM</span></div></div><div className="auth-kicker"><span/> YOUR NEXT CHAPTER STARTS HERE</div><h1>Make focus<br/>your <em>superpower.</em></h1><p className="auth-copy">One place for your syllabus, deep work, and the future you're building.</p><div className="auth-tabs"><button type="button" className={authMode==='login'?'selected':''} onClick={()=>setAuthMode('login')}>Log in</button><button type="button" className={authMode==='signup'?'selected':''} onClick={()=>setAuthMode('signup')}>Create account</button></div><label className="field-label">EMAIL ADDRESS<input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" required/></label><label className="field-label">PASSWORD<input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="At least 8 characters" autoComplete={authMode==='signup'?'new-password':'current-password'} minLength={8} required/></label><button className="auth-submit" onClick={signIn} disabled={busy}>{busy?(authMode==='signup'?'Creating account…':'Signing in…'):authMode==='signup'?'Create free account':'Log in'} <ArrowUpRight size={16}/></button>{message&&<div className="auth-message" role="status">{message}</div>}<div className="auth-security"><ShieldCheck size={15}/> Your study data stays private to your account.</div><div className="auth-foot">FREE TO USE <span>·</span> POWERED BY YOU</div></div></div>;
 }
 function Overview({tasks,done,percent,focusSeconds,fmt,setFocusSeconds,focusRunning,setFocusRunning,focusMode,setFocusMode,setActiveNav,completedSteps,coins,startFocus,resetFocus,pauseFocus,focusPaused,focusCompleted,focusSaving,sessionActive}:{tasks:Task[];done:number;percent:number;focusSeconds:number;fmt:(s:number)=>string;setFocusSeconds:(s:number)=>void;focusRunning:boolean;setFocusRunning:(b:boolean)=>void;focusMode:string;setFocusMode:(s:string)=>void;setActiveNav:(s:string)=>void;completedSteps:number;coins:number;startFocus:()=>void;resetFocus:()=>void;pauseFocus:()=>void;focusPaused:boolean;focusCompleted:boolean;focusSaving:boolean;sessionActive:boolean}) {
  const remaining=tasks.length-done;
