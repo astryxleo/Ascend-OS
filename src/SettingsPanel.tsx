@@ -42,7 +42,7 @@ async function compressAvatar(file: File): Promise<Blob> {
   });
 }
 
-export default function SettingsPanel({ supabase, profile, userId, onSaved, setNotice }: Props) {
+export default function SettingsPanel({ supabase, profile, userId, onSaved, setNotice, onContactOperator }: Props) {
   const [name, setName] = useState(profile?.full_name ?? '');
   const [username, setUsername] = useState(profile?.username ?? '');
   const [grade, setGrade] = useState(profile?.class_grade ?? '12');
