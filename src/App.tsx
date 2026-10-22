@@ -50,13 +50,10 @@ function labelFromPath(path: string) {
 function studyDay() { const d = new Date(Date.now() - 4 * 60 * 60 * 1000); const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(d); const part = (type: string) => parts.find(item => item.type === type)?.value ?? ''; return `${part('year')}-${part('month')}-${part('day')}`; }
 function shiftStudyDay(day: string, amount: number) { const d = new Date(`${day}T12:00:00.000Z`); d.setUTCDate(d.getUTCDate() + amount); return d.toISOString().slice(0, 10); }
 function shouldShowBootIntro() {
-  const key = 'ascend-os:last-pagehide-at';
   try {
     const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
-    const lastClosedAt = Number(localStorage.getItem(key) || 0);
-    if (navigation?.type === 'reload') { localStorage.removeItem(key); return false; }
-    localStorage.removeItem(key);
-    return !lastClosedAt || Date.now() - lastClosedAt > 10_000;
+    // Play on a fresh browser navigation, but never replay on refresh (including Ctrl+R).
+    return navigation?.type !== 'reload';
   } catch { return true; }
 }
 
@@ -111,12 +108,6 @@ function App() {
   const [notice,setNotice] = useState('');
   const [newTaskOpen,setNewTaskOpen] = useState(false);
 
-  useEffect(() => {
-    const key = 'ascend-os:last-pagehide-at';
-    const onPageHide = () => { try { localStorage.setItem(key, String(Date.now())); } catch { /* storage can be disabled */ } };
-    window.addEventListener('pagehide', onPageHide);
-    return () => window.removeEventListener('pagehide', onPageHide);
-  }, []);
   useEffect(() => {
     if (!supabase) return;
     // A newer auth event must win over a slower initial session restore.
