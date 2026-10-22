@@ -26,3 +26,39 @@
 .squad-challenge-delete:hover:not(:disabled){background:#ef444425;border-color:#f8717180;transform:translateY(-1px)}
 .squad-challenge-delete:disabled{opacity:.4;cursor:wait}
 @media(max-width:700px){.squad-dashboard{padding:16px}.squad-dashboard-heading{flex-direction:column}.squad-dashboard-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.squad-dashboard-open{width:100%}}
+
+
+/* SQUAD ASCEND — premium command-deck pass */
+.squad-page{gap:22px}
+.squad-hero{border-radius:27px;border-color:#d9b86d36;background:radial-gradient(ellipse at 78% 0%,#f3cf7b12,transparent 36%),radial-gradient(ellipse at 0% 100%,#4f46e50d,transparent 40%),linear-gradient(120deg,#17151c,#0d1018 60%,#101923);box-shadow:0 24px 70px #0003,inset 0 1px #ffffff09}
+.squad-hero:after{content:"";position:absolute;inset:12px;border:1px solid #ffffff08;border-radius:19px;pointer-events:none}
+.squad-hero h1{font-size:clamp(35px,5vw,54px);text-shadow:0 4px 36px #e9c77812}
+.squad-hero-stat{min-width:130px;padding:18px;border:1px solid #e9c77830;border-radius:19px;background:linear-gradient(145deg,#e9c7780f,#ffffff03);box-shadow:inset 0 1px #ffffff0c}
+.squad-hero-stat b{font-size:clamp(42px,5vw,58px);letter-spacing:-.08em;text-shadow:0 0 30px #e9c77818}
+.squad-detail.panel,.squad-section.panel{position:relative;border-radius:22px;border-color:#ffffff13;background:radial-gradient(ellipse at 100% 0%,#e9c77807,transparent 42%),linear-gradient(145deg,#121218,#0b0b10);box-shadow:0 18px 50px #0002,inset 0 1px #ffffff06}
+.squad-detail-top{gap:17px}
+.squad-big-emblem{width:58px;height:58px;border:1px solid #e9c77845;border-radius:18px;background:linear-gradient(145deg,#e9c77820,#ffffff04);box-shadow:0 0 35px #e9c7780d,inset 0 1px #ffffff12}
+.squad-dashboard{border:1px solid #d8b86a28;border-radius:24px;padding:clamp(18px,2.5vw,27px);background:radial-gradient(ellipse at 100% 0%,#d8b86a12,transparent 38%),linear-gradient(145deg,#11131b,#090a10);box-shadow:0 20px 55px #0003,inset 0 1px #ffffff09}
+.squad-dashboard-heading h3{font-size:clamp(22px,3vw,30px);letter-spacing:-.045em}
+.squad-dashboard-kpis{gap:12px}
+.squad-dashboard-kpis article{position:relative;overflow:hidden;border-radius:17px;border-color:#ffffff13;background:linear-gradient(145deg,#ffffff08,#ffffff02);padding:17px}
+.squad-dashboard-kpis article:before{content:"";position:absolute;left:0;top:0;width:100%;height:2px;background:linear-gradient(90deg,#d8b86a80,transparent);opacity:.65}
+.squad-dashboard-kpis article b{font-size:clamp(23px,2.6vw,32px);letter-spacing:-.06em}
+.squad-dashboard-kpis article:hover{transform:translateY(-4px);border-color:#e9c77855;background:linear-gradient(145deg,#e9c77810,#ffffff02);box-shadow:0 18px 35px #0003,0 0 22px #e9c7780a}
+.squad-ascend-panel{overflow:hidden}
+.squad-ascend-panel:before{content:"";position:absolute;top:-140px;right:-90px;width:300px;height:240px;border-radius:50%;background:#e9c7780a;filter:blur(40px);pointer-events:none}
+.squad-ascend-upgrades article{border-radius:16px;border-color:#ffffff12;background:linear-gradient(120deg,#ffffff06,#ffffff01);transition:transform .2s ease,border-color .2s ease,background .2s ease}
+.squad-ascend-upgrades article:hover{transform:translateY(-2px);border-color:#d8b86a45;background:linear-gradient(120deg,#d8b86a0d,#ffffff02)}
+.squad-ascend-icon{border-radius:12px;border:1px solid #e9c77822;background:#e9c7780d}
+.squad-ascend-upgrades article button{border-radius:10px;letter-spacing:.08em;box-shadow:0 5px 18px #0002}
+.squad-member-row{transition:background .18s ease,border-color .18s ease}
+.squad-member-row:hover{background:linear-gradient(90deg,#e9c7780c,transparent);border-color:#e9c77820}
+.squad-challenge{position:relative;border:1px solid #ffffff11;border-radius:17px;background:linear-gradient(145deg,#ffffff06,#ffffff01);transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+.squad-challenge:hover{transform:translateY(-2px);border-color:#d8b86a45;box-shadow:0 14px 35px #0003}
+.squad-challenge-progress{overflow:hidden;border-radius:20px;background:#ffffff10}
+.squad-challenge-progress i{box-shadow:0 0 13px #e9c77835}
+.squad-dashboard-open{border:1px solid #e9c77845!important;border-radius:12px!important;background:linear-gradient(120deg,#d8b86a20,#ffffff04)!important;color:#f2d995!important;box-shadow:0 0 22px #d8b86a0b;transition:all .2s ease}
+.squad-dashboard-open:hover{transform:translateY(-2px);border-color:#e9c77890!important;box-shadow:0 8px 25px #d8b86a15}
+.squad-role-note{border-radius:12px}
+.squad-bottom-actions{padding-top:12px}
+@media(max-width:680px){.squad-hero{align-items:flex-start;flex-direction:column}.squad-hero-stat{align-self:stretch;display:flex;align-items:center;justify-content:space-between}.squad-detail-top{flex-wrap:wrap}.squad-dashboard-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
