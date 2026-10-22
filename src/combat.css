@@ -240,3 +240,10 @@
 .army-doctrine>.combat-primary { justify-self:start; }
 .forge-swatches button:disabled { opacity:.42;cursor:not-allowed; }
 @media(max-width:680px) { .army-overview { grid-template-columns:1fr; } .army-actions { align-items:stretch;flex-direction:column; } .army-actions .combat-primary { justify-content:center; } .army-formation-preview { min-height:120px;padding:10px; } }
+
+/* Keep the off-hand blade attached to the off-hand in every pose. */
+.stick-svg .fighter-drawing .fighter-weapon { transform-box:view-box;transform-origin:0 0!important; }
+.stick-svg .fighter-drawing .fighter-weapon-offhand { transform:translate(26px,80px) rotate(25deg)!important;transform-origin:0 0!important; }
+.stick-svg.pose-guard .fighter-drawing .fighter-weapon-offhand { transform:translate(26px,80px) rotate(8deg)!important; }
+.stick-svg.pose-agile .fighter-drawing .fighter-weapon-offhand { transform:translate(24px,79px) rotate(38deg)!important; }
+.stick-svg.pose-power .fighter-drawing .fighter-weapon-offhand { transform:translate(27px,80px) rotate(48deg)!important; }
