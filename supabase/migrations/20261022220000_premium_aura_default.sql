@@ -1,0 +1,1 @@
+alter table public.combat_customizations alter column aura set default false;
