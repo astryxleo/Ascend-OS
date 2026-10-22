@@ -1,6 +1,6 @@
 import {useCallback,useEffect,useState} from 'react';
 import type {SupabaseClient} from '@supabase/supabase-js';
-import {Activity,Clock3,RefreshCw,Search,Shield,Swords,Trophy,Zap,CheckCircle2,XCircle,Users} from 'lucide-react';
+import {Clock3,RefreshCw,Search,Swords,Trophy,Zap,CheckCircle2,XCircle,Users} from 'lucide-react';
 import './individual-duels.css';
 type Opponent={user_id:string;username:string;full_name:string;level:number;rating:number;wins:number;losses:number};
 type Match={id:string;challenger_id:string;opponent_id:string;status:string;challenger_ready:boolean;opponent_ready:boolean;duration_seconds:number|null;started_at:string|null;challenger_snapshot:any;opponent_snapshot:any;winner_id:string|null;event_log:any[];result:any;created_at:string};
