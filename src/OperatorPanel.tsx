@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { Activity, RefreshCw, Search, Send, ShieldCheck, Wallet, Users, CarFront } from 'lucide-react';
+import { Activity, RefreshCw, Search, Send, ShieldCheck, Wallet, Users } from 'lucide-react';
 
 type UserRow = {
   user_id: string;
@@ -16,7 +16,6 @@ type UserRow = {
 };
 type Stats = Record<string, number>;
 type WalletTransaction = { id: string; user_id: string; username: string | null; full_name: string | null; currency: string; amount: number; reason: string; source: string; created_by: string | null; created_at: string };
-type Vehicle = { id: string; name: string; maker: string; tier: string; rarity: string; price_coins: number; price_cash: number; stock_limit: number | null; stock_sold: number; is_available: boolean; is_limited: boolean; is_operator_drop: boolean; top_speed_kmh: number | null; zero_to_100: number | null; horsepower: number | null };
 type Broadcast = {
   id: string;
   title: string;
@@ -50,26 +49,11 @@ export default function OperatorPanel({
   const [publish, setPublish] = useState(true);
   const [busy, setBusy] = useState(false);
   const [searchingUsers, setSearchingUsers] = useState(false);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [vehicleLoadError, setVehicleLoadError] = useState('');
   const [walletTransactions, setWalletTransactions] = useState<WalletTransaction[]>([]);
   const [walletAuditError, setWalletAuditError] = useState('');
   const [walletAuditQuery, setWalletAuditQuery] = useState('');
-  const [vehicleQuery, setVehicleQuery] = useState('');
-  const [vehicleId, setVehicleId] = useState('');
-  const [vehicleName, setVehicleName] = useState('');
-  const [vehicleMaker, setVehicleMaker] = useState('');
-  const [vehicleTier, setVehicleTier] = useState('Hypercar');
-  const [vehicleRarity, setVehicleRarity] = useState('Rare');
-  const [vehicleCoins, setVehicleCoins] = useState('1000');
-  const [vehicleCash, setVehicleCash] = useState('0');
-  const [vehicleStock, setVehicleStock] = useState('');
-  const [vehicleLimited, setVehicleLimited] = useState(false);
-  const [vehicleDrop, setVehicleDrop] = useState(false);
-  const [vehicleAvailable, setVehicleAvailable] = useState(true);
   const usersRequestId = useRef(0);
   const dashboardRequestId = useRef(0);
-  const vehiclesRequestId = useRef(0);
   const walletAuditRequestId = useRef(0);
 
   async function refresh() {
@@ -242,70 +226,6 @@ export default function OperatorPanel({
     }
   }
 
-  async function loadVehicles() {
-    if (!supabase) return;
-    const request = ++vehiclesRequestId.current;
-    setBusy(true);
-    try {
-      const { data, error } = await supabase.from('vehicles').select('id,name,maker,tier,rarity,price_coins,price_cash,stock_limit,stock_sold,is_available,is_limited,is_operator_drop,top_speed_kmh,zero_to_100,horsepower').order('created_at', { ascending: false });
-      if (request !== vehiclesRequestId.current) return;
-      if (error) {
-        setVehicles([]);
-        setVehicleLoadError(error.message);
-        setNotice('Marketplace catalog failed to load: ' + error.message);
-      } else {
-        setVehicleLoadError('');
-        setVehicles((data ?? []) as Vehicle[]);
-      }
-    } catch (error) {
-      if (request !== vehiclesRequestId.current) return;
-      const message = error instanceof Error ? error.message : 'Unexpected error.';
-      setVehicles([]);
-      setVehicleLoadError(message);
-      setNotice('Marketplace catalog failed to load: ' + message);
-    } finally { if (request === vehiclesRequestId.current) setBusy(false); }
-  }
-
-  useEffect(() => { if (tab === 'Marketplace') void loadVehicles(); else vehiclesRequestId.current += 1; }, [tab, supabase]);
-
-  function selectVehicle(vehicle: Vehicle) {
-    setVehicleId(vehicle.id); setVehicleName(vehicle.name); setVehicleMaker(vehicle.maker);
-    setVehicleTier(vehicle.tier); setVehicleRarity(vehicle.rarity);
-    setVehicleCoins(String(vehicle.price_coins)); setVehicleCash(String(vehicle.price_cash));
-    setVehicleStock(vehicle.stock_limit === null ? '' : String(vehicle.stock_limit));
-    setVehicleLimited(vehicle.is_limited); setVehicleDrop(vehicle.is_operator_drop); setVehicleAvailable(vehicle.is_available);
-  }
-
-  function resetVehicleForm() {
-    setVehicleId(''); setVehicleName(''); setVehicleMaker(''); setVehicleTier('Hypercar'); setVehicleRarity('Rare');
-    setVehicleCoins('1000'); setVehicleCash('0'); setVehicleStock(''); setVehicleLimited(false); setVehicleDrop(false); setVehicleAvailable(true);
-  }
-
-  async function saveVehicle(event: FormEvent) {
-    event.preventDefault();
-    if (!supabase) return;
-    const cleanId = vehicleId.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-    const coins = Number(vehicleCoins); const cash = Number(vehicleCash);
-    const stock = vehicleStock.trim() === '' ? null : Number(vehicleStock);
-    if (!cleanId || cleanId.length > 48 || !vehicleName.trim() || !vehicleMaker.trim()) { setNotice('Enter a valid vehicle ID, name and maker.'); return; }
-    if (!Number.isSafeInteger(coins) || coins < 0 || !Number.isSafeInteger(cash) || cash < 0) { setNotice('Prices must be non-negative whole numbers.'); return; }
-    if (stock !== null && (!Number.isSafeInteger(stock) || stock < 0)) { setNotice('Stock limit must be a non-negative whole number or left blank for unlimited stock.'); return; }
-    const existing = vehicles.find(v => v.id === cleanId);
-    if (!existing && vehicleId.trim() !== cleanId) { setNotice('Vehicle ID may contain lowercase letters, numbers and hyphens only.'); return; }
-    if (existing && stock !== null && stock < existing.stock_sold) { setNotice('Stock limit cannot be lower than units already sold (' + existing.stock_sold + ').'); return; }
-    const payload = { id: cleanId, name: vehicleName.trim(), maker: vehicleMaker.trim(), tier: vehicleTier, rarity: vehicleRarity, price_coins: coins, price_cash: cash, stock_limit: stock, is_limited: vehicleLimited, is_operator_drop: vehicleDrop, is_available: vehicleAvailable };
-    setBusy(true);
-    try {
-      const result = existing
-        ? await supabase.from('vehicles').update({ name: payload.name, maker: payload.maker, tier: payload.tier, rarity: payload.rarity, price_coins: payload.price_coins, price_cash: payload.price_cash, stock_limit: payload.stock_limit, is_limited: payload.is_limited, is_operator_drop: payload.is_operator_drop, is_available: payload.is_available }).eq('id', cleanId)
-        : await supabase.from('vehicles').insert(payload);
-      if (result.error) setNotice('Vehicle save failed: ' + result.error.message);
-      else { setNotice(existing ? 'Vehicle catalog entry updated.' : 'Vehicle added to the dealership catalog.'); resetVehicleForm(); await loadVehicles(); }
-    } catch (error) { setNotice('Vehicle save failed: ' + (error instanceof Error ? error.message : 'Unexpected error.')); }
-    finally { setBusy(false); }
-  }
-
-  const visibleVehicles = vehicles.filter(v => (v.name + ' ' + v.maker + ' ' + v.id).toLowerCase().includes(vehicleQuery.toLowerCase()));
   async function loadWalletAudit() {
     if (!supabase) return;
     const request = ++walletAuditRequestId.current;
@@ -335,7 +255,7 @@ export default function OperatorPanel({
     return [row.reason, row.source, row.currency, row.user_id, row.username ?? '', row.full_name ?? ''].join(' ').toLowerCase().includes(walletAuditQuery.toLowerCase());
   });
 
-  const tabs = ['Overview', 'Users', 'Wallet', 'Wallet audit', 'Broadcasts', 'Marketplace'];
+  const tabs = ['Overview', 'Users', 'Wallet', 'Wallet audit', 'Broadcasts'];
 
   return (
     <section className="panel operator-panel">
@@ -373,7 +293,6 @@ export default function OperatorPanel({
               ['Focus sessions', 'focus_sessions'],
               ['Focus minutes', 'focus_minutes'],
               ['Exams', 'exams'],
-              ['Vehicles', 'vehicles'],
               ['Live broadcasts', 'published_broadcasts'],
             ].map(([label, key]) => (
               <div className="operator-stat" key={key}>
@@ -387,7 +306,6 @@ export default function OperatorPanel({
             <button onClick={() => setTab('Wallet')}><Wallet /><b>Reward terminal</b><span>Audited wallet changes</span></button>
             <button onClick={() => setTab('Wallet audit')}><Activity /><b>Wallet audit log</b><span>Latest currency ledger entries</span></button>
             <button onClick={() => setTab('Broadcasts')}><Activity /><b>Global broadcast</b><span>System-wide alerts</span></button>
-            <button onClick={() => setTab('Marketplace')}><CarFront /><b>Marketplace</b><span>Manage dealership inventory</span></button>
           </div>
         </>
       )}
@@ -452,43 +370,6 @@ export default function OperatorPanel({
             {walletAuditError && <p className="operator-help" role="alert">Could not load wallet history: {walletAuditError}. Use Refresh to try again.</p>}
             {visibleWalletTransactions.map(row => <article key={row.id}><div><b>{row.full_name ? row.full_name + (row.username ? ' · @' + row.username : '') : 'Account ' + row.user_id.slice(0, 8)}</b><p>{row.reason}</p><small>{row.currency.toUpperCase()} · {row.source} · {new Date(row.created_at).toLocaleString()} · {row.created_by ? 'Recorded by ' + row.created_by.slice(0, 8) : 'System recorded'}</small></div><strong style={{whiteSpace:'nowrap'}}>{row.amount > 0 ? '+' : ''}{Number(row.amount).toLocaleString()} {row.currency}</strong></article>)}
             {!busy && !walletAuditError && visibleWalletTransactions.length === 0 && <p className="operator-help">No transactions match this filter.</p>}
-          </div>
-        </>
-      )}
-
-      {tab === 'Marketplace' && (
-        <>
-          <div className="operator-warning">
-            <CarFront size={18} />
-            <div><b>Dealership catalog</b><span>Add vehicles, update pricing and control availability. Existing purchases and sold-stock counts are preserved.</span></div>
-          </div>
-          <form className="operator-form" onSubmit={saveVehicle}>
-            <label>Vehicle ID <input value={vehicleId} onChange={event => setVehicleId(event.target.value)} placeholder="e.g. apex-v12" pattern="[a-z0-9-]+" maxLength={48} required disabled={vehicles.some(v => v.id === vehicleId)} /></label>
-            <label>Vehicle name <input value={vehicleName} onChange={event => setVehicleName(event.target.value)} maxLength={100} required /></label>
-            <label>Maker <input value={vehicleMaker} onChange={event => setVehicleMaker(event.target.value)} maxLength={80} required /></label>
-            <label>Tier <select value={vehicleTier} onChange={event => setVehicleTier(event.target.value)}>{['Hypercar','Track Toy','Luxury GT','Concept Prototype','Le Mans Legend'].map(value => <option key={value}>{value}</option>)}</select></label>
-            <label>Rarity <select value={vehicleRarity} onChange={event => setVehicleRarity(event.target.value)}>{['Common','Rare','Exotic','Mythic','1-of-1'].map(value => <option key={value}>{value}</option>)}</select></label>
-            <label>Price (coins) <input type="number" min="0" step="1" value={vehicleCoins} onChange={event => setVehicleCoins(event.target.value)} required /></label>
-            <label>Price (cash) <input type="number" min="0" step="1" value={vehicleCash} onChange={event => setVehicleCash(event.target.value)} required /></label>
-            <label>Stock limit <input type="number" min="0" step="1" value={vehicleStock} onChange={event => setVehicleStock(event.target.value)} placeholder="Blank = unlimited" /></label>
-            <label className="operator-check"><input type="checkbox" checked={vehicleAvailable} onChange={event => setVehicleAvailable(event.target.checked)} /> Available in dealership</label>
-            <label className="operator-check"><input type="checkbox" checked={vehicleLimited} onChange={event => setVehicleLimited(event.target.checked)} /> Limited release</label>
-            <label className="operator-check"><input type="checkbox" checked={vehicleDrop} onChange={event => setVehicleDrop(event.target.checked)} /> Operator drop</label>
-            <div className="operator-wide" style={{display:'flex',gap:'.65rem',flexWrap:'wrap'}}>
-              <button className="operator-primary" disabled={busy}>{busy ? 'Saving…' : vehicles.some(v => v.id === vehicleId) ? 'Save catalog changes' : 'Add vehicle'}</button>
-              <button type="button" disabled={busy} onClick={resetVehicleForm}>Clear form</button>
-              <button type="button" disabled={busy} onClick={() => void loadVehicles()}><RefreshCw size={14}/> Refresh catalog</button>
-            </div>
-          </form>
-          <div className="operator-search"><input value={vehicleQuery} onChange={event => setVehicleQuery(event.target.value)} placeholder="Filter by name, maker or ID…" aria-label="Filter marketplace catalog" /></div>
-          <div className="operator-broadcast-list">
-            <h3>Catalog inventory · {visibleVehicles.length} vehicles</h3>
-            {vehicleLoadError && <p className="operator-help" role="alert">Could not load the catalog: {vehicleLoadError}. Use Refresh catalog to try again.</p>}
-            {visibleVehicles.map(vehicle => <article key={vehicle.id}>
-              <div><b>{vehicle.name} <small>· {vehicle.maker}</small></b><p>{vehicle.id} · {vehicle.tier} · {vehicle.rarity}</p><small>◈ {Number(vehicle.price_coins).toLocaleString()} coins · {vehicle.price_cash.toLocaleString()} cash · {vehicle.stock_limit === null ? 'Unlimited stock' : Math.max(0, vehicle.stock_limit - vehicle.stock_sold) + ' remaining'} · {vehicle.is_available ? 'Available' : 'Hidden'}</small></div>
-              <button type="button" disabled={busy} onClick={() => selectVehicle(vehicle)}>Edit</button>
-            </article>)}
-            {visibleVehicles.length === 0 && !vehicleLoadError && <p className="operator-help">No vehicles match this filter.</p>}
           </div>
         </>
       )}
