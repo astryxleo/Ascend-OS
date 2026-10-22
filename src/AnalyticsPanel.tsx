@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { Activity, Award, BarChart3, CheckCircle2, RefreshCw, Search, ShieldCheck, Swords, TrendingUp, Trophy, Users } from 'lucide-react';
 
 type Person = { id: string; username: string | null; full_name: string | null; avatar_url: string | null };
+type CombatRanking = {user_id:string;combat_level:number|string;combat_rating:number|string;combat_wins:number|string;power_score:number|string;army_quantity:number|string};
 type DayFocus = { date: string; minutes: number; hours: number };
 type DayTasks = { date: string; created: number; completed: number; rate: number };
 type DayCumulative = { date: string; hours: number };
@@ -101,6 +102,7 @@ export default function AnalyticsPanel({ supabase, userId, initialTab = 'analyti
   const [tab,setTab]=useState<'analytics'|'duels'>(initialTab);
   const [self,setSelf]=useState<Analytics|null>(null);
   const [opponent,setOpponent]=useState<Analytics|null>(null);
+  const [combatRanks,setCombatRanks]=useState<CombatRanking[]>([]);
   const [opponents,setOpponents]=useState<Person[]>([]);
   const [selectedId,setSelectedId]=useState('');
   const [search,setSearch]=useState('');
@@ -149,6 +151,22 @@ export default function AnalyticsPanel({ supabase, userId, initialTab = 'analyti
   },[supabase,userId,selectedId,tab,load]);
 
   useEffect(()=>{
+    if(!supabase||!userId||tab!=='duels'){setCombatRanks([]);return;}
+    let alive=true;
+    supabase.rpc('get_ascend_rankings',{p_limit:100}).then(({data,error})=>{
+      if(!alive)return;
+      if(error){setCombatRanks([]);return;}
+      const wanted=new Set([userId,selectedId]);
+      setCombatRanks(((data??[]) as CombatRanking[]).filter(row=>wanted.has(row.user_id)));
+    });
+    const channel=supabase.channel('duel-combat-'+userId+'-'+selectedId)
+      .on('postgres_changes',{event:'*',schema:'public',table:'combat_fighters'},()=>{supabase.rpc('get_ascend_rankings',{p_limit:100}).then(({data,error})=>{if(alive&&!error){const wanted=new Set([userId,selectedId]);setCombatRanks(((data??[]) as CombatRanking[]).filter(row=>wanted.has(row.user_id));}});})
+      .on('postgres_changes',{event:'*',schema:'public',table:'combat_customizations'},()=>{supabase.rpc('get_ascend_rankings',{p_limit:100}).then(({data,error})=>{if(alive&&!error){const wanted=new Set([userId,selectedId]);setCombatRanks(((data??[]) as CombatRanking[]).filter(row=>wanted.has(row.user_id));}});})
+      .subscribe();
+    return()=>{alive=false;void supabase.removeChannel(channel);};
+  },[supabase,userId,selectedId,tab]);
+
+  useEffect(()=>{
     if(!supabase||!userId)return;
     const channel=supabase.channel('analytics-live-'+userId+'-'+(selectedId||'none'))
       .on('postgres_changes',{event:'*',schema:'public',table:'focus_sessions'},()=>void load(true))
@@ -193,6 +211,7 @@ export default function AnalyticsPanel({ supabase, userId, initialTab = 'analyti
     </>:!selectedId||!opponent?<div className="aa-empty"><Users size={25}/><b>Select a study opponent</b><span>{opponents.length?'Choose a student from the selector above to start a 1v1 comparison.':'No other student profiles are currently available in the platform directory.'}</span></div>:<>
       <div className="aa-section-label"><span>DUELS · HEAD-TO-HEAD</span><b>02 / THE MATCHUP</b></div>
       <div className="aa-duel-summary"><span className="aa-duel-dot red-dot"/><b>{self.name}</b><span>·</span><span className="aa-duel-dot cyan-dot"/><b>{opponent.name}</b><small>LAST 30 DAYS · LIVE METRICS</small></div>
+      <Card eyebrow="COMBAT ARENA · PLAYER STATS" title="Combat power matchup"><div className="aa-combat-duel-grid">{[{id:userId,name:self.name,color:RED},{id:selectedId,name:opponent.name,color:CYAN}].map(person=>{const stats=combatRanks.find(row=>row.user_id===person.id);return <article key={person.id} className="aa-combat-duel-card" style={{'--duel-accent':person.color} as CSSProperties}><div className="aa-combat-duel-title"><span><Swords size={17}/></span><div><b>{person.name}</b><small>{person.id===userId?'YOUR COMBAT PROFILE':'OPPONENT PROFILE'}</small></div></div><div className="aa-combat-main-power"><small>COMBAT POWER</small><strong>{stats?Number(stats.power_score).toLocaleString('en-IN'):'—'}</strong></div><div className="aa-combat-stat-grid"><div><span>LEVEL</span><b>{stats?Number(stats.combat_level):'—'}</b></div><div><span>RATING</span><b>{stats?Number(stats.combat_rating).toLocaleString('en-IN'):'—'}</b></div><div><span>WINS</span><b>{stats?Number(stats.combat_wins).toLocaleString('en-IN'):'—'}</b></div><div><span>ARMY</span><b>{stats?Number(stats.army_quantity).toLocaleString('en-IN'):'—'}</b></div></div></article>;})}</div><p className="aa-combat-note"><ShieldCheck size={13}/> Combat metrics use saved profile stats. Duel analytics never exposes private wallet or account information.</p></Card>
       <Card eyebrow="EXAMS" title="Exam mastery"><div className="aa-exam-duel"><ExamScore data={self} color={RED}/><ExamScore data={opponent} color={CYAN}/></div></Card>
       <Card eyebrow="ACTUAL FOCUSED HOURS · COMPLETED SESSIONS" title="Focus trend — last 30 days"><LineGraph data={duelFocus} series={[{key:'you',label:self.name,color:RED},{key:'them',label:opponent.name,color:CYAN}]} max={16} ticks={[0,4,8,12,16]} suffix="h"/><Legend items={[{label:self.name,color:RED},{label:opponent.name,color:CYAN}]}/></Card>
       <Card eyebrow="TASKS COMPLETED / CREATED" title="Daily Planner success"><LineGraph data={duelTasks} series={[{key:'you',label:self.name,color:RED},{key:'them',label:opponent.name,color:CYAN}]} max={100} ticks={[0,25,50,75,100]} suffix="%"/><Legend items={[{label:self.name,color:RED},{label:opponent.name,color:CYAN}]}/></Card>
