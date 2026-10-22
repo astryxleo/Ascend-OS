@@ -334,3 +334,124 @@ input:focus,select:focus,textarea:focus{border-color:rgba(167,139,250,.72)!impor
 .boot .brand-mark{width:44px;height:44px}
 .sidebar .brand-mark{width:40px;height:40px;flex:0 0 40px}
 @media(prefers-reduced-motion:reduce){.brand-mark:after{animation:none!important}}
+
+
+/* ASCEND OS — command-center interface system */
+:root{--asc-bg:#08090e;--asc-panel:rgba(17,19,29,.82);--asc-line:rgba(222,211,255,.105);--asc-gold:#e7c77b;--asc-violet:#9a83ff;--asc-cyan:#82e6f4}
+.panel,.metric-card,.focus-card,.task-panel,.exam-command,.syllabus-panel{position:relative;isolation:isolate}
+.panel{border-color:var(--asc-line);background:linear-gradient(145deg,rgba(22,23,35,.92),rgba(10,11,17,.9));box-shadow:0 18px 70px rgba(0,0,0,.19),inset 0 1px rgba(255,255,255,.035);transition:border-color .25s ease,transform .25s ease,box-shadow .25s ease}
+.panel:hover{border-color:rgba(205,184,255,.2);box-shadow:0 22px 80px rgba(0,0,0,.27),0 0 35px rgba(139,92,246,.035)}
+.section-heading h2,.focus-command-head h2{letter-spacing:-.045em}
+.section-heading h2 em,.focus-command-head h2 em,.planner-command-banner h3 em,.syllabus-command-banner h3 em,.exam-command-banner h3 em{font-style:normal;background:linear-gradient(100deg,#fff4d2 5%,#e7c77b 40%,#b7a0ff 88%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ascend-hero{border:1px solid rgba(202,180,255,.17);background:radial-gradient(ellipse at 77% 23%,rgba(112,79,201,.2),transparent 35%),radial-gradient(ellipse at 15% 100%,rgba(216,174,94,.085),transparent 36%),linear-gradient(135deg,#15131f 0%,#0c0d15 56%,#11101a 100%);box-shadow:0 24px 90px rgba(0,0,0,.27),inset 0 1px rgba(255,255,255,.055)}
+.metric-card{background:linear-gradient(145deg,rgba(24,25,37,.94),rgba(12,13,20,.96));border:1px solid rgba(255,255,255,.075);transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+.metric-card:hover{transform:translateY(-4px);border-color:rgba(231,199,123,.26);box-shadow:0 18px 40px rgba(0,0,0,.25)}
+.brand-mark{box-shadow:0 0 24px rgba(154,131,255,.12),inset 0 0 0 1px rgba(255,255,255,.1)}
+/* Syllabus mastery */
+.syllabus-command-banner,.planner-command-banner,.exam-command-banner{position:relative;display:flex;align-items:center;justify-content:space-between;gap:26px;overflow:hidden;padding:clamp(22px,3.2vw,36px);margin:18px 0 22px;border:1px solid rgba(191,169,255,.17);border-radius:22px;background:radial-gradient(ellipse at 82% 20%,rgba(130,95,222,.19),transparent 36%),radial-gradient(ellipse at 0 110%,rgba(231,199,123,.1),transparent 42%),linear-gradient(120deg,rgba(27,25,40,.96),rgba(13,14,22,.98));box-shadow:inset 0 1px rgba(255,255,255,.05),0 20px 50px rgba(0,0,0,.16)}
+.syllabus-command-banner h3,.planner-command-banner h3,.exam-command-banner h3{font-size:clamp(23px,3vw,34px);letter-spacing:-.045em;margin:9px 0 8px;line-height:1.12}
+.syllabus-command-banner p,.planner-command-banner p,.exam-command-banner p{max-width:600px;color:#a9aabd;line-height:1.7;margin:0;font-size:13px}
+.syllabus-banner-orb{position:absolute;width:180px;height:180px;right:22%;top:-120px;border:1px solid rgba(183,160,255,.2);border-radius:50%;box-shadow:0 0 0 18px rgba(183,160,255,.025),0 0 0 38px rgba(183,160,255,.02);pointer-events:none}
+.syllabus-level-badge,.exam-grade-orb{flex:0 0 155px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:145px;border:1px solid rgba(231,199,123,.2);border-radius:20px;background:linear-gradient(145deg,rgba(231,199,123,.09),rgba(154,131,255,.08));box-shadow:inset 0 1px rgba(255,255,255,.06)}
+.syllabus-level-badge>span,.exam-grade-orb>span{font-size:9px;letter-spacing:.18em;color:#bcb8d1;font-weight:800}
+.syllabus-level-badge>b,.exam-grade-orb>b{font-size:39px;letter-spacing:-.06em;color:#f8e7b2;line-height:1}
+.syllabus-level-badge b small{font-size:16px}
+.syllabus-level-track,.planner-score-track{width:72%;height:4px;border-radius:9px;background:rgba(255,255,255,.09);overflow:hidden}
+.syllabus-level-track i,.planner-score-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#9a83ff,#e7c77b);box-shadow:0 0 12px rgba(154,131,255,.4);transition:width .5s ease}
+.syllabus-quick-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 20px}
+.syllabus-quick-stats>div{padding:17px 18px;border:1px solid rgba(255,255,255,.075);border-radius:16px;background:linear-gradient(145deg,rgba(23,24,36,.8),rgba(13,14,21,.75))}
+.syllabus-quick-stats span,.planner-stat-card>span{display:block;font-size:9px;letter-spacing:.13em;color:#9496ab;font-weight:800}
+.syllabus-quick-stats b{display:block;margin:10px 0 3px;font-size:27px;letter-spacing:-.04em;color:#f4f0ff}
+.syllabus-quick-stats small{font-size:11px;color:#9c9caf}
+/* Focus protocol */
+.focus-command-room{overflow:hidden;padding:clamp(20px,3vw,34px);background:radial-gradient(ellipse at 18% 0%,rgba(122,94,215,.13),transparent 32%),linear-gradient(145deg,#12131e,#0a0b11)}
+.focus-room-glow{position:absolute;z-index:-1;width:420px;height:420px;border-radius:50%;right:-180px;top:120px;background:rgba(122,94,215,.075);filter:blur(70px);pointer-events:none}
+.focus-command-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.focus-command-head h2{font-size:clamp(28px,4vw,42px);margin:8px 0}
+.focus-command-head p{color:#a5a6b8;line-height:1.7;margin:0;max-width:520px}
+.focus-live-badge{display:inline-flex;align-items:center;gap:9px;padding:10px 12px;border-radius:999px;border:1px solid rgba(130,230,244,.15);background:rgba(130,230,244,.055);font-size:9px;letter-spacing:.13em;font-weight:800;color:#c3f6fa;white-space:nowrap}
+.focus-live-badge>span,.focus-timer-foot i{width:7px;height:7px;border-radius:50%;background:#7ce6c2;box-shadow:0 0 12px rgba(124,230,194,.6)}
+.focus-live-badge>span.pulse{animation:ascendPulse 1.8s infinite}
+@keyframes ascendPulse{0%,100%{box-shadow:0 0 0 0 rgba(124,230,194,.45)}50%{box-shadow:0 0 0 7px rgba(124,230,194,0)}}
+.focus-mode-deck{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin:28px 0 25px}
+.focus-mode-card{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-height:122px;padding:15px;border-radius:16px;text-align:left;border:1px solid rgba(255,255,255,.085);background:linear-gradient(145deg,rgba(29,30,44,.86),rgba(15,16,24,.92));color:#f2efff;transition:transform .22s ease,border-color .22s ease,background .22s ease}
+.focus-mode-card:hover:not(:disabled){transform:translateY(-3px);border-color:rgba(183,160,255,.36)}
+.focus-mode-card.chosen{border-color:rgba(231,199,123,.6);background:linear-gradient(145deg,rgba(93,73,123,.25),rgba(35,29,43,.88));box-shadow:inset 0 0 0 1px rgba(231,199,123,.1),0 0 28px rgba(154,131,255,.08)}
+.focus-mode-index{font:10px 'DM Mono',monospace;color:#9a83ff}
+.focus-mode-card b{font-size:14px}
+.focus-mode-card small{font-size:11px;color:#9b9db2}
+.focus-mode-card strong{margin-top:auto;font-size:9px;letter-spacing:.12em;color:#e7c77b}
+.focus-custom-field{display:block;max-width:300px;margin:0 0 18px}
+.focus-command-layout{display:grid;grid-template-columns:minmax(300px,.95fr) minmax(300px,1.05fr);gap:clamp(20px,4vw,48px);align-items:center;padding:8px 0 24px}
+.focus-timer-stage{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;padding:14px 0}
+.focus-timer-orbit{position:absolute;width:min(80%,290px);aspect-ratio:1;border:1px dashed rgba(154,131,255,.2);border-radius:50%;animation:ascendOrbit 42s linear infinite;pointer-events:none}
+@keyframes ascendOrbit{to{transform:rotate(360deg)}}
+.focus-timer-ring{position:relative;width:min(100%,300px);aspect-ratio:1;display:grid;place-items:center}
+.focus-timer-ring>svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.focus-ring-track,.focus-ring-progress{fill:none;stroke-width:2.5}
+.focus-ring-track{stroke:rgba(255,255,255,.075)}
+.focus-ring-progress{stroke:url(#focusGradient);stroke:#b5a1ff;stroke-linecap:round;filter:drop-shadow(0 0 5px rgba(154,131,255,.35));transition:stroke-dashoffset .8s linear}
+.focus-timer-ring:before{content:"";position:absolute;inset:13%;border-radius:50%;background:radial-gradient(circle,rgba(154,131,255,.09),transparent 68%);box-shadow:inset 0 0 45px rgba(154,131,255,.035)}
+.focus-timer-center{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:11px;text-align:center}
+.focus-timer-center>span{font-size:8px;letter-spacing:.15em;color:#9e9fb6;font-weight:800}
+.focus-timer-center>strong{font:clamp(35px,5vw,51px) 'DM Mono',monospace;letter-spacing:-.065em;color:#f8f2ff;text-shadow:0 0 25px rgba(183,160,255,.15)}
+.focus-timer-center>small{font-size:9px;letter-spacing:.12em;color:#c3aefb}
+.focus-timer-foot{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:16px;color:#8f91a8;font-size:8px;letter-spacing:.11em}
+.focus-timer-foot>span{display:inline-flex;align-items:center;gap:7px}
+.focus-timer-foot i{display:inline-block;width:5px;height:5px}
+.focus-intention-panel{padding:clamp(18px,2.4vw,27px);border:1px solid rgba(255,255,255,.085);border-radius:20px;background:linear-gradient(145deg,rgba(25,26,39,.86),rgba(13,14,22,.95));box-shadow:inset 0 1px rgba(255,255,255,.035)}
+.focus-intention-panel h3{font-size:23px;letter-spacing:-.035em;margin:11px 0 8px}
+.focus-intention-panel>p{font-size:12px;line-height:1.7;color:#9ea0b4;margin:0 0 20px}
+.focus-intention-label{display:block;color:#a8a6bd;font-size:9px;font-weight:800;letter-spacing:.13em}
+.focus-intention-label textarea{display:block;width:100%;min-height:100px;resize:vertical;margin-top:10px;padding:13px 14px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(5,6,11,.6);color:#f7f2ff;outline:none;letter-spacing:normal;font-size:13px}
+.focus-intention-label textarea:focus{border-color:rgba(183,160,255,.5);box-shadow:0 0 0 3px rgba(154,131,255,.08)}
+.focus-intention-note{display:flex;align-items:center;gap:8px;margin:13px 0 18px;font-size:11px;color:#b6a6ec}
+.focus-command-controls{justify-content:flex-start;flex-wrap:wrap}
+.focus-session-foot{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;border-top:1px solid rgba(255,255,255,.07);padding-top:22px}
+.focus-session-foot>div{display:flex;gap:10px;align-items:flex-start;padding:13px;border-radius:13px;background:rgba(255,255,255,.025);color:#b8a7f3}
+.focus-session-foot span{display:flex;flex-direction:column;gap:5px}
+.focus-session-foot b{font-size:11px;color:#dedbea}
+.focus-session-foot small{font-size:10px;color:#898ba1;line-height:1.5}
+/* Planner */
+.planner-command-banner{align-items:center}
+.planner-focus-score{flex:0 0 140px;display:flex;flex-direction:column;align-items:center;gap:7px;padding:18px 14px;border:1px solid rgba(231,199,123,.18);border-radius:18px;background:rgba(231,199,123,.04)}
+.planner-focus-score>span{font-size:9px;letter-spacing:.14em;color:#b4adca;font-weight:800}
+.planner-focus-score>b{font:42px 'DM Mono',monospace;color:#f7e6b1;letter-spacing:-.08em}
+.planner-focus-score>b small{font:11px 'DM Mono',monospace;color:#a6a0b9;letter-spacing:0}
+.planner-score-track{width:100%}
+.planner-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin:0 0 23px}
+.planner-stat-card{min-width:0;padding:17px;border:1px solid rgba(255,255,255,.075);border-radius:16px;background:linear-gradient(145deg,rgba(23,24,36,.86),rgba(12,13,20,.9));transition:transform .2s ease,border-color .2s ease}
+.planner-stat-card:hover{transform:translateY(-3px);border-color:rgba(183,160,255,.24)}
+.planner-stat-card>b{display:block;font:31px 'DM Mono',monospace;letter-spacing:-.06em;color:#f4f0ff;margin:10px 0}
+.planner-stat-card>b small{font-size:14px;color:#b6a7ee}
+.planner-stat-card>small{display:flex;align-items:center;gap:6px;color:#a2a1b5;font-size:10px}
+.planner-stat-card>small svg{color:#b7a0ff}
+/* Exam intelligence */
+.exam-grade-orb{flex-basis:190px;min-height:160px;background:radial-gradient(circle at 50% 30%,rgba(231,199,123,.12),transparent 70%),rgba(13,14,22,.5)}
+.exam-grade-orb>b{font-size:36px}
+.exam-grade-orb>small{font-size:8px;letter-spacing:.08em;color:#9c9cb0;text-align:center}
+.exam-metrics{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+.exam-metrics>div{min-width:0;padding:18px;border:1px solid rgba(255,255,255,.075);border-radius:16px;background:linear-gradient(145deg,rgba(24,25,37,.86),rgba(12,13,20,.92))}
+.exam-metrics>div>b{display:block;margin:10px 0 5px;font-size:28px;letter-spacing:-.04em;color:#f5f0ff}
+.exam-metrics>div>small{font-size:10px;color:#999bb0}
+.exam-subject-insights{margin:24px 0;padding:20px;border:1px solid rgba(255,255,255,.075);border-radius:18px;background:rgba(9,10,16,.44)}
+.exam-insight-title{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.exam-insight-title>b{font-size:17px}
+.exam-subject-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.exam-subject-card{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:center;padding:13px;border:1px solid rgba(255,255,255,.055);border-radius:13px;background:rgba(255,255,255,.02)}
+.exam-subject-card>div:nth-child(2){display:flex;flex-direction:column;gap:4px;min-width:0}
+.exam-subject-card>div:nth-child(2)>b{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exam-subject-card>div:nth-child(2)>small{font-size:9px;color:#9294aa}
+.exam-subject-card>strong{font:13px 'DM Mono',monospace;color:#e7c77b}
+.exam-subject-track{grid-column:2/4;height:4px;border-radius:5px;background:rgba(255,255,255,.07);overflow:hidden}
+.exam-subject-track>i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#9a83ff,#e7c77b);box-shadow:0 0 10px rgba(154,131,255,.25);transition:width .5s ease}
+.exam-form,.exam-row,.syllabus-chapter{transition:border-color .2s ease,background .2s ease}
+.syllabus-tile{transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
+.syllabus-tile:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.2)}
+.syllabus-tile.active{box-shadow:inset 0 0 0 1px rgba(231,199,123,.13),0 0 24px rgba(154,131,255,.055)}
+.task-row{transition:background .2s ease,transform .2s ease}
+.task-row:hover{background:rgba(255,255,255,.025);transform:translateX(2px)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid rgba(183,160,255,.75);outline-offset:3px}
+@media(max-width:900px){.focus-command-layout{grid-template-columns:1fr}.focus-timer-stage{padding:12px 0 22px}.focus-timer-ring{width:min(100%,270px)}.focus-session-foot{grid-template-columns:1fr}.planner-stat-grid,.exam-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:600px){.syllabus-command-banner,.planner-command-banner,.exam-command-banner{align-items:flex-start;flex-direction:column;gap:18px;padding:20px}.syllabus-level-badge,.exam-grade-orb{align-self:stretch;flex-basis:auto;min-height:120px}.planner-focus-score{align-self:stretch;flex-basis:auto}.syllabus-quick-stats{grid-template-columns:1fr;gap:9px}.syllabus-quick-stats>div{padding:14px}.syllabus-quick-stats b{font-size:23px}.focus-command-head{flex-direction:column}.focus-mode-deck{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:22px 0}.focus-mode-card{min-height:112px;padding:13px}.focus-intention-panel{padding:17px}.focus-command-controls .primary-btn{flex:1}.planner-stat-grid,.exam-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px}.planner-stat-card,.exam-metrics>div{padding:13px}.planner-stat-card>b,.exam-metrics>div>b{font-size:24px}.exam-subject-grid{grid-template-columns:1fr}.exam-subject-insights{padding:14px}.exam-subject-card{padding:11px}.focus-timer-foot{gap:9px;font-size:7px}}
+@media(prefers-reduced-motion:reduce){.focus-timer-orbit,.focus-live-badge>span.pulse{animation:none!important}.metric-card,.panel,.task-row,.syllabus-tile,.planner-stat-card{transition:none!important}}
