@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import './operator-contact.css';
 import MarkdownMessage from './MarkdownMessage';
-import { Activity, RefreshCw, Search, Send, ShieldCheck, Wallet, Users, MessageSquareText, CheckCircle2, Clock3 } from 'lucide-react';
+import { Activity, RefreshCw, Search, Send, ShieldCheck, Wallet, Users, MessageSquareText, CheckCircle2, Clock3, Bell } from 'lucide-react';
 
 type UserRow = {
   user_id: string;
