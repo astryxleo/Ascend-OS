@@ -103,3 +103,6 @@
 .cq-atlas-territory.rival{box-shadow:0 0 5px #ff526b77}
 .cq-atlas-territory:hover,.cq-atlas-territory.selected{width:172px;height:auto;min-width:172px;max-width:172px;min-height:118px;padding:12px 13px;border-radius:13px;border-width:1px;box-shadow:0 12px 34px #000b,inset 0 1px #ffffff18;overflow:hidden}
 .cq-atlas-territory:hover .cq-territory-mark,.cq-atlas-territory.selected .cq-territory-mark{display:grid}
+
+/* The moving grid belongs to the atlas canvas; keep the viewport itself stationary. */
+.cq-atlas-wrap:before{display:none}
