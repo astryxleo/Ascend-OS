@@ -970,3 +970,50 @@ input:focus,select:focus,textarea:focus{border-color:#f0c8758c!important;box-sha
 @media(max-width:760px){.duels-panel .duel-create{grid-template-columns:1fr 1fr}.duels-panel .duel-create label:first-child{grid-column:1/-1}.duels-panel .duel-create .primary-btn{grid-column:1/-1}.duels-panel .duel-list{grid-template-columns:1fr}.duels-panel .duel-person{min-height:155px}}
 @media(max-width:420px){.duels-panel .duel-create{grid-template-columns:1fr}.duels-panel .duel-create label:first-child,.duels-panel .duel-create .primary-btn{grid-column:auto}.duels-panel .duel-matchup{grid-template-columns:minmax(0,1fr) 25px minmax(0,1fr)!important;gap:5px!important}.duels-panel .duel-combat-metrics span{font-size:7px;padding:5px 4px}}
 @media(prefers-reduced-motion:reduce){.duels-panel .duel-versus svg{animation:none}.duels-panel .duel-card{transition:none!important}}
+
+
+/* Readability pass: raise tiny UI labels and metadata across the workspace */
+.nav-item{font-size:12px}
+.brand span{font-size:10px}
+.workspace-label,.operator-chip,.user-meta span,.status-pill,.coin-pill small{font-size:10px}
+.breadcrumb{font-size:12px}
+.eyebrow{font-size:10px}
+.date-chip{font-size:11px}
+.welcome-row p,.focus-card-top p,.focus-room>p,.placeholder>p{font-size:12px}
+.metric-top{font-size:10px;letter-spacing:.07em}
+.metric-value small{font-size:11px}
+.metric-note{font-size:11px}
+.focus-card h2,.section-heading h2,.focus-room h2,.placeholder h2{font-size:20px}
+.focus-modes button{font-size:11px;padding:8px 10px}
+.timer-content span,.timer-content small,.focus-note{font-size:10px}
+.primary-btn,.secondary-btn,.text-btn,.empty-action,.task-form input,.task-form select{font-size:12px}
+.daily-summary>div+div span,.task-info span,.subject-name span,.metric-note,.syllabus-tile span{font-size:11px;line-height:1.55}
+.task-info b,.subject-name b,.syllabus-tile b{font-size:12px}
+.priority,.badge{font-size:10px}
+.panel-bottom-link,.footer{font-size:10px;line-height:1.6}
+.subject-progress small{font-size:9px}
+.operator-grid b,.operator-warning b{font-size:12px}
+.operator-grid span,.operator-warning span{font-size:11px;line-height:1.6}
+.auth-kicker{font-size:10px}
+.auth-copy{font-size:12px}
+.aa-kpi>span,.aa-card .aa-eyebrow,.aa-section-label,.aa-rank-section-heading>span{font-size:11px}
+.aa-kpi>small,.aa-legend,.aa-exam-insight>small,.aa-exam-insight>p,.aa-exam-foot,.aa-footnote{font-size:11px;line-height:1.6}
+.aa-duel-summary>small,.aa-versus span,.aa-you-pill small,.aa-opponent-picker small{font-size:10px}
+.aa-donut-caption{font-size:10px}
+.aa-subject-row,.aa-radar-list>span,.aa-compare-center>span{font-size:11px}
+.aa-subject-row>b,.aa-radar-list b{font-size:11px}
+.aa-error,.aa-error button{font-size:12px}
+.ascend-category-copy small,.ascend-podium .leaderboard-podium-meta,.ascend-squad-name-cell small{font-size:10px;line-height:1.5}
+.ascend-podium .leaderboard-podium-label{font-size:9px}
+.ascend-squad-total span,.ascend-squad-place,.ascend-squad-top-card>small{font-size:10px}
+.ascend-squad-stats span{font-size:10px}
+.focus-live-badge{font-size:10px}
+.focus-mode-card strong,.focus-intention-label,.planner-focus-score>span,.syllabus-quick-stats span,.planner-stat-card>span{font-size:10px}
+.focus-timer-center>span,.focus-timer-foot{font-size:10px}
+.syllabus-workspace .syllabus-step>small{font-size:9px;padding:5px 8px}
+@media(max-width:600px){
+ .nav-item{font-size:12px}
+ .metric-top,.metric-note,.eyebrow,.date-chip,.focus-modes button,.primary-btn,.secondary-btn,.text-btn{font-size:11px}
+ .aa-kpi>span,.aa-kpi>small,.aa-card .aa-eyebrow,.aa-section-label,.aa-exam-insight>small,.aa-exam-insight>p,.aa-exam-foot,.aa-footnote{font-size:10px}
+ .ascend-squad-stats span,.ascend-category-copy small,.ascend-podium .leaderboard-podium-meta{font-size:9px}
+}
