@@ -1077,3 +1077,24 @@ input:focus,select:focus,textarea:focus{border-color:#a99aff75!important;box-sha
 .focus-float-trigger{flex:0 0 auto;width:auto!important;min-width:76px;max-width:100%;min-height:48px;height:auto!important;padding:7px 9px;gap:4px;border-radius:11px;white-space:nowrap}
 .focus-float-hint{display:block;max-width:100%;font-size:7px;line-height:1.2;letter-spacing:.07em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:380px){.focus-card-top{gap:8px}.focus-float-trigger{min-width:68px;padding:7px 6px}.focus-float-hint{font-size:6px;letter-spacing:.04em}}
+
+
+/* Aurora visibility fix: keep the animated color fields above the body canvas,
+   but below the entire app. Negative z-index hid them behind the opaque body. */
+body{background:#05060a!important}
+body:before,body:after{z-index:0!important;inset:-12%;opacity:1!important;mix-blend-mode:screen}
+body:before{background:
+ radial-gradient(ellipse 44% 38% at 14% 18%,rgba(98,66,230,.30) 0%,transparent 72%),
+ radial-gradient(ellipse 42% 35% at 79% 13%,rgba(18,174,200,.24) 0%,transparent 72%),
+ radial-gradient(ellipse 46% 39% at 67% 76%,rgba(130,61,202,.23) 0%,transparent 72%),
+ radial-gradient(ellipse 38% 35% at 19% 83%,rgba(194,65,122,.18) 0%,transparent 74%),
+ radial-gradient(ellipse 32% 30% at 49% 45%,rgba(34,129,164,.19) 0%,transparent 74%);
+ filter:blur(95px) saturate(155%)}
+body:after{background:
+ radial-gradient(ellipse 30% 42% at 37% 12%,rgba(24,174,210,.20) 0%,transparent 75%),
+ radial-gradient(ellipse 35% 29% at 86% 48%,rgba(146,88,235,.22) 0%,transparent 75%),
+ radial-gradient(ellipse 32% 34% at 14% 62%,rgba(204,65,131,.15) 0%,transparent 75%);
+ filter:blur(115px) saturate(165%)}
+#root{position:relative;z-index:1;isolation:isolate;min-height:100vh;background:transparent}
+.app-shell{background:transparent!important}
+@media(max-width:760px){body:before{filter:blur(76px) saturate(145%);opacity:.9!important}body:after{filter:blur(88px);opacity:.65!important}}
