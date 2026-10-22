@@ -40,3 +40,13 @@
 @media(max-width:760px){.cq-atlas-wrap{height:680px;min-height:680px}.cq-atlas-canvas{width:1000px;height:750px;margin-left:-500px;margin-top:-375px}.cq-atlas-territory{width:132px;min-height:108px;padding:9px}.cq-atlas-territory b{font-size:10px}.cq-terrain-label{font-size:9px}.cq-atlas-hint{font-size:7px;letter-spacing:.04em}.cq-atlas-controls>span{font-size:8px}.cq-atlas-controls>div button{width:30px;height:30px}}
 @media(max-width:480px){.cq-atlas-wrap{height:610px;min-height:610px}.cq-atlas-controls{top:9px;left:9px;right:9px}.cq-atlas-controls>span{padding:7px;font-size:7px}.cq-atlas-hint{max-width:92%;overflow:hidden}.cq-atlas-territory{width:120px;min-height:100px;padding:8px}.cq-atlas-territory .cq-territory-level{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.cq-atlas-canvas{transition:none}}
+
+
+/* Map-first layout: the atlas gets the entire row; intel sits below it */
+.cq-layout{grid-template-columns:minmax(0,1fr)!important}
+.cq-map-panel-large{width:100%}
+.cq-atlas-wrap{height:clamp(720px,82vh,1100px);min-height:720px}
+.cq-atlas-canvas{width:1200px}
+.cq-side{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);align-items:stretch}
+.cq-detail,.cq-report{min-height:100%}
+@media(max-width:760px){.cq-atlas-wrap{height:680px;min-height:680px}.cq-side{grid-template-columns:1fr}}
