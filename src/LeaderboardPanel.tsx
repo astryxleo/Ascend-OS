@@ -14,7 +14,7 @@ type SquadEntry = {
   focus_minutes:number|string; completed_steps:number|string; coins:number|string;
   squad_power:number|string; created_at:string;
 };
-type Category='overall'|'army'|'wealth'|'focus'|'power'|'syllabus'|'tasks'|'sessions';
+type Category='overall'|'army'|'wealth'|'focus'|'power'|'syllabus'|'tasks'|'sessions'|'duels';
 type Props={supabase:SupabaseClient|null;userId:string};
 const categories:{id:Category;label:string;short:string;icon:typeof Trophy;metric:string;hint:string}[]=[
  {id:'overall',label:'Overall Legends',short:'Overall',icon:Crown,metric:'power_score',hint:'Balanced all-round ranking'},
@@ -25,6 +25,7 @@ const categories:{id:Category;label:string;short:string;icon:typeof Trophy;metri
  {id:'syllabus',label:'Syllabus Masters',short:'Syllabus',icon:BookOpen,metric:'completed_steps',hint:'Completed syllabus checkpoints'},
  {id:'tasks',label:'Task Finishers',short:'Tasks',icon:ListChecks,metric:'completed_tasks',hint:'Completed planner tasks'},
  {id:'sessions',label:'Focus Streakers',short:'Sessions',icon:Flame,metric:'completed_sessions',hint:'Completed focus sessions'},
+ {id:'duels',label:'Duel Dominators',short:'Duels',icon:Swords,metric:'combat_rating',hint:'Combat rating, with wins as the tie-breaker'},
 ];
 const number=(v:number|string|undefined)=>Number(v??0)||0;
 const fmt=(v:number|string|undefined)=>number(v).toLocaleString('en-IN');
@@ -61,6 +62,7 @@ export default function LeaderboardPanel({supabase,userId}:Props){
    .on('postgres_changes',{event:'*',schema:'public',table:'profiles'},()=>void load(true))
    .on('postgres_changes',{event:'*',schema:'public',table:'combat_customizations'},()=>void load(true))
    .on('postgres_changes',{event:'*',schema:'public',table:'combat_fighters'},()=>void load(true))
+   .on('postgres_changes',{event:'*',schema:'public',table:'combat_matches'},()=>void load(true))
    .on('postgres_changes',{event:'*',schema:'public',table:'wallets'},()=>void load(true))
    .on('postgres_changes',{event:'*',schema:'public',table:'focus_sessions'},()=>void load(true))
    .on('postgres_changes',{event:'*',schema:'public',table:'chapter_progress'},()=>void load(true))
@@ -75,6 +77,7 @@ export default function LeaderboardPanel({supabase,userId}:Props){
   return [...users].sort((a,b)=>{
    if(category==='overall')return number(b.power_score)+number(b.focus_minutes)+number(b.completed_steps)*20+number(b.completed_tasks)*10-number(a.power_score)-number(a.focus_minutes)-number(a.completed_steps)*20-number(a.completed_tasks)*10;
    if(category==='wealth')return number(b.coins)+number(b.cash)-number(a.coins)-number(a.cash);
+   if(category==='duels')return number(b.combat_rating)-number(a.combat_rating)||number(b.combat_wins)-number(a.combat_wins);
    return number(b[key as keyof UserEntry] as number|string)-number(a[key as keyof UserEntry] as number|string);
   });
  },[users,category]);
@@ -90,6 +93,7 @@ export default function LeaderboardPanel({supabase,userId}:Props){
   if(category==='syllabus')return fmt(e.completed_steps)+' checkpoints';
   if(category==='tasks')return fmt(e.completed_tasks)+' tasks';
   if(category==='sessions')return fmt(e.completed_sessions)+' sessions';
+  if(category==='duels')return fmt(e.combat_rating)+' rating · '+fmt(e.combat_wins)+' wins';
   if(category==='power')return fmt(e.power_score)+' power';
   return fmt(number(e.power_score)+number(e.focus_minutes)+number(e.completed_steps)*20+number(e.completed_tasks)*10)+' score';
  };
