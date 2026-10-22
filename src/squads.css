@@ -14,7 +14,7 @@
 .squad-dashboard-heading .squad-eyebrow{display:flex;align-items:center;gap:6px}
 .squad-dashboard-heading h3{margin:9px 0 5px;font-size:clamp(20px,2.5vw,28px);letter-spacing:-.04em;color:#fff}
 .squad-dashboard-heading p{margin:0;color:#a7a5b0;font-size:12px;line-height:1.6}
-.squad-dashboard-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.squad-dashboard-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .squad-dashboard-kpis article{min-width:0;padding:15px;border:1px solid #ffffff10;border-radius:13px;background:linear-gradient(145deg,#ffffff08,#ffffff02)}
 .squad-dashboard-kpis article>span{display:flex;align-items:center;gap:7px;color:#b7b4bd;font:9px 'DM Mono',monospace;letter-spacing:.08em}
 .squad-dashboard-kpis article>span svg{color:#e8c56c}
