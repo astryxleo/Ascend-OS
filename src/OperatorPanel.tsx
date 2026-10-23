@@ -437,6 +437,33 @@ export default function OperatorPanel({
         </section>
       )}
 
+
+      {tab === 'Daily activity' && (
+        <section className="operator-daily-activity">
+          <div className="operator-warning"><CalendarDays size={18}/><div><b>Daily study telemetry</b><span>Select a player to inspect daily focus time and task completion for the last 30 days.</span></div></div>
+          <div className="operator-form"><label>Player<select value={target} onChange={e=>{setTarget(e.target.value);void loadDossier(e.target.value);}}><option value="">Choose a player…</option>{users.map(u=><option key={u.user_id} value={u.user_id}>{u.full_name} · @{u.username}</option>)}</select></label></div>
+          {dossier&&<><div className="operator-daily-summary"><b>{dossier.profile.full_name||dossier.profile.username} · Last 30 days</b><span>{Number(dossier.stats.focus_minutes||0).toLocaleString()} total focus minutes</span></div><div className="operator-daily-list">{dossier.daily.slice().reverse().map(day=><article key={day.day}><div><b>{new Date(day.day+'T12:00:00').toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'})}</b><small>{day.focus_sessions} focus sessions · {day.tasks_completed}/{day.tasks_planned} tasks</small></div><div className="operator-daily-meter"><span style={{width:Math.min(100,day.focus_minutes/240*100)+'%'}}/></div><strong>{day.focus_minutes} min</strong></article>)}</div></>}
+        </section>
+      )}
+      {tab === 'Marketplace discounts' && (
+        <section className="operator-marketplace">
+          <div className="operator-warning"><Percent size={18}/><div><b>Individual item pricing</b><span>Set a discount per item. Buyers should see the discount percentage and final coin price. Reset restores the original price.</span></div><button type="button" onClick={()=>void loadCosmetics()}><RefreshCw size={14}/> Refresh</button></div>
+          <div className="operator-market-items">{cosmetics.map(item=><article key={item.id}><div className="operator-market-item-title"><span>{item.slot} · {item.rarity}</span><b>{item.label}</b><small>{item.active?'Available in shop':'Inactive item'} · {item.id}</small></div><div className="operator-market-prices">{item.discount_percent>0&&<del>{item.original_price_coins.toLocaleString()} coins</del>}<b>{item.price_coins.toLocaleString()} <small>coins</small></b>{item.discount_percent>0&&<span>{item.discount_percent}% OFF</span>}</div><label>Discount %<input type="number" min="0" max="95" step="1" value={discountValues[item.id]??String(item.discount_percent)} onChange={e=>setDiscountValues(v=>({...v,[item.id]:e.target.value}))}/></label><div className="operator-market-actions"><button type="button" disabled={busy} onClick={()=>void saveDiscount(item)}><Percent size={13}/> Apply discount</button><button type="button" disabled={busy||item.discount_percent===0} onClick={()=>void saveDiscount(item,true)}><RotateCcw size={13}/> Reset original price</button></div></article>)}{!cosmetics.length&&<p className="operator-help">No marketplace cosmetics were returned.</p>}</div>
+        </section>
+      )}
+      {tab === 'Warnings' && (
+        <section className="operator-warning-terminal">
+          <div className="operator-warning"><AlertTriangle size={18}/><div><b>Private warning terminal</b><span>Send a custom warning to any account. It is saved in the user’s notification history and triggers a live popup while online.</span></div></div>
+          <form className="operator-direct-notification" onSubmit={sendWarning}>
+            <label>RECIPIENT<select value={warningTarget} onChange={e=>setWarningTarget(e.target.value)} required><option value="">Choose a user account…</option>{users.map(user=><option key={user.user_id} value={user.user_id}>{user.full_name} · @{user.username} · {user.email}</option>)}</select></label>
+            <label>WARNING TITLE<input value={warningTitle} onChange={e=>setWarningTitle(e.target.value)} minLength={3} maxLength={120} required/></label>
+            <label>PERSONALIZED WARNING MESSAGE<textarea value={warningMessage} onChange={e=>setWarningMessage(e.target.value)} minLength={3} maxLength={4000} rows={7} required placeholder="Explain what needs attention and what action is expected…"/></label>
+            <div className="operator-direct-preview"><b>LIVE WARNING PREVIEW</b><h3>⚠️ Operator Warning: {warningTitle||'Warning title'}</h3><p>{warningMessage||'Your warning message will appear here.'}</p></div>
+            <button className="operator-primary" disabled={busy||!warningTarget||warningTitle.trim().length<3||warningMessage.trim().length<3}><AlertTriangle size={14}/>{busy?'Sending warning…':'Send warning popup'}</button>
+          </form>
+        </section>
+      )}
+
       {tab === 'Wallet audit' && (
         <>
           <div className="operator-warning"><ShieldCheck size={18} /><div><b>Wallet audit ledger</b><span>Read-only view of the latest 100 currency transactions.</span></div></div>
