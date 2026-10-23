@@ -1259,6 +1259,15 @@ body:after{background:
 @media(prefers-reduced-motion:reduce){.ascend-squad-banner:before,.focus-command-room:before,.achievement-unlock-toast:after{animation:none!important}}
 
 
+/* Clear, always-visible navbar toggle control */
+.nav-toggle-button{display:inline-flex!important;align-items:center;justify-content:center;gap:8px;width:auto!important;min-width:88px;padding:0 11px!important;border:1px solid rgba(232,189,99,.28)!important;border-radius:10px!important;background:linear-gradient(135deg,rgba(232,189,99,.12),rgba(167,139,250,.07))!important;color:#ead9b1!important;white-space:nowrap}
+.nav-toggle-button span{font-size:10px;font-weight:800;letter-spacing:.025em}
+.nav-toggle-button:hover{border-color:rgba(232,189,99,.55)!important;background:linear-gradient(135deg,rgba(232,189,99,.2),rgba(167,139,250,.11))!important}
+.sidebar-navigation{cursor:default}
+.sidebar-navigation::-webkit-scrollbar,.sidebar-navigation::-webkit-scrollbar-track,.sidebar-navigation::-webkit-scrollbar-thumb{cursor:default!important}
+.sidebar-navigation::-webkit-scrollbar-corner{cursor:default!important}
+@media(max-width:600px){.nav-toggle-button{min-width:39px;padding:0 10px!important}.nav-toggle-button span{display:none}}
+
 /* Atlas-friendly collapsible desktop navigation */
 @media (min-width: 901px) {
   .app-shell.nav-collapsed > .sidebar { display: none !important; }
