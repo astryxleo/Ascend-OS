@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent, type ChangeEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { Save, ShieldCheck, Upload, UserRound, Sparkles, MessageSquareText, ArrowUpRight, Flag } from 'lucide-react';
+import { Save, ShieldCheck, Upload, UserRound, MessageSquareText, ArrowUpRight, Flag } from 'lucide-react';
 
 type Profile = {
   full_name?: string | null;
