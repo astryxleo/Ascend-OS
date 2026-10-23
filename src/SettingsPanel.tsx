@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent, type ChangeEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { Save, ShieldCheck, Upload, UserRound, MousePointer2, ShoppingBag, Check, Sparkles, MessageSquareText, ArrowUpRight } from 'lucide-react';
+import { Save, ShieldCheck, Upload, UserRound, MousePointer2, ShoppingBag, Check, Sparkles, MessageSquareText, ArrowUpRight, Flag } from 'lucide-react';
 
 type Profile = {
   full_name?: string | null;
@@ -9,6 +9,7 @@ type Profile = {
   stream?: string | null;
   school_target?: string | null;
   avatar_url?: string | null;
+  kingdom_flag_url?: string | null;
 };
 
 type Props = {
@@ -51,6 +52,8 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
   const [targetExam, setTargetExam] = useState((profile?.school_target ?? '').split(' · ').slice(1).join(' · ') || 'JEE');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState(profile?.avatar_url ?? '');
+  const [kingdomFlagPreview, setKingdomFlagPreview] = useState(profile?.kingdom_flag_url ?? '');
+  const [flagBusy, setFlagBusy] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [cursorStore,setCursorStore] = useState<{selected_cursor_id:number;owned_cursor_ids:number[];coins:number;price:number}>({selected_cursor_id:6,owned_cursor_ids:[6],coins:0,price:50000});
@@ -99,9 +102,10 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
     setTargetExam((profile?.school_target ?? '').split(' · ').slice(1).join(' · ') || 'JEE');
     setAvatarFile(null);
     setAvatarPreview(profile?.avatar_url ?? '');
+    setKingdomFlagPreview(profile?.kingdom_flag_url ?? '');
     setError('');
     setBusy(false);
-  }, [userId, profile?.full_name, profile?.username, profile?.class_grade, profile?.stream, profile?.school_target, profile?.avatar_url]);
+  }, [userId, profile?.full_name, profile?.username, profile?.class_grade, profile?.stream, profile?.school_target, profile?.avatar_url, profile?.kingdom_flag_url]);
 
   function chooseAvatar(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null;
@@ -124,6 +128,40 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
       setAvatarPreview(URL.createObjectURL(file));
       setError('');
     }
+  }
+
+  async function saveKingdomFlag(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0] ?? null;
+    event.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { setError('Choose an image file for your kingdom flag.'); return; }
+    if (!supabase) { setError('Supabase is not configured.'); return; }
+    setFlagBusy(true); setError('');
+    try {
+      const blob = await compressAvatar(file);
+      if (currentUserId.current !== userId) return;
+      const path = userId + '/kingdom-flag-' + Date.now() + '.webp';
+      const { error: uploadError } = await supabase.storage.from('lumen-avatars').upload(path, blob, { contentType: 'image/webp', upsert: true, cacheControl: '3600' });
+      if (uploadError) throw uploadError;
+      if (currentUserId.current !== userId) { await supabase.storage.from('lumen-avatars').remove([path]); return; }
+      const url = supabase.storage.from('lumen-avatars').getPublicUrl(path).data.publicUrl;
+      const { data, error: updateError } = await supabase.from('profiles').update({ kingdom_flag_url: url }).eq('id', userId).select('*').single();
+      if (updateError) throw updateError;
+      onSaved(data as Profile); setKingdomFlagPreview(url); setNotice('Kingdom flag uploaded! It will appear on your kingdom hover card and rankings.');
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Could not upload your kingdom flag.');
+    } finally { setFlagBusy(false); }
+  }
+
+  async function removeKingdomFlag() {
+    if (!supabase) return;
+    setFlagBusy(true); setError('');
+    try {
+      const { data, error: updateError } = await supabase.from('profiles').update({ kingdom_flag_url: null }).eq('id', userId).select('*').single();
+      if (updateError) throw updateError;
+      onSaved(data as Profile); setKingdomFlagPreview(''); setNotice('Kingdom flag removed.');
+    } catch (reason) { setError(reason instanceof Error ? reason.message : 'Could not remove your kingdom flag.'); }
+    finally { setFlagBusy(false); }
   }
 
   async function save(event: FormEvent) {
@@ -202,6 +240,10 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
       {error && <div className="settings-error" role="alert">{error}</div>}
       <div className="settings-actions"><span>Changes apply after a successful save.</span><button className="primary-btn" disabled={busy}><Save size={15}/>{busy ? 'Saving settings…' : 'Save settings'}</button></div>
     </form>
+    <section className="kingdom-flag-settings">
+      <div className="kingdom-flag-preview">{kingdomFlagPreview ? <img src={kingdomFlagPreview} alt="Kingdom flag preview"/> : <Flag size={26}/>}</div>
+      <div className="kingdom-flag-copy"><span className="eyebrow">CONQUEST ATLAS · KINGDOM IDENTITY</span><h3>Your kingdom flag</h3><p>Upload a banner for your kingdom. It appears on territory hover cards and in Kingdom Rankings. Wide images work best.</p><div className="kingdom-flag-actions"><label className="settings-upload"><Upload size={14}/>{flagBusy?'Saving flag…':kingdomFlagPreview?'Change flag':'Upload flag'}<input type="file" accept="image/png,image/jpeg,image/webp,image/avif" onChange={event=>void saveKingdomFlag(event)} disabled={flagBusy}/></label>{kingdomFlagPreview&&<button type="button" className="cursor-action" onClick={()=>void removeKingdomFlag()} disabled={flagBusy}>Remove flag</button>}</div></div>
+    </section>
     <section className="cursor-market">
       <div className="cursor-market-head"><div><span className="eyebrow"><MousePointer2 size={13}/> ASCEND CUSTOMIZATION</span><h2>Cursor armory</h2><p>One signature cursor across your entire Ascend workspace. Purchases stay on your account.</p></div><div className="cursor-balance"><span>YOUR BALANCE</span><b>◈ {cursorStore.coins.toLocaleString()}</b><small>50,000 ◈ per cursor</small></div></div>
       <div className="cursor-showcase"><div className="cursor-showcase-preview"><span>LIVE PREVIEW</span><div className="cursor-orbit"><img src={cursorUrl(cursorStore.selected_cursor_id)} alt="Selected cursor preview" style={{width:cursorSize,height:cursorSize,objectFit:"contain"}}/></div><b>{cursorSize} x {cursorSize} px</b><small>Choose a size below, then save to apply it across Ascend.</small></div><div className="cursor-equipped"><span>NOW EQUIPPED</span><b>{cursorStore.selected_cursor_id===6?'ASCEND CLASSIC':`CURSOR ${cursorStore.selected_cursor_id===0?6:cursorStore.selected_cursor_id}`}</b><small>{cursorStore.selected_cursor_id===6?'Default · always free':'Owned · saved to your profile'}</small></div></div>
