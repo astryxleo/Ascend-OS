@@ -346,16 +346,27 @@ function App() {
   async function signIn() {
     if (!supabase) { setAuthMessage('Add your Supabase URL and publishable key to .env.local, then restart the dev server.'); return; }
     setAuthBusy(true); setAuthMessage('');
+    const normalizedEmail = email.trim().toLowerCase();
     try {
-      if (!email.includes('@')) throw new Error('Enter a valid email address.');
+      if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(normalizedEmail)) throw new Error('Enter a valid email address.');
       if (password.length < 8) throw new Error('Password must be at least 8 characters.');
       if (authMode === 'signup') {
-        const {data,error} = await supabase.auth.signUp({email,password,options:{emailRedirectTo:window.location.origin}});
-        if (error) throw error;
-        if (!data.session) setAuthMessage('Account created. Check your email to confirm your account, then sign in.');
+        const {data,error} = await supabase.auth.signUp({email:normalizedEmail,password,options:{emailRedirectTo:window.location.origin}});
+        if (error) {
+          const message = error.message.toLowerCase();
+          if (message.includes('already registered') || message.includes('already exists') || message.includes('user already') || message.includes('duplicate')) {
+            throw new Error('An account with this email already exists. Log in instead or use a different email address.');
+          }
+          throw error;
+        }
+        // Supabase Auth enforces email uniqueness server-side; this message also covers
+        // projects configured to hide whether an address is already registered.
+        if (data.user && !data.session && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+          setAuthMessage('An account with this email may already exist. Try logging in or use a different email address.');
+        } else if (!data.session) setAuthMessage('Account created. Check your email to confirm your account, then sign in.');
         else setAuthMessage('Account created successfully. Welcome to Ascend OS.');
       } else {
-        const {error} = await supabase.auth.signInWithPassword({email,password});
+        const {error} = await supabase.auth.signInWithPassword({email:normalizedEmail,password});
         if (error) throw error;
       }
     } catch(e) { setAuthMessage(e instanceof Error?e.message:'Authentication failed. Please try again.'); }
