@@ -182,7 +182,7 @@ function App() {
   const [notice,setNotice] = useState('');
   const [fighterXp,setFighterXp]=useState(0);
   useEffect(()=>{if(!supabase||!session?.user.id){setFighterXp(0);return;}let live=true;const loadXp=async()=>{const {data}=await supabase.rpc('get_combat_fighter');if(live)setFighterXp(Number((data as any)?.xp)||0);};void loadXp();const ch=supabase.channel('overview-xp-'+session.user.id).on('postgres_changes',{event:'*',schema:'public',table:'combat_fighters',filter:'user_id=eq.'+session.user.id},()=>void loadXp()).subscribe();return()=>{live=false;void supabase.removeChannel(ch);};},[session?.user.id]);
-  useEffect(()=>{if(!supabase||!session?.user.id)return;const ch=supabase.channel('global-notice-'+session.user.id).on('postgres_changes',{event:'INSERT',schema:'public',table:'ascend_notifications',filter:'user_id=eq.'+session.user.id},payload=>{const n=payload.new as {title?:string;message?:string};setNotice('✦ '+(n.title||'New notification')+' — New message received. Open Notifications to read the full message.');}).subscribe();return()=>{void supabase.removeChannel(ch);};},[session?.user.id]);
+  useEffect(()=>{if(!supabase||!session?.user.id)return;const ch=supabase.channel('global-notice-'+session.user.id).on('postgres_changes',{event:'INSERT',schema:'public',table:'ascend_notifications',filter:'user_id=eq.'+session.user.id},payload=>{const n=payload.new as {title?:string;message?:string};setNotice('✦ '+(n.title||'New notification')+(n.message?' — '+n.message:' — Open Notifications to read the full message.'));}).subscribe();return()=>{void supabase.removeChannel(ch);};},[session?.user.id]);
   const [newTaskOpen,setNewTaskOpen] = useState(false);
 
   useEffect(() => {
