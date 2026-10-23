@@ -1274,3 +1274,62 @@ body:after{background:
   .app-shell.nav-collapsed > .main-area { width: 100%; min-width: 0; margin-left: 0; }
   .app-shell.nav-collapsed .menu-toggle { color: var(--accent, #e8bd63); }
 }
+
+
+/* Navigation overlap fix: isolate the Operator Control Center from workspace links
+   and keep the topbar actions from colliding at compact desktop widths. */
+.sidebar-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+.sidebar-navigation > .workspace-label.operator-label {
+  flex: 0 0 auto;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #24242c;
+}
+.sidebar-navigation > .nav-item {
+  flex: 0 0 auto;
+  min-height: 40px;
+  margin-top: 4px;
+}
+.sidebar-navigation .nav-list {
+  flex: 0 0 auto;
+  width: 100%;
+}
+.sidebar-navigation .nav-item > span:not(.nav-dot):not(.operator-chip) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sidebar-navigation .operator-chip {
+  flex: 0 0 auto;
+}
+.topbar,
+.top-left,
+.top-actions {
+  min-width: 0;
+}
+.top-actions {
+  flex-wrap: nowrap;
+}
+.operator-mode-toggle {
+  flex: 0 0 auto;
+}
+@media (max-width: 1080px) {
+  .topbar { padding-inline: 16px; gap: 12px; }
+  .top-left { flex: 1 1 auto; overflow: hidden; }
+  .breadcrumb { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .top-actions { flex: 0 1 auto; gap: 8px; }
+  .status-pill { display: none; }
+}
+@media (max-width: 760px) {
+  .sidebar-navigation { padding-bottom: 16px; }
+  .sidebar-navigation > .workspace-label.operator-label { margin-top: 14px; padding-top: 12px; }
+  .topbar { gap: 8px; }
+  .top-actions { flex: 0 0 auto; }
+  .operator-mode-toggle { max-width: 42px; overflow: hidden; padding-inline: 10px !important; font-size: 0 !important; }
+  .operator-mode-toggle svg { flex: 0 0 auto; }
+}
