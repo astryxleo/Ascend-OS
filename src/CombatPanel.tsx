@@ -6,7 +6,7 @@ type Fighter={user_id:string;xp:number;level:number;wins:number;losses:number;ra
 type Army={army_quantity:number;command_level:number;attack_level:number;defense_level:number;vitality_level:number;discipline_level:number};
 type Props={supabase:SupabaseClient|null;userId:string;setNotice:(s:string)=>void};
 type Cosmetic={id:string;label:string;slot:string;value:string;price_coins:number;original_price_coins:number;discount_percent:number;rarity:string;active:boolean};
-const defaults:Army={army_quantity:1000,command_level:1,attack_level:1,defense_level:1,vitality_level:1,discipline_level:1};
+const defaults:Army={army_quantity:5,command_level:1,attack_level:1,defense_level:1,vitality_level:1,discipline_level:1};
 const stats=[{key:'attack_level',title:'Attack',detail:'Raises offensive power.',icon:Swords,weight:14},{key:'defense_level',title:'Defence',detail:'Improves resistance and staying power.',icon:Shield,weight:12},{key:'vitality_level',title:'Vitality',detail:'Boosts total army durability.',icon:HeartPulse,weight:13},{key:'command_level',title:'Command',detail:'Improves overall force efficiency.',icon:Target,weight:16},{key:'discipline_level',title:'Discipline',detail:'Adds an all-round power bonus.',icon:Zap,weight:10}] as const;
 type StatKey=typeof stats[number]['key'];
 const soulCostFor=(level:number)=>Math.max(1,level);
