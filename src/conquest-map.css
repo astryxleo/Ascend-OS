@@ -130,3 +130,15 @@
 .cq-atlas-wrap>.cq-atlas-hint span{color:#e8cd83;padding:0 5px;}
 .cq-atlas-controls{z-index:10;}
 @media(max-width:760px){.cq-atlas-canvas{width:12000px;height:9600px;margin-left:-6000px;margin-top:-4800px;}.cq-atlas-wrap>.cq-map-compass{left:9px;bottom:40px;font-size:8px}.cq-atlas-wrap>.cq-atlas-hint{font-size:7px;letter-spacing:.03em;bottom:10px}}
+
+
+/* Atlas geometry fix: hexes use staggered rows, so suppress the old illustrative SVG landmass
+   that was visually fighting the live, data-driven hex territory layer. */
+.cq-atlas-canvas .cq-terrain-art,
+.cq-atlas-canvas .cq-terrain-label,
+.cq-atlas-canvas .cq-world-grid{display:none!important}
+.cq-atlas-wrap{background-color:#14231f;background-image:radial-gradient(ellipse at 50% 45%,#2c4b3b40,transparent 70%),linear-gradient(145deg,#14231f,#101a22 60%,#1b202b)}
+.cq-territory-canvas{z-index:4!important}
+.cq-atlas-controls{position:absolute;top:14px;right:14px}
+.cq-atlas-controls button[aria-label="View your location"]{min-width:38px;font-size:19px;color:#f4d98b;border-color:#f4d98b70;background:#f4d98b12;box-shadow:0 0 18px #f4d98b15}
+.cq-atlas-controls button[aria-label="View your location"]:hover{background:#f4d98b25;border-color:#f4d98b}
