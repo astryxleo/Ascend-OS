@@ -348,7 +348,7 @@ function App() {
     setAuthBusy(true); setAuthMessage('');
     const normalizedEmail = email.trim().toLowerCase();
     try {
-      if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(normalizedEmail)) throw new Error('Enter a valid email address.');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) throw new Error('Enter a valid email address.');
       if (password.length < 8) throw new Error('Password must be at least 8 characters.');
       if (authMode === 'signup') {
         const {data,error} = await supabase.auth.signUp({email:normalizedEmail,password,options:{emailRedirectTo:window.location.origin}});
