@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { Check, Circle, MousePointer2, PackageOpen, RefreshCw, Search, ShoppingBag, Sparkles } from 'lucide-react';
+import { Check, Circle, PackageOpen, RefreshCw, Search } from 'lucide-react';
 import { CardVectorArt, type CardSkin } from './PlayerCardPanel';
 import { CosmeticPreview, type Cosmetic } from './MarketplacePanel';
 import './marketplace.css';
