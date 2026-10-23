@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent, type ChangeEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { Save, ShieldCheck, Upload, UserRound, MessageSquareText, ArrowUpRight, Flag } from 'lucide-react';
+import { Save, ShieldCheck, Upload, UserRound, MessageSquareText, ArrowUpRight, Flag, MousePointer2 } from 'lucide-react';
 
 type Profile = {
   full_name?: string | null;
@@ -54,6 +54,10 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
   const [avatarPreview, setAvatarPreview] = useState(profile?.avatar_url ?? '');
   const [kingdomFlagPreview, setKingdomFlagPreview] = useState(profile?.kingdom_flag_url ?? '');
   const [flagBusy, setFlagBusy] = useState(false);
+  const [cursorSize, setCursorSize] = useState(() => {
+    try { return Math.max(12, Math.min(48, Number(window.localStorage.getItem('ascend-cursor-size') || 23))); }
+    catch { return 23; }
+  });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const currentUserId = useRef(userId);
@@ -80,6 +84,16 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
     setError('');
     setBusy(false);
   }, [userId, profile?.full_name, profile?.username, profile?.class_grade, profile?.stream, profile?.school_target, profile?.avatar_url, profile?.kingdom_flag_url]);
+
+  function changeCursorSize(value: number) {
+    const nextSize = Math.max(12, Math.min(48, Math.round(value)));
+    setCursorSize(nextSize);
+    try {
+      window.localStorage.setItem('ascend-cursor-size', String(nextSize));
+      const cursorId = Number(window.localStorage.getItem('ascend-cursor-id') || 6);
+      window.dispatchEvent(new CustomEvent('ascend-cursor-settings-change', { detail: { id: cursorId, size: nextSize } }));
+    } catch { /* Keep the control usable if browser storage is unavailable. */ }
+  }
 
   function chooseAvatar(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null;
@@ -219,6 +233,16 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
       <div className="kingdom-flag-copy"><span className="eyebrow">CONQUEST ATLAS · KINGDOM IDENTITY</span><h3>Your kingdom flag</h3><p>Upload a banner for your kingdom. It appears on territory hover cards and in Kingdom Rankings. Wide images work best.</p><div className="kingdom-flag-actions"><label className="settings-upload"><Upload size={14}/>{flagBusy?'Saving flag…':kingdomFlagPreview?'Change flag':'Upload flag'}<input type="file" accept="image/png,image/jpeg,image/webp,image/avif" onChange={event=>void saveKingdomFlag(event)} disabled={flagBusy}/></label>{kingdomFlagPreview&&<button type="button" className="cursor-action" onClick={()=>void removeKingdomFlag()} disabled={flagBusy}>Remove flag</button>}</div></div>
     </section>
     
+    <section className="cursor-size-settings" style={{ marginTop: 22, padding: 18, border: '1px solid rgba(148,163,184,.18)', borderRadius: 16, background: 'linear-gradient(135deg, rgba(30,41,59,.32), rgba(15,23,42,.16))' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+        <span style={{ width: 40, height: 40, display: 'grid', placeItems: 'center', borderRadius: 12, color: '#93c5fd', background: 'rgba(59,130,246,.14)', border: '1px solid rgba(96,165,250,.24)' }}><MousePointer2 size={20}/></span>
+        <div style={{ flex: 1 }}><span className="eyebrow">PERSONALIZATION · POINTER</span><h3 style={{ margin: '4px 0 0', fontSize: 16 }}>Cursor size</h3></div>
+        <strong style={{ fontSize: 14, color: '#bfdbfe', fontVariantNumeric: 'tabular-nums' }}>{cursorSize} × {cursorSize}px</strong>
+      </div>
+      <p style={{ margin: '0 0 14px', color: 'var(--muted, #94a3b8)', fontSize: 13, lineHeight: 1.6 }}>Adjust your equipped custom cursor here. The setting applies instantly and is saved on this browser.</p>
+      <input aria-label="Cursor size" type="range" min={12} max={48} step={1} value={cursorSize} onChange={event => changeCursorSize(Number(event.target.value))} style={{ display: 'block', width: '100%', accentColor: '#60a5fa', cursor: 'pointer' }}/>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 7, color: 'var(--muted, #94a3b8)', fontSize: 11 }}><span>12px · Compact</span><span>48px · Large</span></div>
+    </section>
     <button type="button" className="settings-contact-operator" onClick={onContactOperator}><span><MessageSquareText size={19}/></span><span><b>Need a hand? Contact Operator</b><small>Send a private request, track its status, and receive a direct reply.</small></span><ArrowUpRight size={17}/></button>
   </section>;
 }
