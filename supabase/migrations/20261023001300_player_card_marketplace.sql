@@ -17,7 +17,7 @@ create table if not exists public.player_card_owned (
 );
 create table if not exists public.player_card_equipped (
   user_id uuid primary key references auth.users(id) on delete cascade,
-  card_id text not null references public.player_card_owned(card_id) on delete cascade,
+  card_id text not null,
   updated_at timestamptz not null default now()
 );
 -- Composite ownership FK enforces that an equipped card belongs to that same user.
