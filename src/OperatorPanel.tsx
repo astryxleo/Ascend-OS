@@ -498,7 +498,7 @@ export default function OperatorPanel({
         <section className="operator-contact-inbox">
           <div className="operator-warning"><MessageSquareText size={18}/><div><b>Direct Operator inbox · {contactRequests.filter(r=>r.status==='awaiting').length} awaiting</b><span>Read the entire request, then confirm you have read it before changing its status. Status changes notify the requester in real time.</span></div><button type="button" onClick={()=>void loadContactRequests()}><RefreshCw size={14}/> Refresh</button></div>
           <div className="operator-contact-filters">{[{v:'all',l:'All requests'},{v:'awaiting',l:'Awaiting'},{v:'accepted',l:'Accepted'},{v:'in_progress',l:'In progress'},{v:'rejected',l:'Rejected'},{v:'resolved',l:'Resolved'}].map(x=><button type="button" key={x.v} className={contactFilter===x.v?'selected':''} onClick={()=>setContactFilter(x.v)}>{x.l}</button>)}</div>
-          <div className="operator-contact-list">{filteredContactRequests.map(row=><article className="operator-contact-card" key={row.id}>
+          <div className="operator-contact-list">{filteredContactRequests.map(row=><details className="operator-contact-card" key={row.id}>
             <div className="operator-contact-card-head"><span className={'operator-contact-status status-'+row.status}>{row.status.replaceAll('_',' ')}</span><time>{new Date(row.created_at).toLocaleString()}</time></div>
             <h3>{row.subject}</h3><div className="operator-contact-meta"><span>{row.category}</span><span>{row.user_email||row.user_id}</span><span>Ref · {row.id.slice(0,8).toUpperCase()}</span></div>
             <div className="operator-contact-message"><b>Full message</b><MarkdownMessage value={row.message}/></div>
