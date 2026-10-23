@@ -46,10 +46,7 @@ async function compressAvatar(file: File): Promise<Blob> {
 export default function SettingsPanel({ supabase, profile, userId, onSaved, setNotice, onContactOperator }: Props) {
   const [name, setName] = useState(profile?.full_name ?? '');
   const [username, setUsername] = useState(profile?.username ?? '');
-  const [grade, setGrade] = useState(profile?.class_grade ?? '12');
-  const [stream, setStream] = useState(profile?.stream ?? 'PCM');
   const [school, setSchool] = useState((profile?.school_target ?? '').split(' · ')[0] ?? '');
-  const [targetExam, setTargetExam] = useState((profile?.school_target ?? '').split(' · ').slice(1).join(' · ') || 'JEE');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState(profile?.avatar_url ?? '');
   const [kingdomFlagPreview, setKingdomFlagPreview] = useState(profile?.kingdom_flag_url ?? '');
@@ -74,10 +71,7 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
   useEffect(() => {
     setName(profile?.full_name ?? '');
     setUsername(profile?.username ?? '');
-    setGrade(profile?.class_grade ?? '12');
-    setStream(profile?.stream ?? 'PCM');
     setSchool((profile?.school_target ?? '').split(' · ')[0] ?? '');
-    setTargetExam((profile?.school_target ?? '').split(' · ').slice(1).join(' · ') || 'JEE');
     setAvatarFile(null);
     setAvatarPreview(profile?.avatar_url ?? '');
     setKingdomFlagPreview(profile?.kingdom_flag_url ?? '');
@@ -160,7 +154,7 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
       return;
     }
     if (!name.trim() || !school.trim()) {
-      setError('Name and school / target institution are required.');
+      setError('Name and school are required.');
       return;
     }
     setBusy(true);
@@ -189,9 +183,9 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
       const { data, error: updateError } = await supabase.from('profiles').update({
         full_name: name.trim(),
         username: username.toLowerCase(),
-        class_grade: grade,
-        stream,
-        school_target: school.trim() + ' · ' + targetExam,
+        class_grade: '12',
+        stream: 'PCM',
+        school_target: school.trim(),
         avatar_url: avatarUrl,
       }).eq('id', userId).select('*').single();
       if (updateError) throw updateError;
@@ -220,10 +214,7 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
       <div className="settings-fields">
         <label>Full name<input value={name} onChange={e => setName(e.target.value)} maxLength={80} required autoComplete="name"/></label>
         <label>Username<input value={username} onChange={e => setUsername(e.target.value)} minLength={3} maxLength={24} pattern="[A-Za-z0-9_]+" required autoComplete="username"/><small>3–24 letters, numbers or underscores</small></label>
-        <label>Class<select value={grade} onChange={e => setGrade(e.target.value)}><option value="11">Class XI</option><option value="12">Class XII</option><option value="Other">Other</option></select></label>
-        <label>Stream<select value={stream} onChange={e => setStream(e.target.value)}><option>PCM</option><option>PCB</option><option>Commerce</option><option>Humanities</option><option>Other</option></select></label>
         <label>School / target institution<input value={school} onChange={e => setSchool(e.target.value)} maxLength={120} required/></label>
-        <label>Target exam<select value={targetExam} onChange={e => setTargetExam(e.target.value)}><option>JEE</option><option>NEET</option><option>CUET</option><option>Board Exams</option><option>Other</option></select></label>
       </div>
       {error && <div className="settings-error" role="alert">{error}</div>}
       <div className="settings-actions"><span>Changes apply after a successful save.</span><button className="primary-btn" disabled={busy}><Save size={15}/>{busy ? 'Saving settings…' : 'Save settings'}</button></div>
