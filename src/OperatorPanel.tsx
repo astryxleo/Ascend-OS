@@ -64,6 +64,10 @@ export default function OperatorPanel({
   const [notifyTitle,setNotifyTitle]=useState('');
   const [notifyMessage,setNotifyMessage]=useState('');
   const [notifyKind,setNotifyKind]=useState('operator');
+  const [giftCoins,setGiftCoins]=useState('0');
+  const [giftSouls,setGiftSouls]=useState('0');
+  const [giftXp,setGiftXp]=useState('0');
+  const [giftMessage,setGiftMessage]=useState('A little gift to celebrate your progress — keep ascending!');
   const usersRequestId = useRef(0);
   const dashboardRequestId = useRef(0);
   const walletAuditRequestId = useRef(0);
