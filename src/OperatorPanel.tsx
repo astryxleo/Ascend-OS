@@ -313,7 +313,7 @@ export default function OperatorPanel({
     return [row.reason, row.source, row.currency, row.user_id, row.username ?? '', row.full_name ?? ''].join(' ').toLowerCase().includes(walletAuditQuery.toLowerCase());
   });
 
-  const tabs = ['Overview', 'Users', 'Wallet', 'Gift terminal', 'Wallet audit', 'Broadcasts', 'Contact requests', 'Notifications'];
+  const tabs = ['Overview', 'Users', 'Daily activity', 'Wallet', 'Gift terminal', 'Marketplace discounts', 'Warnings', 'Wallet audit', 'Broadcasts', 'Contact requests', 'Notifications'];
 
   return (
     <section className="panel operator-panel">
@@ -382,7 +382,7 @@ export default function OperatorPanel({
                 type="button"
                 className={'operator-user ' + (target === user.user_id ? 'active' : '')}
                 key={user.user_id}
-                onClick={() => setTarget(user.user_id)}
+                onClick={() => void loadDossier(user.user_id)}
               >
                 <span>
                   <b>{user.full_name}</b>
