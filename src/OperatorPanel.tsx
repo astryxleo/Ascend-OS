@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import './operator-contact.css';
 import MarkdownMessage from './MarkdownMessage';
-import { Activity, RefreshCw, Search, Send, ShieldCheck, Wallet, Users, MessageSquareText, CheckCircle2, Clock3, Bell } from 'lucide-react';
+import { Activity, RefreshCw, Search, Send, ShieldCheck, Wallet, Users, MessageSquareText, CheckCircle2, Clock3, Bell, Gift, Sparkles, Zap } from 'lucide-react';
 
 type UserRow = {
   user_id: string;
@@ -199,6 +199,19 @@ export default function OperatorPanel({
     }
   }
 
+  async function sendRewardGift(event: FormEvent) {
+    event.preventDefault();
+    if(!supabase||!target)return;
+    const coins=Number(giftCoins),souls=Number(giftSouls),xp=Number(giftXp),note=giftMessage.trim();
+    if([coins,souls,xp].some(v=>!Number.isSafeInteger(v)||v<0)||coins+souls+xp===0){setNotice('Enter non-negative whole-number rewards and make at least one reward greater than zero.');return;}
+    if(note.length<1||note.length>1000){setNotice('Gift message must be between 1 and 1,000 characters.');return;}
+    if(!users.some(user=>user.user_id===target)){setNotice('Choose a user from the loaded account list.');return;}
+    setBusy(true);
+    try{const {error}=await supabase.rpc('operator_gift_rewards',{p_target_user:target,p_coins:coins,p_souls:souls,p_xp:xp,p_message:note});if(error){setNotice('Reward gift failed: '+error.message);return;}const recipient=users.find(user=>user.user_id===target);setNotice('Gift sent to '+(recipient?.full_name||'the selected player')+'. Their in-app notification should arrive live.');setGiftCoins('0');setGiftSouls('0');setGiftXp('0');await refresh();}
+    catch(error){setNotice('Reward gift failed: '+(error instanceof Error?error.message:'Unexpected error.'));}
+    finally{setBusy(false);}
+  }
+
   async function createBroadcast(event: FormEvent) {
     event.preventDefault();
     if (!supabase) return;
@@ -282,7 +295,7 @@ export default function OperatorPanel({
     return [row.reason, row.source, row.currency, row.user_id, row.username ?? '', row.full_name ?? ''].join(' ').toLowerCase().includes(walletAuditQuery.toLowerCase());
   });
 
-  const tabs = ['Overview', 'Users', 'Wallet', 'Wallet audit', 'Broadcasts', 'Contact requests', 'Notifications'];
+  const tabs = ['Overview', 'Users', 'Wallet', 'Gift terminal', 'Wallet audit', 'Broadcasts', 'Contact requests', 'Notifications'];
 
   return (
     <section className="panel operator-panel">
@@ -332,6 +345,7 @@ export default function OperatorPanel({
             <button onClick={() => setTab('Users')}><Users /><b>User inspector</b><span>Progress & readiness</span></button>
             <button onClick={() => setTab('Wallet')}><Wallet /><b>Reward terminal</b><span>Audited wallet changes</span></button>
             <button onClick={() => setTab('Wallet audit')}><Activity /><b>Wallet audit log</b><span>Latest currency ledger entries</span></button>
+            <button onClick={() => setTab('Gift terminal')}><Gift /><b>Reward & gift terminal</b><span>Coins, souls, XP + live message</span></button>
             <button onClick={() => setTab('Broadcasts')}><Activity /><b>Global broadcast</b><span>System-wide alerts</span></button>
           </div>
         </>
@@ -387,6 +401,22 @@ export default function OperatorPanel({
           <label>Reason <input value={reason} onChange={(event) => setReason(event.target.value)} minLength={3} maxLength={240} required /></label>
           <button className="operator-primary" disabled={busy || !target}><Wallet size={14} /> Apply adjustment</button>
         </form>
+      )}
+
+      {tab === 'Gift terminal' && (
+        <section className="operator-gift-terminal">
+          <div className="operator-warning"><Gift size={18}/><div><b>Operator reward terminal</b><span>Gift Coins, Ascend Souls and XP with a personal message delivered through the live in-app notification system.</span></div></div>
+          <form className="operator-form" onSubmit={sendRewardGift}>
+            <label className="operator-wide">Recipient account<select value={target} onChange={e=>setTarget(e.target.value)} required><option value="">Choose a player…</option>{users.map(user=><option key={user.user_id} value={user.user_id}>{user.full_name} · @{user.username} · {user.email}</option>)}</select></label>
+            <label><span style={{display:'flex',alignItems:'center',gap:7}}><Wallet size={14}/> Coins</span><input type="number" min="0" step="1" value={giftCoins} onChange={e=>setGiftCoins(e.target.value)} required/></label>
+            <label><span style={{display:'flex',alignItems:'center',gap:7}}><Sparkles size={14}/> Ascend Souls</span><input type="number" min="0" step="1" value={giftSouls} onChange={e=>setGiftSouls(e.target.value)} required/></label>
+            <label><span style={{display:'flex',alignItems:'center',gap:7}}><Zap size={14}/> XP</span><input type="number" min="0" step="1" value={giftXp} onChange={e=>setGiftXp(e.target.value)} required/></label>
+            <label className="operator-wide">Personal message<textarea value={giftMessage} onChange={e=>setGiftMessage(e.target.value)} maxLength={1000} rows={5} required placeholder="Write a personal note for the player…"/></label>
+            <div className="operator-gift-preview operator-wide"><span>LIVE POPUP PREVIEW</span><b>✦ A Gift from the Operator</b><p>{giftMessage||'Your message will appear here.'}</p><small>Rewards: {Number(giftCoins||0).toLocaleString()} Coins · {Number(giftSouls||0).toLocaleString()} Ascend Souls · {Number(giftXp||0).toLocaleString()} XP</small></div>
+            <button className="operator-primary operator-wide" disabled={busy||!target||![giftCoins,giftSouls,giftXp].every(v=>Number.isSafeInteger(Number(v))&&Number(v)>=0)||(Number(giftCoins)+Number(giftSouls)+Number(giftXp)===0)||!giftMessage.trim()}><Gift size={15}/>{busy?'Delivering gift…':'Grant rewards & send live message'}</button>
+          </form>
+          <p className="operator-help">Every gift is saved to the operator gift audit table. Coins also create a wallet transaction record. Rewards are granted server-side and the user notification is saved to their inbox.</p>
+        </section>
       )}
 
       {tab === 'Wallet audit' && (
