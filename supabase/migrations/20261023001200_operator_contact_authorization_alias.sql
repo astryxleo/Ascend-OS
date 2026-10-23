@@ -4,7 +4,7 @@ create policy "Users read their own operator requests"
 on public.operator_contact_requests for select to authenticated
 using (
   (select auth.uid()) = user_id
-  or lower(coalesce((select auth.jwt()->>'email'),'')) in ('astryxleo@gmail.com','astryxleo@op.in')
+  or lower(coalesce((select auth.jwt()->>'email'),'')) in ('astryxleo@gmail.com','astryxleo@op.in','yoursjace@gmail.com')
 );
 
 create or replace function public.operator_manage_contact_request(
@@ -16,7 +16,7 @@ declare
   e text := lower(coalesce(auth.jwt()->>'email',''));
   result public.operator_contact_requests;
 begin
-  if auth.uid() is null or e not in ('astryxleo@gmail.com','astryxleo@op.in') then
+  if auth.uid() is null or e not in ('astryxleo@gmail.com','astryxleo@op.in','yoursjace@gmail.com') then
     raise exception 'Operator access required';
   end if;
   if not p_read_confirmed then raise exception 'Read the complete request before updating its status'; end if;
@@ -57,7 +57,7 @@ declare
   e text := lower(coalesce(auth.jwt()->>'email',''));
   result public.ascend_notifications;
 begin
-  if auth.uid() is null or e not in ('astryxleo@gmail.com','astryxleo@op.in') then
+  if auth.uid() is null or e not in ('astryxleo@gmail.com','astryxleo@op.in','yoursjace@gmail.com') then
     raise exception 'Operator access required';
   end if;
   if p_user_id is null then raise exception 'Choose a recipient'; end if;
