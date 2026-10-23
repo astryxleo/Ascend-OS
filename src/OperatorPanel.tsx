@@ -397,6 +397,12 @@ export default function OperatorPanel({
             ))}
             {users.length === 0 && !usersLoadError && <p className="operator-help">No users found for this search.</p>}
           </div>
+          {dossierLoading&&<div className="operator-warning"><RefreshCw size={16}/> Loading full player dossier…</div>}
+          {dossier&&<section className="operator-dossier">
+            <header><div><span>FULL PLAYER DOSSIER</span><h3>{dossier.profile.full_name||dossier.profile.username}</h3><p>@{dossier.profile.username} · {dossier.profile.email}</p></div><button type="button" className="operator-primary" onClick={()=>void downloadDossierCard()}><Download size={14}/> Download card PNG</button></header>
+            <div className="operator-dossier-grid">{[['Coins',dossier.stats.coins],['Ascend Souls',dossier.stats.ascend_souls],['Combat level',dossier.stats.combat_level],['Combat XP',dossier.stats.combat_xp],['Focus minutes',dossier.stats.focus_minutes],['Focus sessions',dossier.stats.focus_sessions],['Tasks completed',dossier.stats.completed_tasks],['Tasks pending',dossier.stats.pending_tasks],['Syllabus checkpoints',dossier.stats.syllabus_checkpoints],['Combat rating',dossier.stats.combat_rating],['Combat wins',dossier.stats.combat_wins],['Combat losses',dossier.stats.combat_losses]].map(([label,value])=><article key={String(label)}><span>{label}</span><b>{Number(value||0).toLocaleString('en-IN')}</b></article>)}</div>
+            <div className="operator-dossier-meta"><span>Role: {dossier.profile.role||'—'}</span><span>Class: {dossier.profile.class_grade||'—'}</span><span>Stream: {dossier.profile.stream||'—'}</span><span>Target: {dossier.profile.school_target||'—'}</span><span>Joined: {dossier.profile.created_at?new Date(dossier.profile.created_at).toLocaleDateString():'—'}</span></div>
+          </section>}
         </>
       )}
 
