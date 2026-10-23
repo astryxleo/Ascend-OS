@@ -174,3 +174,9 @@
 .cq-kingdom-hover-card{padding-top:14px;background:rgba(12,15,24,.82);backdrop-filter:blur(18px) saturate(130%)}
 .cq-kingdom-hover-card>small{color:#f1d17f}
 @media(max-width:560px){.cq-atlas-wrap .cq-kingdom-menu-anchor{left:auto!important;right:8px!important;top:72px!important;bottom:auto!important}.cq-atlas-wrap .cq-kingdom-rank-menu{left:auto!important;right:0!important;top:46px!important;bottom:auto!important;max-height:min(460px,calc(100% - 145px))}}
+
+.cq-epic-tag{display:inline-flex;align-items:center;gap:5px;width:max-content;max-width:100%;padding:6px 9px;border:1px solid rgba(255,213,107,.35);border-radius:7px;background:rgba(255,213,107,.08);color:#ffe2a0;font-size:8px;font-weight:950;letter-spacing:.09em}
+.cq-epic-level-7{color:#9cefff;border-color:#6ee7ff55;background:#6ee7ff0d}
+.cq-epic-level-8{color:#e6c8ff;border-color:#e7c6ff55;background:#e7c6ff0d}
+.cq-epic-level-9{color:#ffad8a;border-color:#ff805455;background:#ff80540d}
+.cq-epic-level-10{color:#ffb8ef;border-color:#ff4dce77;background:linear-gradient(100deg,#ff4dce18,#6ee7ff12);box-shadow:0 0 22px #ff4dce18}
