@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { Award, Flame, Clock3, Target, Sparkles, RefreshCw, LockKeyhole, CheckCircle2, Trophy, Crown, X } from 'lucide-react';
+import { Award, Flame, Clock3, Target, Sparkles, RefreshCw, LockKeyhole, CheckCircle2, Trophy, X } from 'lucide-react';
 
 type FocusRow = { id:string; duration_minutes:number; ended_at:string; xp_earned:number|null; completed:boolean|null; subject:string|null };
 type Props = { supabase:SupabaseClient|null; userId:string };
