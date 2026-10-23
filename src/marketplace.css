@@ -58,3 +58,7 @@
 .atlas-obsidian .atlas-card-aurora{background:repeating-linear-gradient(125deg,transparent 0 20px,#c4b5fd17 21px 22px,transparent 23px 39px)}
 .atlas-celestial:before{background:radial-gradient(ellipse at 50% 30%,#ffe7a060,transparent 54%),linear-gradient(145deg,#5b4923,#241b0d 58%,#0a0908)}
 .atlas-celestial .atlas-card-aurora{background:radial-gradient(circle at 15% 20%,#fff1c0 0 1px,transparent 2px),radial-gradient(circle at 83% 35%,#fff1c0 0 1px,transparent 2px),radial-gradient(circle at 75% 78%,#fff1c0 0 1px,transparent 2px),radial-gradient(circle at 24% 74%,#fff1c0 0 1px,transparent 2px),repeating-radial-gradient(ellipse at 50% 50%,transparent 0 19px,#ffe7a018 20px 21px,transparent 22px 32px)}
+
+/* Image-backed previews for border skins and profile frames */
+.market-cosmetic-image{display:block;width:100%;height:100%;object-fit:cover;object-position:center;filter:saturate(1.08);}
+.market-cosmetic-image.is-profile-frame{object-fit:contain;padding:0 10px;}
