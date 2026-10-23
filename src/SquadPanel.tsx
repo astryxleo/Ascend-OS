@@ -1,7 +1,7 @@
 import './squads.css';
 import { useCallback, useEffect, useState, type FormEvent, type ChangeEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { Users, Plus, KeyRound, Copy, Shield, Trophy, Target, Clock3, CheckCircle2, LogOut, RefreshCw, Sparkles, Coins, Swords, HeartPulse, TrendingUp, Zap, ArrowUpRight, Trash2, BarChart3 } from 'lucide-react';
+import { Users, Plus, KeyRound, Copy, Shield, Trophy, Target, Clock3, CheckCircle2, LogOut, RefreshCw, Sparkles, Coins, Swords, HeartPulse, TrendingUp, Zap, ArrowUpRight, Trash2, BarChart3, Flag } from 'lucide-react';
 
 type Squad = {id:string;name:string;description:string;invite_code:string;created_by:string;created_at:string;my_role:'leader'|'co_leader'|'member';member_count:number;flag_url?:string|null};
 type Member = {user_id:string;display_name:string;avatar_url:string|null;role:string;focus_minutes:number;tasks_completed:number;score:number};
