@@ -157,3 +157,20 @@
 .cq-atlas-wrap .cq-kingdom-menu-button{position:relative;left:auto;right:auto;top:auto;bottom:auto;z-index:81;}
 .cq-atlas-wrap .cq-kingdom-rank-menu{position:absolute;left:0;right:auto;top:auto;bottom:48px;z-index:90;width:min(360px,calc(100vw - 48px));max-height:min(570px,calc(100% - 130px));}
 @media(max-width:560px){.cq-atlas-wrap .cq-kingdom-menu-anchor{left:8px;right:auto;top:auto;bottom:10px}.cq-atlas-wrap .cq-kingdom-rank-menu{left:0;right:auto;top:auto;bottom:46px;}}
+
+
+/* Atlas refinements: rank glass sits just beneath the zoom controls. */
+.cq-atlas-wrap .cq-kingdom-menu-anchor{left:auto!important;right:14px!important;top:72px!important;bottom:auto!important;align-items:flex-end}
+.cq-atlas-wrap .cq-kingdom-menu-button{background:rgba(13,17,27,.58)!important;border-color:rgba(220,190,118,.55);box-shadow:0 8px 28px rgba(0,0,0,.28);backdrop-filter:blur(14px) saturate(135%)}
+.cq-atlas-wrap .cq-kingdom-rank-menu{left:auto!important;right:0!important;top:48px!important;bottom:auto!important;width:min(360px,calc(100vw - 38px));background:rgba(12,15,25,.56)!important;border-color:rgba(214,190,132,.43);box-shadow:0 20px 58px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.08);backdrop-filter:blur(13px) saturate(130%)}
+.cq-atlas-wrap .cq-kingdom-rank-menu>header{background:rgba(255,255,255,.025)}
+.cq-atlas-wrap .cq-kingdom-rank-row{background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.08)}
+.cq-atlas-wrap .cq-kingdom-rank-row.is-self{border-color:rgba(239,207,128,.7);background:rgba(231,190,95,.13);box-shadow:inset 3px 0 #e7be5f}
+.cq-rank-player b{display:flex;align-items:center;gap:6px}
+.cq-rank-player b i{font-size:7px;font-style:normal;letter-spacing:.1em;padding:3px 5px;border-radius:4px;background:rgba(231,190,95,.17);color:#f3d58a;border:1px solid rgba(231,190,95,.3)}
+.cq-hover-banner{height:86px;margin:-14px -16px 5px;position:relative;display:flex;align-items:flex-end;overflow:hidden;border-radius:13px 13px 0 0;background:radial-gradient(ellipse at 50% 0%,rgba(120,151,218,.28),transparent 70%),linear-gradient(125deg,#22283a,#10121b 65%,#393023);background-size:cover;background-position:center;border-bottom:1px solid rgba(231,190,95,.3)}
+.cq-hover-banner>span{position:absolute;top:9px;right:12px;font-size:24px;color:rgba(255,239,190,.72);text-shadow:0 2px 12px #000}
+.cq-hover-banner>b{position:relative;max-width:100%;padding:11px 13px 10px;font-size:15px;color:#fff4d2;text-shadow:0 2px 8px #000;overflow-wrap:anywhere}
+.cq-kingdom-hover-card{padding-top:14px;background:rgba(12,15,24,.82);backdrop-filter:blur(18px) saturate(130%)}
+.cq-kingdom-hover-card>small{color:#f1d17f}
+@media(max-width:560px){.cq-atlas-wrap .cq-kingdom-menu-anchor{left:auto!important;right:8px!important;top:72px!important;bottom:auto!important}.cq-atlas-wrap .cq-kingdom-rank-menu{left:auto!important;right:0!important;top:46px!important;bottom:auto!important;max-height:min(460px,calc(100% - 145px))}}
