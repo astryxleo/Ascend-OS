@@ -561,7 +561,7 @@ function App() {
         {activeNav==='Notifications'&&<NotificationsPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
         {activeNav==='Help center'&&<HelpCenterPanel onNavigate={navigate}/>}
         {activeNav==='Marketplace'&&<MarketplacePanel supabase={supabase} userId={session.user.id} profile={profile} setNotice={setNotice}/>}
-        {activeNav==='Marketplace'&&<MarketplacePanel supabase={supabase} userId={session.user.id} profile={profile} setNotice={setNotice}/>}
+        {activeNav==='Marketplace'&&<MarketplacePanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
         {activeNav==='Player Card'&&<PlayerCardPanel supabase={supabase} userId={session.user.id} profile={profile} email={session.user.email}/>} 
         <footer className="footer"><span>◈ ASCEND OS <i>STUDY OS</i></span><span>BUILT FOR THE LONG GAME <span className="footer-dot">●</span></span></footer>
       </div>
