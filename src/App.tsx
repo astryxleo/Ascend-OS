@@ -17,7 +17,8 @@ import ContactOperatorPanel from './ContactOperatorPanel';
 import NotificationsPanel from './NotificationsPanel';
 import HelpCenterPanel from './HelpCenterPanel';
 import PlayerCardPanel from './PlayerCardPanel';
-import { Activity, ArrowUpRight, Bell, BookOpen, ChartNoAxesColumn, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, ShieldAlert, LockKeyhole, Award, Sparkles, Swords, Target, Trophy, Wallet, Users, X, MessageSquareText } from 'lucide-react';
+import MarketplacePanel from './MarketplacePanel';
+import { Activity, ArrowUpRight, Bell, BookOpen, ChartNoAxesColumn, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, ShieldAlert, LockKeyhole, Award, Sparkles, ShoppingBag, Swords, Target, Trophy, Wallet, Users, X, MessageSquareText } from 'lucide-react';
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
@@ -44,6 +45,7 @@ const nav = [
   {label:'Notifications',icon:Bell},
   {label:'Help center',icon:CircleHelp},
   {label:'Contact Operator',icon:MessageSquareText},
+  {label:'Marketplace',icon:ShoppingBag},
   {label:'Player Card',icon:Sparkles},
 ];
 
@@ -52,7 +54,7 @@ const routeByLabel: Record<string, string> = {
   'Planner': '/planner', 'Exams & marks': '/exams', 'Updates': '/updates',
   'Leaderboard': '/leaderboard', 'Combat Arena': '/combat', '1v1 Arena': '/1v1', 'Duels': '/duels',
   'Squads': '/squads', 'Squad Wars': '/squad-wars', 'Achievements': '/achievements', 'Analytics': '/analytics',
-  'Control center': '/operator', 'Settings': '/settings', 'Notifications':'/notifications', 'Contact Operator':'/contact-operator', 'Help center':'/help', 'Player Card':'/player-card',
+  'Control center': '/operator', 'Settings': '/settings', 'Notifications':'/notifications', 'Contact Operator':'/contact-operator', 'Help center':'/help', 'Marketplace':'/marketplace', 'Player Card':'/player-card',
 };
 const labelByRoute = Object.fromEntries(Object.entries(routeByLabel).map(([label, route]) => [route, label])) as Record<string, string>;
 function labelFromPath(path: string) {
@@ -556,6 +558,7 @@ function App() {
         {activeNav==='Contact Operator'&&<ContactOperatorPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
         {activeNav==='Notifications'&&<NotificationsPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
         {activeNav==='Help center'&&<HelpCenterPanel onNavigate={navigate}/>}
+        {activeNav==='Marketplace'&&<MarketplacePanel supabase={supabase} userId={session.user.id} profile={profile} setNotice={setNotice}/>}
         {activeNav==='Player Card'&&<PlayerCardPanel supabase={supabase} userId={session.user.id} profile={profile} email={session.user.email}/>} 
         <footer className="footer"><span>◈ ASCEND OS <i>STUDY OS</i></span><span>BUILT FOR THE LONG GAME <span className="footer-dot">●</span></span></footer>
       </div>
