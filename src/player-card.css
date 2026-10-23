@@ -15,3 +15,44 @@
 .pc-all-ranks small{display:block;color:#969db0;font:800 7px 'DM Mono',monospace;letter-spacing:.05em;overflow-wrap:anywhere}
 .pc-all-ranks b{display:block;margin-top:6px;color:var(--pc-accent);font-size:16px;font-weight:950}
 @media(max-width:520px){.pc-all-ranks{grid-template-columns:repeat(3,minmax(0,1fr))}.pc-squad-line{grid-template-columns:auto minmax(0,1fr)}.pc-squad-line>span{grid-column:1/-1}.pc-squad-line>small{grid-column:2}}
+
+/* Purchasable player-card vault */
+.pc-gallery{padding:clamp(18px,3vw,30px);border:1px solid #302b3b;border-radius:22px;background:radial-gradient(ellipse at 100% 0,#d9b7650d,transparent 38%),linear-gradient(145deg,#121219,#09090f);display:grid;gap:20px}
+.pc-gallery-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.pc-gallery-head h2{margin:12px 0 7px;font-size:clamp(25px,4vw,40px);letter-spacing:-.06em;color:#faf8ff}
+.pc-gallery-head p{margin:0;color:#a39daf;font-size:12px;line-height:1.7}
+.pc-wallet{display:grid;gap:6px;padding:12px 15px;border:1px solid #e7c77935;border-radius:12px;background:#e7c7790a}
+.pc-wallet span{font-size:8px;letter-spacing:.13em;font-weight:900;color:#a9a2b5}
+.pc-wallet b{font-size:16px;color:#f2d58c}
+.pc-gallery-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.pc-vault-card{min-width:0;overflow:hidden;border:1px solid #ffffff16;border-radius:17px;background:linear-gradient(155deg,#171720,#0b0b11);transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+.pc-vault-card:hover{transform:translateY(-3px);border-color:#e7c77955;box-shadow:0 14px 34px #0005}
+.pc-vault-card.is-equipped{border-color:#e7c779aa;box-shadow:0 0 0 1px #e7c77925,0 12px 32px #0005}
+.pc-vault-art{--vault-accent:#d9b765;position:relative;isolation:isolate;min-height:220px;overflow:hidden;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;background:radial-gradient(ellipse at 70% 25%,color-mix(in srgb,var(--vault-accent) 32%,transparent),transparent 48%),linear-gradient(145deg,#252532,#0c0d14 65%,#14111a);border-bottom:1px solid color-mix(in srgb,var(--vault-accent) 40%,transparent)}
+.pc-vault-card.gold .pc-vault-art{--vault-accent:#f4ce78}.pc-vault-card.cyan .pc-vault-art{--vault-accent:#75e7dc}.pc-vault-card.violet .pc-vault-art{--vault-accent:#c1a0ff}.pc-vault-card.crimson .pc-vault-art{--vault-accent:#ff647c}.pc-vault-card.emerald .pc-vault-art{--vault-accent:#72e6ad}.pc-vault-card.obsidian .pc-vault-art{--vault-accent:#c4cbd8}
+.pc-vault-art:before{content:"";position:absolute;inset:8px;z-index:-1;border:1px solid color-mix(in srgb,var(--vault-accent) 55%,transparent);border-radius:10px;pointer-events:none}
+.pc-vault-glow{position:absolute;width:170px;height:170px;right:-45px;top:-50px;border-radius:50%;background:var(--vault-accent);filter:blur(65px);opacity:.2;z-index:-1}
+.pc-vault-index,.pc-vault-rarity{position:absolute;top:18px;font:900 7px 'DM Mono',monospace;letter-spacing:.12em;color:#d8d7e1}
+.pc-vault-index{left:19px}.pc-vault-rarity{right:19px;color:var(--vault-accent)}
+.pc-vault-emblem{display:grid;place-items:center;width:54px;height:54px;margin-bottom:auto;border:1px solid color-mix(in srgb,var(--vault-accent) 65%,transparent);border-radius:15px;color:var(--vault-accent);background:#08091088;box-shadow:0 0 32px color-mix(in srgb,var(--vault-accent) 15%,transparent)}
+.pc-vault-art>strong{margin-top:24px;font-size:clamp(14px,1.6vw,20px);letter-spacing:-.04em;color:#fff;overflow-wrap:anywhere}
+.pc-vault-art>small{margin-top:5px;font:800 7px 'DM Mono',monospace;letter-spacing:.12em;color:#aaaebe}
+.pc-vault-art-foot{display:flex;justify-content:space-between;gap:6px;margin-top:18px;padding-top:9px;border-top:1px solid #ffffff20;font:900 6px 'DM Mono',monospace;letter-spacing:.08em;color:var(--vault-accent)}
+.pc-vault-copy{padding:14px;display:grid;gap:10px}
+.pc-vault-copy h3{margin:0;color:#f7f5fb;font-size:14px;letter-spacing:-.03em}
+.pc-vault-copy p{margin:0;min-height:34px;color:#a09bad;font-size:10px;line-height:1.6}
+.pc-vault-price{display:flex;align-items:center;justify-content:space-between;gap:6px;padding-top:10px;border-top:1px solid #ffffff12}
+.pc-vault-price span{font-size:7px;font-weight:900;letter-spacing:.08em;color:#9993a8}
+.pc-vault-price b{white-space:nowrap;color:#f0d38b;font-size:12px}
+.pc-vault-buy,.pc-vault-equip,.pc-vault-equipped{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;min-height:38px;padding:10px;border:1px solid #e7c77970;border-radius:9px;background:linear-gradient(110deg,#8f6e32,#d8b765);color:#111;font-size:9px;font-weight:950;cursor:pointer}
+.pc-vault-equip{background:#ffffff0a;border-color:#ffffff2b;color:#f6f2ff}
+.pc-vault-equipped{background:#72e6ad12;border-color:#72e6ad55;color:#83e8b8;cursor:default}
+.pc-vault-buy:disabled,.pc-vault-equip:disabled{opacity:.55;cursor:wait}
+.pc-export-lock{display:flex;gap:9px;align-items:flex-start;padding:11px;border:1px solid #ffcf7d30;border-radius:10px;background:#ffcf7d08;color:#d9c59b;font-size:9px;line-height:1.6}
+.pc-export-lock svg{flex-shrink:0;color:#f1cc77}
+.pc-gallery-empty{padding:24px;border:1px dashed #ffffff20;border-radius:12px;color:#aaa4b8;font-size:12px;text-align:center}
+.pc-card-preview.crimson{--pc-accent:#ff647c;border-color:#ff647c70;background:radial-gradient(ellipse at 95% 0%,#ff647c20,transparent 44%),linear-gradient(145deg,#21151d,#090b12 70%,#170e16)}
+.pc-card-preview.emerald{--pc-accent:#72e6ad;border-color:#72e6ad70;background:radial-gradient(ellipse at 95% 0%,#72e6ad20,transparent 44%),linear-gradient(145deg,#14221d,#090b12 70%,#0d1713)}
+.pc-card-preview.obsidian{--pc-accent:#c4cbd8;border-color:#c4cbd870;background:radial-gradient(ellipse at 95% 0%,#c4cbd81a,transparent 44%),linear-gradient(145deg,#20232b,#090b12 70%,#101116)}
+@media(max-width:1050px){.pc-gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.pc-gallery{padding:13px}.pc-gallery-grid{grid-template-columns:1fr}.pc-vault-art{min-height:235px}.pc-gallery-head{align-items:stretch}.pc-wallet{width:100%}}
