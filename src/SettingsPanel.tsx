@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent, type ChangeEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { Save, ShieldCheck, Upload, UserRound, MousePointer2, ShoppingBag, Check, Sparkles, MessageSquareText, ArrowUpRight, Flag } from 'lucide-react';
+import { Save, ShieldCheck, Upload, UserRound, Sparkles, MessageSquareText, ArrowUpRight, Flag } from 'lucide-react';
 
 type Profile = {
   full_name?: string | null;
@@ -56,32 +56,6 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
   const [flagBusy, setFlagBusy] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [cursorStore,setCursorStore] = useState<{selected_cursor_id:number;owned_cursor_ids:number[];coins:number;price:number}>({selected_cursor_id:6,owned_cursor_ids:[6],coins:0,price:50000});
-  const [cursorBusy,setCursorBusy] = useState<number|null>(null);
-  const [cursorSize,setCursorSize] = useState(() => { try { return Math.max(12, Math.min(48, Number(localStorage.getItem('ascend-cursor-size') || 23))); } catch { return 23; } });
-  const [cursorSizeSaved,setCursorSizeSaved] = useState(false);
-  const [cursorError,setCursorError] = useState('');
-  const cursorUrl = (id:number) => id===0
-    ? 'https://raw.githubusercontent.com/astryxleo/Ascend-OS/main/cursor/cursor.png'
-    : id===21
-      ? 'https://raw.githubusercontent.com/astryxleo/Ascend-OS/main/cursor/cursor(21).png'
-      : 'https://raw.githubusercontent.com/astryxleo/Ascend-OS/main/cursor/cursor%20('+id+').png';
-  function applyAccountCursor(id:number, size?:number) {
-    const nextSize = Math.max(12, Math.min(48, Number(size ?? cursorSize)));
-    try { localStorage.setItem('ascend-cursor-id', String(id)); } catch {}
-    window.dispatchEvent(new CustomEvent('ascend-cursor-settings-change', { detail: { id, size: nextSize } }));
-  }
-  function saveCursorSize() {
-    const size = Math.max(12, Math.min(48, Number(cursorSize)));
-    try { localStorage.setItem('ascend-cursor-size', String(size)); } catch {}
-    applyAccountCursor(cursorStore.selected_cursor_id, size);
-    setCursorSizeSaved(true);
-    setNotice('Cursor size saved: ' + size + ' x ' + size + ' px');
-  }
-  async function loadCursorStore(){ if(!supabase)return; const {data,error}=await supabase.rpc('get_ascend_cursor_store'); if(error){setCursorError(error.message);return;} if(data){setCursorStore(data as typeof cursorStore);applyAccountCursor(Number((data as {selected_cursor_id?:number}).selected_cursor_id??6));} }
-  useEffect(()=>{void loadCursorStore();},[userId,supabase]);
-  async function unlockCursor(id:number){ if(!supabase)return; setCursorBusy(id);setCursorError('');try{const {data,error}=await supabase.rpc('purchase_ascend_cursor',{p_cursor_id:id});if(error)throw error;if(data){setCursorStore(data as typeof cursorStore);applyAccountCursor(Number((data as {selected_cursor_id?:number}).selected_cursor_id??id));}setNotice('Cursor unlocked and equipped!');}catch(e){setCursorError(e instanceof Error?e.message:'Could not unlock cursor.');}finally{setCursorBusy(null);} }
-  async function equipCursor(id:number){ if(!supabase)return;setCursorBusy(id);setCursorError('');try{const {data,error}=await supabase.rpc('select_ascend_cursor',{p_cursor_id:id});if(error)throw error;if(data){setCursorStore(data as typeof cursorStore);applyAccountCursor(Number((data as {selected_cursor_id?:number}).selected_cursor_id??id));}setNotice('Cursor selection saved to your account.');}catch(e){setCursorError(e instanceof Error?e.message:'Could not equip cursor.');}finally{setCursorBusy(null);} }
   const currentUserId = useRef(userId);
   currentUserId.current = userId;
 
@@ -244,22 +218,7 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
       <div className="kingdom-flag-preview">{kingdomFlagPreview ? <img src={kingdomFlagPreview} alt="Kingdom flag preview"/> : <Flag size={26}/>}</div>
       <div className="kingdom-flag-copy"><span className="eyebrow">CONQUEST ATLAS · KINGDOM IDENTITY</span><h3>Your kingdom flag</h3><p>Upload a banner for your kingdom. It appears on territory hover cards and in Kingdom Rankings. Wide images work best.</p><div className="kingdom-flag-actions"><label className="settings-upload"><Upload size={14}/>{flagBusy?'Saving flag…':kingdomFlagPreview?'Change flag':'Upload flag'}<input type="file" accept="image/png,image/jpeg,image/webp,image/avif" onChange={event=>void saveKingdomFlag(event)} disabled={flagBusy}/></label>{kingdomFlagPreview&&<button type="button" className="cursor-action" onClick={()=>void removeKingdomFlag()} disabled={flagBusy}>Remove flag</button>}</div></div>
     </section>
-    <section className="cursor-market">
-      <div className="cursor-market-head"><div><span className="eyebrow"><MousePointer2 size={13}/> ASCEND CUSTOMIZATION</span><h2>Cursor armory</h2><p>One signature cursor across your entire Ascend workspace. Purchases stay on your account.</p></div><div className="cursor-balance"><span>YOUR BALANCE</span><b>◈ {cursorStore.coins.toLocaleString()}</b><small>50,000 ◈ per cursor</small></div></div>
-      <div className="cursor-showcase"><div className="cursor-showcase-preview"><span>LIVE PREVIEW</span><div className="cursor-orbit"><img src={cursorUrl(cursorStore.selected_cursor_id)} alt="Selected cursor preview" style={{width:cursorSize,height:cursorSize,objectFit:"contain"}}/></div><b>{cursorSize} x {cursorSize} px</b><small>Choose a size below, then save to apply it across Ascend.</small></div><div className="cursor-equipped"><span>NOW EQUIPPED</span><b>{cursorStore.selected_cursor_id===6?'ASCEND CLASSIC':`CURSOR ${cursorStore.selected_cursor_id===0?6:cursorStore.selected_cursor_id}`}</b><small>{cursorStore.selected_cursor_id===6?'Default · always free':'Owned · saved to your profile'}</small></div></div>
-      <div className="cursor-size-control">
-        <div className="cursor-size-heading"><div><b>Cursor size</b><small>Personalize the pointer across your workspace</small></div><strong>{cursorSize} x {cursorSize} px</strong></div>
-        <input aria-label="Cursor size in pixels" type="range" min="12" max="48" step="1" value={cursorSize} onChange={e=>{setCursorSize(Number(e.target.value));setCursorSizeSaved(false);}} />
-        <div className="cursor-size-scale"><span>12 px · Compact</span><span>48 px · Large</span></div>
-        <button type="button" className="cursor-action buy" onClick={saveCursorSize}><Save size={13}/>{cursorSizeSaved?"Size saved":"Save cursor size"}</button>
-      </div>
-      {cursorError&&<div className="settings-error" role="alert">{cursorError}</div>}
-      <div className="cursor-grid">{[6,1,2,3,4,5,0,...Array.from({length:14},(_,i)=>i+7)].map(id=><article key={id} className={`cursor-item ${cursorStore.selected_cursor_id===id?'is-equipped':''}`}>
-        <div className="cursor-preview-stage"><span>PREVIEW</span><div className="cursor-art"><img src={cursorUrl(id)} alt={id===6?"Ascend Classic cursor preview":`Cursor ${id===0?6:id} preview`} style={{width:cursorSize,height:cursorSize,objectFit:"contain"}}/></div><small>{id===6?'ASCEND CLASSIC':`CURSOR ${id===0?6:id}`}</small></div>
-        <div className="cursor-item-info"><div><b>{id===6?'Ascend Classic':`Cursor ${id===0?6:id}`}</b><span>{id===6?'Included forever':cursorStore.owned_cursor_ids.includes(id)?'In your collection':'Legendary drop'}</span></div>{cursorStore.selected_cursor_id===id?<span className="cursor-state"><Check size={13}/> EQUIPPED</span>:cursorStore.owned_cursor_ids.includes(id)?<button className="cursor-action" disabled={cursorBusy!==null} onClick={()=>void equipCursor(id)}>Equip</button>:<button className="cursor-action buy" disabled={cursorBusy!==null||cursorStore.coins<50000} onClick={()=>void unlockCursor(id)}>{cursorBusy===id?'Unlocking…':<><ShoppingBag size={13}/> 50,000 ◈</>}</button>}</div>
-      </article>)}</div>
-      <div className="cursor-market-foot"><Sparkles size={15}/><span>Ascend Classic is your free default and appears first. The original pointer is now displayed as Cursor 6; all other paid cursors cost exactly 50,000 Ascend Coins.</span></div>
-    </section>
+    
     <button type="button" className="settings-contact-operator" onClick={onContactOperator}><span><MessageSquareText size={19}/></span><span><b>Need a hand? Contact Operator</b><small>Send a private request, track its status, and receive a direct reply.</small></span><ArrowUpRight size={17}/></button>
   </section>;
 }
