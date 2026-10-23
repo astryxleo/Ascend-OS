@@ -72,3 +72,16 @@
 .slot-border_skin:after,.slot-territory_border_skin:after{content:'';position:absolute;inset:8px;border:1px solid color-mix(in srgb,var(--cosmetic-accent) 52%,transparent);border-radius:10px;pointer-events:none;box-shadow:inset 0 0 0 3px #07080a55,inset 0 0 20px color-mix(in srgb,var(--cosmetic-accent) 12%,transparent)}
 .slot-territory_border_skin{background:radial-gradient(ellipse at 50% 50%,color-mix(in srgb,var(--cosmetic-accent) 22%,transparent),transparent 70%),linear-gradient(145deg,#191b24,#090a0e)}
 .slot-territory_border_skin:before{border-style:dashed;border-width:1px;inset:5px;border-radius:13px;opacity:.85}
+
+/* Marketplace horizontal category rail: browser-like polished scrollbar + forced Ascend cursor */
+.marketplace-shell,.marketplace-shell *{cursor:none!important}
+.marketplace-shell button,.marketplace-shell input,.marketplace-shell [role="button"],.marketplace-shell [role="tab"]{cursor:none!important}
+.market-filter-strip{scrollbar-width:thin;scrollbar-color:#d7b65a #15131a;overscroll-behavior-x:contain;scroll-behavior:smooth}
+.market-filter-strip::-webkit-scrollbar{height:8px}
+.market-filter-strip::-webkit-scrollbar-track{background:#15131a;border:1px solid #28232d;border-radius:999px}
+.market-filter-strip::-webkit-scrollbar-thumb{background:linear-gradient(90deg,#9c7bdf,#e7c477);border:2px solid #15131a;border-radius:999px}
+.market-filter-strip::-webkit-scrollbar-thumb:hover{background:linear-gradient(90deg,#bca0ff,#ffe09a)}
+.marketplace-shell{scrollbar-width:thin;scrollbar-color:#b59ae8 #101015}
+.marketplace-shell::-webkit-scrollbar{width:9px}
+.marketplace-shell::-webkit-scrollbar-track{background:#101015}
+.marketplace-shell::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#b59ae8,#e7c477);border:2px solid #101015;border-radius:999px}
