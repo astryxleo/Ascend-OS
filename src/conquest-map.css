@@ -180,3 +180,10 @@
 .cq-epic-level-8{color:#e6c8ff;border-color:#e7c6ff55;background:#e7c6ff0d}
 .cq-epic-level-9{color:#ffad8a;border-color:#ff805455;background:#ff80540d}
 .cq-epic-level-10{color:#ffb8ef;border-color:#ff4dce77;background:linear-gradient(100deg,#ff4dce18,#6ee7ff12);box-shadow:0 0 22px #ff4dce18}
+
+/* Atlas leaderboard: glass panel sits below zoom controls with safe breathing room. */
+.cq-atlas-wrap .cq-kingdom-menu-anchor{top:72px!important;right:14px!important;z-index:18!important;}
+.cq-atlas-wrap .cq-kingdom-menu-anchor>.cq-kingdom-rank-menu{top:48px!important;right:0!important;background:rgba(8,12,20,.72)!important;border:1px solid rgba(218,190,122,.42)!important;backdrop-filter:blur(28px) saturate(155%)!important;-webkit-backdrop-filter:blur(28px) saturate(155%)!important;box-shadow:0 24px 80px rgba(0,0,0,.42),inset 0 1px rgba(255,255,255,.08)!important;}
+.cq-kingdom-rank-row.is-self{background:linear-gradient(100deg,rgba(228,190,103,.16),rgba(255,255,255,.025))!important;border-color:rgba(228,190,103,.3)!important;}
+.cq-kingdom-rank-row.is-self .cq-rank-player b{color:#f7d98b!important;}
+@media(max-width:560px){.cq-atlas-wrap .cq-kingdom-menu-anchor{top:76px!important;right:8px!important}.cq-atlas-wrap .cq-kingdom-menu-anchor>.cq-kingdom-rank-menu{top:46px!important;width:min(340px,calc(100vw - 32px))!important;}}
