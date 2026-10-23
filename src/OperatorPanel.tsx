@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import './operator-contact.css';
 import MarkdownMessage from './MarkdownMessage';
-import { Activity, RefreshCw, Search, Send, ShieldCheck, Wallet, Users, MessageSquareText, CheckCircle2, Clock3, Bell, Gift, Sparkles, Zap } from 'lucide-react';
+import { Activity, RefreshCw, Search, Send, ShieldCheck, Wallet, Users, MessageSquareText, CheckCircle2, Clock3, Bell, Gift, Sparkles, Zap, Download, Percent, RotateCcw, CalendarDays, AlertTriangle } from 'lucide-react';
 
 type UserRow = {
   user_id: string;
@@ -17,6 +17,8 @@ type UserRow = {
   completed_steps: number;
 };
 type Stats = Record<string, number>;
+type CosmeticItem={id:string;label:string;slot:string;value:string;price_coins:number;original_price_coins:number;discount_percent:number;rarity:string;active:boolean};
+type Dossier={profile:Record<string,any>;stats:Record<string,number>;daily:Array<{day:string;focus_minutes:number;focus_sessions:number;tasks_completed:number;tasks_planned:number}>};
 type ContactRequest={id:string;user_id:string;user_email:string;category:string;subject:string;message:string;status:string;operator_remark:string;created_at:string;updated_at:string};
 type WalletTransaction = { id: string; user_id: string; username: string | null; full_name: string | null; currency: string; amount: number; reason: string; source: string; created_by: string | null; created_at: string };
 type Broadcast = {
@@ -68,6 +70,13 @@ export default function OperatorPanel({
   const [giftSouls,setGiftSouls]=useState('0');
   const [giftXp,setGiftXp]=useState('0');
   const [giftMessage,setGiftMessage]=useState('A little gift to celebrate your progress — keep ascending!');
+  const [dossier,setDossier]=useState<Dossier|null>(null);
+  const [dossierLoading,setDossierLoading]=useState(false);
+  const [cosmetics,setCosmetics]=useState<CosmeticItem[]>([]);
+  const [discountValues,setDiscountValues]=useState<Record<string,string>>({});
+  const [warningTarget,setWarningTarget]=useState('');
+  const [warningTitle,setWarningTitle]=useState('Account conduct notice');
+  const [warningMessage,setWarningMessage]=useState('');
   const usersRequestId = useRef(0);
   const dashboardRequestId = useRef(0);
   const walletAuditRequestId = useRef(0);
@@ -216,6 +225,11 @@ export default function OperatorPanel({
     finally{setBusy(false);}
   }
 
+  async function loadDossier(userId:string){if(!supabase||!userId)return;setTarget(userId);setDossierLoading(true);setDossier(null);try{const {data,error}=await supabase.rpc('operator_get_user_dossier',{p_target_user:userId});if(error){setNotice('Could not load user dossier: '+error.message);return;}setDossier(data as Dossier);}catch(error){setNotice('Could not load user dossier: '+(error instanceof Error?error.message:'Unexpected error.'));}finally{setDossierLoading(false);}}
+  async function downloadDossierCard(){if(!dossier)return;const p=dossier.profile,s=dossier.stats;const canvas=document.createElement('canvas');canvas.width=1200;canvas.height=1500;const ctx=canvas.getContext('2d');if(!ctx){setNotice('Could not create the player card image.');return;}const bg=ctx.createLinearGradient(0,0,1200,1500);bg.addColorStop(0,'#1b1b2a');bg.addColorStop(.55,'#090a11');bg.addColorStop(1,'#111725');ctx.fillStyle=bg;ctx.fillRect(0,0,1200,1500);ctx.strokeStyle='#d8b66b90';ctx.lineWidth=3;ctx.roundRect(35,35,1130,1430,36);ctx.stroke();ctx.fillStyle='#e7ca81';ctx.font='900 26px Arial';ctx.fillText('ASCEND OS / OPERATOR DOSSIER',78,105);ctx.fillStyle='#f7f6fc';ctx.font='900 60px Arial';ctx.fillText('PLAYER PROFILE',78,190);ctx.fillStyle='#b3b7c9';ctx.font='25px Arial';ctx.fillText('PRIVATE ACCOUNT · ADMINISTRATIVE VIEW',80,235);ctx.fillStyle='#111522';ctx.roundRect(75,290,1050,270,24);ctx.fill();ctx.fillStyle='#fff';ctx.font='900 44px Arial';ctx.fillText(String(p.full_name||p.username||'Player').slice(0,28),112,365);ctx.fillStyle='#e7ca81';ctx.font='bold 28px Arial';ctx.fillText('@'+String(p.username||'unknown').slice(0,32),112,415);ctx.fillStyle='#b7bfd0';ctx.font='22px Arial';ctx.fillText(String(p.email||'').slice(0,54),112,465);ctx.fillText('Role: '+String(p.role||'student')+' · Grade: '+String(p.class_grade||'—')+' · Stream: '+String(p.stream||'—'),112,515);const metrics=[['COINS',s.coins],['ASCEND SOULS',s.ascend_souls],['COMBAT LEVEL',s.combat_level],['COMBAT XP',s.combat_xp],['FOCUS MINUTES',s.focus_minutes],['FOCUS SESSIONS',s.focus_sessions],['TASKS COMPLETED',s.completed_tasks],['SYLLABUS CHECKPOINTS',s.syllabus_checkpoints]];metrics.forEach((m,i)=>{const x=78+(i%2)*530,y=600+Math.floor(i/2)*145;ctx.fillStyle='#121722';ctx.roundRect(x,y,500,112,18);ctx.fill();ctx.strokeStyle='#d8b66b35';ctx.stroke();ctx.fillStyle='#b5bacb';ctx.font='bold 20px Arial';ctx.fillText(m[0],x+24,y+38);ctx.fillStyle='#f5d98d';ctx.font='900 39px Arial';ctx.fillText(Number(m[1]||0).toLocaleString('en-IN'),x+24,y+84);});ctx.fillStyle='#929bb0';ctx.font='20px Arial';ctx.fillText('Generated by Operator Control Center · '+new Date().toLocaleString(),80,1370);const a=document.createElement('a');a.download='ascend-player-'+String(p.username||'profile').replace(/[^a-z0-9_-]/gi,'-')+'.png';a.href=canvas.toDataURL('image/png');a.click();}
+  async function loadCosmetics(){if(!supabase)return;const {data,error}=await supabase.from('combat_cosmetic_catalog').select('id,label,slot,value,price_coins,original_price_coins,discount_percent,rarity,active').order('slot').order('label');if(error){setNotice('Could not load marketplace items: '+error.message);return;}const items=(data??[]) as CosmeticItem[];setCosmetics(items);setDiscountValues(Object.fromEntries(items.map(item=>[item.id,String(item.discount_percent||0)])));}
+  async function saveDiscount(item:CosmeticItem,reset=false){if(!supabase)return;const discount=Number(discountValues[item.id]??item.discount_percent??0);if(!reset&&(!Number.isInteger(discount)||discount<0||discount>95)){setNotice('Discount must be between 0 and 95.');return;}setBusy(true);try{const {error}=await supabase.rpc('operator_set_cosmetic_discount',{p_cosmetic_id:item.id,p_discount_percent:discount,p_reset:reset});if(error){setNotice('Could not update price: '+error.message);return;}setNotice(reset?'Original price restored for '+item.label+'.':'Discount saved for '+item.label+'.');await loadCosmetics();}finally{setBusy(false);}}
+  async function sendWarning(event:FormEvent){event.preventDefault();if(!supabase||!warningTarget)return;if(warningTitle.trim().length<3||warningMessage.trim().length<3){setNotice('Add a warning title and a message of at least 3 characters.');return;}setBusy(true);try{const {error}=await supabase.rpc('operator_send_user_warning',{p_target_user:warningTarget,p_title:warningTitle.trim(),p_message:warningMessage.trim()});if(error){setNotice('Warning could not be sent: '+error.message);return;}setNotice('Warning sent. Their live popup should appear while they are online.');setWarningMessage('');}finally{setBusy(false);}}
   async function createBroadcast(event: FormEvent) {
     event.preventDefault();
     if (!supabase) return;
