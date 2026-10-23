@@ -140,7 +140,7 @@ function App() {
   const [operatorMode,setOperatorMode] = useState(false);
   useEffect(() => { setOperatorMode(false); }, [session?.user.id]);
   useEffect(() => {
-    if (activeNav === 'Control center' && !operatorMode && ['astryxleo@gmail.com','astryxleo@op.in'].includes((session?.user.email ?? '').toLowerCase())) navigate('Overview');
+    if (activeNav === 'Control center' && !operatorMode && ['astryxleo@gmail.com','astryxleo@op.in','yoursjace@gmail.com'].includes((session?.user.email ?? '').toLowerCase())) navigate('Overview');
   }, [activeNav, operatorMode, session?.user.email]);
   useEffect(()=>{const body=document.body;if(!bootIntroDone)body.classList.add('ascend-intro-lock');else body.classList.remove('ascend-intro-lock');return()=>body.classList.remove('ascend-intro-lock');},[bootIntroDone]);
   useEffect(()=>{if(!session?.user.id||!profileLoaded||!profile?.school_target)return;try{if(!localStorage.getItem('ascend-tutorial-seen:'+session.user.id))setShowTutorialNudge(true);}catch{}},[session?.user.id,profileLoaded,profile?.school_target]);
@@ -526,7 +526,7 @@ function App() {
   if (activeBan && new Date(activeBan.banned_until).getTime()>banNow) { const left=Math.max(0,Math.ceil((new Date(activeBan.banned_until).getTime()-banNow)/1000)); const days=Math.floor(left/86400),hours=Math.floor((left%86400)/3600),mins=Math.floor((left%3600)/60),secs=left%60; return <div className="ascend-ban-screen"><div className="ascend-ban-glow"/><section className="ascend-ban-card"><div className="ascend-ban-emblem"><ShieldAlert size={34}/></div><span className="ascend-ban-kicker">ASCEND OS · ACCOUNT RESTRICTION</span><h1>Access temporarily suspended</h1><p className="ascend-ban-lead">Your account is currently under an Operator-issued ban. Workspace access will automatically return when the timer expires.</p><div className="ascend-ban-timer"><span>TIME REMAINING</span><strong>{days>0?days+'d ':''}{String(hours).padStart(2,'0')}:{String(mins).padStart(2,'0')}:{String(secs).padStart(2,'0')}</strong><small>Automatic access restoration at {new Date(activeBan.banned_until).toLocaleString()}</small></div><div className="ascend-ban-reason"><span>MESSAGE FROM THE OPERATOR</span><p>{activeBan.message}</p></div><div className="ascend-ban-foot"><LockKeyhole size={15}/> This restriction is checked by the server. Refreshing or navigating will not bypass it.</div></section></div>; }
   if (session && supabase && !profileLoaded) return <div className="boot"><div className="brand-mark"><img className="ascend-logo-image" src={ascendLogo} alt="Ascend OS logo" /></div><span>LOADING YOUR WORKSPACE</span></div>;
   if (session && supabase && profile && !profile.school_target) return <Onboarding supabase={supabase} profile={profile} userId={session.user.id} onSaved={(next) => { setProfile(next); setNotice('Welcome to Ascend OS. Your workspace is ready.'); }} />;
-  const canToggleOperator = ['astryxleo@gmail.com','astryxleo@op.in'].includes((session.user.email ?? '').toLowerCase()) && Boolean(session.user.email_confirmed_at);
+  const canToggleOperator = ['astryxleo@gmail.com','astryxleo@op.in','yoursjace@gmail.com'].includes((session.user.email ?? '').toLowerCase()) && Boolean(session.user.email_confirmed_at);
   const isOperator = canToggleOperator ? operatorMode : profile?.role === 'operator';
   return <div className={`app-shell ${navHidden ? 'nav-collapsed' : ''}`}>
     <aside className={`sidebar ${mobileNav?'sidebar-open':''}`}>
