@@ -24,7 +24,7 @@ export default function PlayerCardPanel({supabase,userId,profile,email}:Props){
  const accent=activeTheme==='gold'?'#f4ce78':activeTheme==='cyan'?'#75e7dc':activeTheme==='violet'?'#c1a0ff':activeTheme==='crimson'?'#ff647c':activeTheme==='emerald'?'#72e6ad':'#c4cbd8';
  const drawCard=useCallback(async()=>{
   const canvas=document.createElement('canvas');canvas.width=1200;canvas.height=1900;const ctx=canvas.getContext('2d');if(!ctx)throw new Error('Image canvas unavailable');
-  const bg=ctx.createLinearGradient(0,0,1200,1500);bg.addColorStop(0,'#171b26');bg.addColorStop(.55,'#090b12');bg.addColorStop(1,'#11101b');ctx.fillStyle=bg;ctx.fillRect(0,0,1200,1500);
+  const bg=ctx.createLinearGradient(0,0,1200,1500);bg.addColorStop(0,'#171b26');bg.addColorStop(.55,'#090b12');bg.addColorStop(1,'#11101b');ctx.fillStyle=bg;ctx.fillRect(0,0,1200,1900);
   const glow=ctx.createRadialGradient(900,180,10,900,180,650);glow.addColorStop(0,accent+'30');glow.addColorStop(1,'#00000000');ctx.fillStyle=glow;ctx.fillRect(0,0,1200,1000);
   const box=(x:number,y:number,w:number,h:number,r:number)=>{ctx.beginPath();ctx.roundRect(x,y,w,h,r);};
   ctx.strokeStyle=accent+'70';ctx.lineWidth=3;box(36,36,1128,1828,42);ctx.stroke();
