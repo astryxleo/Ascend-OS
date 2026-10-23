@@ -1376,3 +1376,42 @@ body:after{background:
 
 .kingdom-crop-backdrop{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:18px;background:#03050ad9;backdrop-filter:blur(14px)}.kingdom-crop-modal{width:min(620px,100%);padding:22px;border:1px solid #d7bd7966;border-radius:20px;background:linear-gradient(145deg,#171a25,#090b11);color:#f5f2e9;box-shadow:0 30px 90px #000b}.kingdom-crop-modal h3{margin:7px 0;font-size:23px}.kingdom-crop-modal p{color:#a6a9b8;font-size:12px}.kingdom-crop-stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border:1px solid #d7bd79;border-radius:12px;background:#080a10;touch-action:none;cursor:grab;user-select:none}.kingdom-crop-stage.is-dragging{cursor:grabbing}.kingdom-crop-stage img{position:absolute;left:50%;top:50%;width:100%;height:100%;object-fit:cover;object-position:center;display:block;max-width:none;max-height:none;pointer-events:none;transform-origin:center center;will-change:transform;user-select:none}.kingdom-crop-stage>span{position:absolute;left:10px;top:10px;z-index:2;padding:6px 8px;border:1px solid #d7bd7966;border-radius:7px;background:#080a10b8;color:#f3dca0;font-size:9px;font-weight:800;letter-spacing:.1em;pointer-events:none}.kingdom-crop-modal footer{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}@media(max-width:520px){.kingdom-crop-modal{padding:15px}.kingdom-crop-modal footer{flex-direction:column-reverse}}
 .cq-hover-banner{height:auto!important;aspect-ratio:16/9!important;min-height:0!important;margin:-14px -16px 5px!important;display:block!important;position:relative!important;overflow:hidden!important;background:radial-gradient(ellipse at 50% 35%,#1d3854 0%,#101a2b 52%,#090d16 100%)!important;background-image:radial-gradient(ellipse at 50% 35%,#1d3854 0%,#101a2b 52%,#090d16 100%)!important}.cq-hover-banner-fallback{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(135deg,rgba(105,160,207,.12),transparent 48%,rgba(209,169,88,.08));color:#d9e8f5}.cq-hover-banner-fallback>span{position:absolute;font-size:52px;opacity:.16;transform:rotate(-12deg)}.cq-hover-banner-fallback>b{display:grid;place-items:center;width:54px;height:54px;border:1px solid rgba(218,190,129,.58);border-radius:16px;background:linear-gradient(145deg,rgba(44,65,88,.9),rgba(10,16,27,.96));box-shadow:0 0 28px rgba(75,145,201,.2),inset 0 1px rgba(255,255,255,.12);font-size:26px;font-weight:900;color:#f4deb0;text-shadow:0 2px 12px #000}.cq-hover-banner>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block}.pc-card-banner{position:relative!important;width:100%;aspect-ratio:16/9!important;height:auto!important;min-height:0!important;overflow:hidden!important;background:#10131b!important;background-image:none!important}.pc-card-banner>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block}.pc-card-banner>span{position:absolute;left:12px;bottom:10px;z-index:1;padding:6px 9px;border-radius:7px;background:#05070cb8;color:#fff1c6;font-size:8px;letter-spacing:.12em;font-weight:900}
+
+
+/* Focus Room layout polish: predictable alignment and a clear action hierarchy */
+.focus-command-room{padding:clamp(22px,3.2vw,40px)!important;border-radius:24px!important}
+.focus-command-head{display:flex;align-items:center;justify-content:space-between;gap:22px;min-width:0}
+.focus-command-title{min-width:0;flex:1}
+.focus-command-title .eyebrow{display:inline-flex;margin-bottom:3px}
+.focus-command-title h2{line-height:1.08;margin:9px 0 10px!important}
+.focus-command-title p{max-width:560px}
+.focus-head-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;flex-shrink:0}
+.focus-float-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 14px;border:1px solid #e7c87955;border-radius:12px;background:linear-gradient(135deg,#e7c87920,#9b83ff16);color:#f4dfaa;font-size:11px;font-weight:800;letter-spacing:.035em;white-space:nowrap;cursor:pointer;box-shadow:inset 0 1px #ffffff0a;transition:transform .2s,border-color .2s,background .2s}
+.focus-float-button:hover{transform:translateY(-2px);border-color:#e7c879aa;background:linear-gradient(135deg,#e7c8792d,#9b83ff24)}
+.focus-mode-deck{margin:27px 0 30px!important;gap:13px!important}
+.focus-mode-card{min-width:0;min-height:132px!important;padding:17px!important;border-radius:17px!important;gap:9px!important}
+.focus-mode-card b{font-size:14px;line-height:1.25}
+.focus-mode-card small{font-size:11px;line-height:1.45}
+.focus-mode-card strong{font-size:10px;line-height:1.3;letter-spacing:.1em}
+.focus-command-layout{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:clamp(22px,4vw,52px)!important;align-items:stretch!important;padding:8px 0 28px!important}
+.focus-timer-stage{min-width:0;justify-content:center;padding:22px 10px!important;border:1px solid #ffffff0b;border-radius:22px;background:radial-gradient(ellipse at 50% 38%,#8b76e313,transparent 58%),linear-gradient(145deg,#ffffff04,#ffffff00)}
+.focus-timer-ring{width:min(100%,320px)!important}
+.focus-timer-center{width:100%;padding:0 8px;gap:12px!important}
+.focus-timer-center>span{line-height:1.5}
+.focus-timer-center>strong{font-size:clamp(38px,5vw,58px)!important;font-variant-numeric:tabular-nums;line-height:1.05}
+.focus-timer-center>small{line-height:1.6}
+.focus-timer-foot{max-width:100%;gap:10px 18px!important;font-size:9px!important;line-height:1.5}
+.focus-intention-panel{display:flex;flex-direction:column;justify-content:center;min-width:0;padding:clamp(20px,2.7vw,32px)!important;border-radius:22px!important}
+.focus-intention-panel h3{line-height:1.22}
+.focus-intention-panel>p{font-size:13px!important;line-height:1.7!important;max-width:440px}
+.focus-intention-label{line-height:1.6}
+.focus-intention-label textarea{min-height:120px!important;line-height:1.6;resize:vertical}
+.focus-intention-note{align-items:flex-start;line-height:1.55}
+.focus-command-controls{display:flex;align-items:center;gap:10px!important;margin-top:4px}
+.focus-command-controls .primary-btn{min-height:44px}
+.focus-session-foot{gap:13px!important}
+.focus-session-foot>div{min-width:0;padding:15px!important;align-items:flex-start}
+.focus-session-foot b{font-size:12px!important;line-height:1.4}
+.focus-session-foot small{font-size:11px!important;line-height:1.6!important}
+@media(max-width:900px){.focus-command-layout{grid-template-columns:minmax(0,1fr)!important}.focus-timer-stage{min-height:360px}.focus-session-foot{grid-template-columns:1fr!important}.focus-session-foot>div{padding:14px 16px!important}}
+@media(max-width:600px){.focus-command-room{padding:18px!important}.focus-command-head{align-items:stretch!important;gap:16px!important}.focus-head-actions{justify-content:flex-start;align-items:center}.focus-live-badge{font-size:8px;padding:9px 10px}.focus-float-button{min-height:38px;padding:0 11px}.focus-mode-deck{grid-template-columns:repeat(2,minmax(0,1fr))!important;margin:21px 0 23px!important}.focus-mode-card{min-height:118px!important;padding:13px!important}.focus-command-layout{gap:16px!important}.focus-timer-stage{min-height:300px;padding:14px 8px!important}.focus-timer-ring{width:min(100%,270px)!important}.focus-timer-center>strong{font-size:clamp(36px,11vw,50px)!important}.focus-intention-panel{padding:18px!important}.focus-command-controls{align-items:stretch}.focus-command-controls .primary-btn{flex:1;justify-content:center}.focus-session-foot{gap:9px!important}}
