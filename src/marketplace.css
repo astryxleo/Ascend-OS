@@ -16,3 +16,45 @@
 @media(max-width:1100px){.market-item-grid,.market-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.market-cursor-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:700px){.marketplace-hero{padding:23px;min-height:0}.marketplace-hero-orb{width:95px;height:95px;flex-basis:95px}.marketplace-hero-orb svg{width:20px}.marketplace-hero-orb small{display:none}.marketplace-toolbar,.market-section-heading{align-items:stretch;flex-direction:column}.market-size-control{width:100%;flex-basis:auto}.market-item-grid,.market-card-grid,.market-cursor-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.market-item-info{padding:12px}.market-item-title h3{font-size:12px}.market-item-bottom{align-items:flex-start;flex-direction:column}.market-item-bottom button{width:100%}.market-player-card-art{height:230px}.marketplace-hero h1{letter-spacing:-1px}.marketplace-hero-meta{gap:7px}.marketplace-hero-meta span{font-size:9px}.market-team-stage{padding:0 17px;gap:8px}.market-team-mark{width:40px;height:40px;flex-basis:40px;font-size:19px}.market-team-stage>div>b{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.marketplace-hero:before{animation:none}.market-item-card{transition:none}}
+
+/* Elemental Atlas: original card-like preview art with distinct material finishes */
+.market-atlas-art{position:relative;isolation:isolate;width:calc(100% - 24px);height:calc(100% - 18px);margin:9px 12px;border:1px solid color-mix(in srgb,var(--cosmetic-accent) 62%,transparent);border-radius:11px;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0;background:#0b0c10;box-shadow:0 0 20px color-mix(in srgb,var(--cosmetic-accent) 12%,transparent),inset 0 0 24px color-mix(in srgb,var(--cosmetic-accent) 9%,transparent)}
+.market-atlas-art:before{content:'';position:absolute;inset:0;z-index:-2;background:radial-gradient(ellipse at 50% 28%,color-mix(in srgb,var(--cosmetic-accent) 28%,transparent),transparent 50%),linear-gradient(145deg,#20202a,#090a0f 72%)}
+.atlas-card-aurora{position:absolute;inset:0;z-index:-1;opacity:.72;background:repeating-linear-gradient(132deg,transparent 0 15px,color-mix(in srgb,var(--cosmetic-accent) 10%,transparent) 16px 17px,transparent 18px 30px)}
+.atlas-card-rune{position:absolute;top:18%;width:76px;height:76px;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--cosmetic-accent) 45%,transparent);border-radius:50%;color:var(--cosmetic-accent);background:radial-gradient(circle,color-mix(in srgb,var(--cosmetic-accent) 17%,transparent),#08090d 74%);box-shadow:0 0 25px color-mix(in srgb,var(--cosmetic-accent) 19%,transparent),inset 0 0 16px color-mix(in srgb,var(--cosmetic-accent) 12%,transparent)}
+.atlas-card-corners{position:absolute;inset:7px;pointer-events:none}
+.atlas-card-corners i{position:absolute;width:13px;height:13px;border-color:var(--cosmetic-accent);opacity:.85}
+.atlas-card-corners i:nth-child(1){top:0;left:0;border-top:1px solid;border-left:1px solid}
+.atlas-card-corners i:nth-child(2){top:0;right:0;border-top:1px solid;border-right:1px solid}
+.atlas-card-corners i:nth-child(3){bottom:0;left:0;border-bottom:1px solid;border-left:1px solid}
+.atlas-card-corners i:nth-child(4){bottom:0;right:0;border-bottom:1px solid;border-right:1px solid}
+.atlas-card-copy{position:absolute;left:12px;right:12px;bottom:13px;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center}
+.atlas-card-copy>span{font-size:6px;letter-spacing:2px;color:color-mix(in srgb,var(--cosmetic-accent) 76%,#fff)}
+.atlas-card-copy>strong{font:700 12px 'Space Grotesk',system-ui;color:#fff;letter-spacing:.2px;text-shadow:0 2px 9px #000}
+.atlas-card-copy>small{display:flex;align-items:center;gap:5px;font-size:6px;letter-spacing:1.2px;color:var(--cosmetic-accent)}
+.atlas-card-copy>small i{width:3px;height:3px;background:currentColor;border-radius:50%}
+.atlas-card-number{position:absolute;top:9px;right:12px;font:700 9px 'Space Grotesk',system-ui;letter-spacing:1px;color:var(--cosmetic-accent);opacity:.85}
+.atlas-wood .atlas-card-aurora{background:repeating-linear-gradient(12deg,transparent 0 7px,#bd8a5730 8px 10px,transparent 11px 18px),repeating-linear-gradient(90deg,transparent 0 24px,#bd8a5714 25px 26px)}
+.atlas-wood:before{background:radial-gradient(ellipse at 50% 30%,#8b5b3238,transparent 56%),linear-gradient(135deg,#3b281e,#17110f 55%,#0b0a0a)}
+.atlas-iron:before{background:linear-gradient(135deg,#596473,#202733 32%,#11151c 55%,#313a47 75%,#0b0d12)}
+.atlas-iron .atlas-card-aurora{background:repeating-linear-gradient(135deg,transparent 0 22px,#cbd5e125 23px 24px,transparent 25px 42px)}
+.atlas-copper:before{background:radial-gradient(ellipse at 50% 30%,#d7834f42,transparent 56%),linear-gradient(130deg,#4a281e,#25140f 52%,#0c0a0a)}
+.atlas-copper .atlas-card-aurora{background:repeating-radial-gradient(ellipse at 15% 100%,transparent 0 12px,#d7834f30 13px 14px,transparent 15px 23px)}
+.atlas-silver:before{background:radial-gradient(ellipse at 50% 28%,#dceaff4a,transparent 52%),linear-gradient(145deg,#424b5c,#141923 52%,#090b10)}
+.atlas-silver .atlas-card-aurora{background:repeating-linear-gradient(45deg,transparent 0 21px,#e7f2ff1c 22px 23px,transparent 24px 38px)}
+.atlas-gold:before{background:radial-gradient(ellipse at 50% 28%,#f2c96d4f,transparent 50%),linear-gradient(135deg,#55401a,#21180a 56%,#0d0b08)}
+.atlas-gold .atlas-card-aurora{background:repeating-linear-gradient(45deg,transparent 0 19px,#ffe5a41e 20px 21px,transparent 22px 36px)}
+.atlas-ruby:before{background:radial-gradient(ellipse at 50% 30%,#ff536e55,transparent 54%),linear-gradient(145deg,#541321,#210912 58%,#0b080d)}
+.atlas-ruby .atlas-card-aurora{background:linear-gradient(30deg,transparent 35%,#ff536e2b 36%,transparent 37%),linear-gradient(150deg,transparent 45%,#ff536e1e 46%,transparent 47%)}
+.atlas-sapphire:before{background:radial-gradient(ellipse at 50% 30%,#5b9dff55,transparent 54%),linear-gradient(145deg,#102e59,#0a1527 60%,#070b12)}
+.atlas-sapphire .atlas-card-aurora{background:repeating-radial-gradient(ellipse at 50% 110%,transparent 0 10px,#5b9dff35 11px 12px,transparent 13px 21px)}
+.atlas-emerald:before{background:radial-gradient(ellipse at 50% 30%,#53d89b48,transparent 54%),linear-gradient(145deg,#124531,#0a2019 58%,#070d0b)}
+.atlas-emerald .atlas-card-aurora{background:repeating-linear-gradient(65deg,transparent 0 18px,#53d89b20 19px 21px,transparent 22px 35px)}
+.atlas-amethyst:before{background:radial-gradient(ellipse at 50% 30%,#ba86ff55,transparent 54%),linear-gradient(145deg,#382052,#160d25 58%,#09080f)}
+.atlas-amethyst .atlas-card-aurora{background:linear-gradient(60deg,transparent 30%,#ba86ff24 31%,transparent 32%),linear-gradient(120deg,transparent 45%,#ba86ff1c 46%,transparent 47%)}
+.atlas-diamond:before{background:radial-gradient(ellipse at 50% 30%,#a9efff58,transparent 54%),linear-gradient(145deg,#2c5260,#111d2a 58%,#080c12)}
+.atlas-diamond .atlas-card-aurora{background:linear-gradient(45deg,transparent 48%,#d5fbff2b 49%,transparent 50%),linear-gradient(135deg,transparent 48%,#a9efff24 49%,transparent 50%)}
+.atlas-obsidian:before{background:radial-gradient(ellipse at 50% 30%,#a78bfa36,transparent 54%),linear-gradient(145deg,#282334,#0b0a12 58%,#050509)}
+.atlas-obsidian .atlas-card-aurora{background:repeating-linear-gradient(125deg,transparent 0 20px,#c4b5fd17 21px 22px,transparent 23px 39px)}
+.atlas-celestial:before{background:radial-gradient(ellipse at 50% 30%,#ffe7a060,transparent 54%),linear-gradient(145deg,#5b4923,#241b0d 58%,#0a0908)}
+.atlas-celestial .atlas-card-aurora{background:radial-gradient(circle at 15% 20%,#fff1c0 0 1px,transparent 2px),radial-gradient(circle at 83% 35%,#fff1c0 0 1px,transparent 2px),radial-gradient(circle at 75% 78%,#fff1c0 0 1px,transparent 2px),radial-gradient(circle at 24% 74%,#fff1c0 0 1px,transparent 2px),repeating-radial-gradient(ellipse at 50% 50%,transparent 0 19px,#ffe7a018 20px 21px,transparent 22px 32px)}
