@@ -199,3 +199,32 @@
 @media(prefers-reduced-motion:reduce){.cq-chunk-loader-orb,.cq-chunk-loading>i:after{animation:none!important}}
 
 .cq-report-casualties{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.cq-report-casualties>div{display:grid;gap:6px;padding:10px;border:1px solid rgba(244,118,118,.22);border-radius:10px;background:linear-gradient(140deg,rgba(118,39,48,.14),rgba(255,255,255,.02))}.cq-report-casualties span{font:800 8px 'DM Mono',monospace;letter-spacing:.08em;color:#a6a9b7}.cq-report-casualties b{font-size:12px;color:#ffaaa9}.cq-report-casualties>div:last-child b{color:#8fe0c1}@media(max-width:420px){.cq-report-casualties{grid-template-columns:1fr}}
+
+
+/* Ranking panel visibility hotfix: keep the glass leaderboard above the map canvas. */
+.cq-atlas-wrap .cq-kingdom-menu-anchor{
+  position:absolute!important;top:84px!important;right:14px!important;left:auto!important;bottom:auto!important;
+  z-index:120!important;display:flex!important;align-items:flex-end!important;pointer-events:none!important;
+}
+.cq-atlas-wrap .cq-kingdom-menu-anchor>.cq-kingdom-menu-button{
+  position:relative!important;z-index:121!important;pointer-events:auto!important;
+}
+.cq-atlas-wrap .cq-kingdom-menu-anchor>.cq-kingdom-rank-menu{
+  position:absolute!important;display:flex!important;flex-direction:column!important;
+  top:calc(100% + 10px)!important;right:0!important;left:auto!important;bottom:auto!important;
+  width:min(380px,calc(100vw - 32px))!important;min-width:min(300px,calc(100vw - 32px))!important;
+  height:auto!important;min-height:220px!important;max-height:min(620px,calc(92vh - 150px))!important;
+  overflow:hidden!important;z-index:130!important;visibility:visible!important;
+  border:1px solid rgba(220,195,132,.52)!important;border-radius:18px!important;
+  background:rgba(9,14,23,.88)!important;
+  -webkit-backdrop-filter:blur(26px) saturate(155%)!important;backdrop-filter:blur(26px) saturate(155%)!important;
+  box-shadow:0 24px 75px rgba(0,0,0,.58),inset 0 1px rgba(255,255,255,.1)!important;
+}
+.cq-atlas-wrap .cq-kingdom-rank-menu>.cq-kingdom-rank-sub{flex:none!important}
+.cq-atlas-wrap .cq-kingdom-rank-menu>.cq-kingdom-rank-list{display:grid!important;grid-auto-rows:minmax(52px,auto)!important;min-height:80px!important;flex:1 1 auto!important;overflow-y:auto!important}
+.cq-atlas-wrap .cq-kingdom-rank-menu>.cq-rank-empty{min-height:110px!important;display:grid!important;place-content:center!important;flex:none!important}
+.cq-atlas-wrap .cq-kingdom-rank-menu>footer{flex:none!important}
+@media(max-width:560px){
+ .cq-atlas-wrap .cq-kingdom-menu-anchor{top:78px!important;right:8px!important}
+ .cq-atlas-wrap .cq-kingdom-menu-anchor>.cq-kingdom-rank-menu{width:min(350px,calc(100vw - 24px))!important;min-width:0!important;max-height:min(540px,calc(92vh - 135px))!important}
+}
