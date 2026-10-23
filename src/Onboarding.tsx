@@ -32,7 +32,6 @@ async function compressImage(file: File): Promise<Blob> {
 export default function Onboarding({ supabase, profile, userId, onSaved }: Props) {
   const [name, setName] = useState(profile.full_name || '');
   const [username, setUsername] = useState(profile.username || '');
-  const [grade, setGrade] = useState(profile.class_grade || '12');
   const [stream, setStream] = useState(profile.stream || 'PCM');
   const [school, setSchool] = useState((profile.school_target || '').split(' · ')[0] || '');
   const [target, setTarget] = useState((profile.school_target || '').split(' · ').slice(1).join(' · ') || 'JEE');
@@ -45,7 +44,6 @@ export default function Onboarding({ supabase, profile, userId, onSaved }: Props
   useEffect(() => {
     setName(profile.full_name || '');
     setUsername(profile.username || '');
-    setGrade(profile.class_grade || '12');
     setStream(profile.stream || 'PCM');
     setSchool((profile.school_target || '').split(' · ')[0] || '');
     setTarget((profile.school_target || '').split(' · ').slice(1).join(' · ') || 'JEE');
@@ -97,7 +95,7 @@ export default function Onboarding({ supabase, profile, userId, onSaved }: Props
       }
       if (activeUserId.current !== userId) return;
       const { data, error: updateError } = await supabase.from('profiles')
-        .update({ full_name: name.trim(), username: username.toLowerCase(), class_grade: grade, stream, school_target: school.trim() + ' · ' + target, avatar_url: avatarUrl })
+        .update({ full_name: name.trim(), username: username.toLowerCase(), class_grade: '12', stream, school_target: school.trim() + ' · ' + target, avatar_url: avatarUrl })
         .eq('id', userId).select('*').single();
       if (updateError) throw updateError;
       if (activeUserId.current !== userId) return;
@@ -118,7 +116,7 @@ export default function Onboarding({ supabase, profile, userId, onSaved }: Props
       <label className="field-label">FULL NAME<input value={name} onChange={e => setName(e.target.value)} required maxLength={80} placeholder="Your name" /></label>
       <label className="field-label">UNIQUE USERNAME<input value={username} onChange={e => setUsername(e.target.value)} required minLength={3} maxLength={24} pattern="[A-Za-z0-9_]+" placeholder="your_handle" /></label>
       <div className="onboard-pair">
-        <label className="field-label">CLASS<select value={grade} onChange={e => setGrade(e.target.value)}><option value="11">Class XI</option><option value="12">Class XII</option><option value="Other">Other</option></select></label>
+        <label className="field-label">CLASS<select value="12" disabled aria-label="Class"><option value="12">Class XII</option></select></label>
         <label className="field-label">STREAM<select value={stream} onChange={e => setStream(e.target.value)}><option>PCM</option><option>PCB</option><option>Commerce</option><option>Humanities</option><option>Other</option></select></label>
       </div>
       <label className="field-label">SCHOOL / TARGET INSTITUTION<input value={school} onChange={e => setSchool(e.target.value)} required maxLength={120} placeholder="School or institution" /></label>
