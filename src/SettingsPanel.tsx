@@ -51,6 +51,11 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
   const [avatarPreview, setAvatarPreview] = useState(profile?.avatar_url ?? '');
   const [kingdomFlagPreview, setKingdomFlagPreview] = useState(profile?.kingdom_flag_url ?? '');
   const [flagBusy, setFlagBusy] = useState(false);
+  const [pendingFlagFile, setPendingFlagFile] = useState<File | null>(null);
+  const [pendingFlagUrl, setPendingFlagUrl] = useState('');
+  const [flagCropZoom, setFlagCropZoom] = useState(1);
+  const [flagCropX, setFlagCropX] = useState(0);
+  const [flagCropY, setFlagCropY] = useState(0);
   const [cursorSize, setCursorSize] = useState(() => {
     try { return Math.max(12, Math.min(48, Number(window.localStorage.getItem('ascend-cursor-size') || 23))); }
     catch { return 23; }
@@ -112,15 +117,32 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
     }
   }
 
-  async function saveKingdomFlag(event: ChangeEvent<HTMLInputElement>) {
+  function chooseKingdomFlag(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null;
     event.target.value = '';
     if (!file) return;
     if (!file.type.startsWith('image/')) { setError('Choose an image file for your kingdom flag.'); return; }
+    if (file.size > 12 * 1024 * 1024) { setError('Choose an image smaller than 12 MB.'); return; }
+    if (pendingFlagUrl) URL.revokeObjectURL(pendingFlagUrl);
+    setPendingFlagFile(file); setPendingFlagUrl(URL.createObjectURL(file));
+    setFlagCropZoom(1); setFlagCropX(0); setFlagCropY(0); setError('');
+  }
+
+  async function saveKingdomFlag() {
+    const file = pendingFlagFile;
+    if (!file) return;
     if (!supabase) { setError('Supabase is not configured.'); return; }
     setFlagBusy(true); setError('');
     try {
-      const blob = await compressAvatar(file);
+      const image = await new Promise<HTMLImageElement>((resolve, reject) => { const element = new Image(); element.onload = () => resolve(element); element.onerror = () => reject(new Error('Unable to read that image.')); element.src = pendingFlagUrl; });
+      const canvas = document.createElement('canvas'); canvas.width = 1600; canvas.height = 900;
+      const context = canvas.getContext('2d'); if (!context) throw new Error('Image crop is not supported by this browser.');
+      const scale = Math.max(canvas.width / image.width, canvas.height / image.height) * flagCropZoom;
+      const width = image.width * scale, height = image.height * scale;
+      const x = (canvas.width - width) / 2 + (canvas.width - width) * flagCropX / 100;
+      const y = (canvas.height - height) / 2 + (canvas.height - height) * flagCropY / 100;
+      context.drawImage(image, x, y, width, height);
+      const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob(result => result ? resolve(result) : reject(new Error('Could not prepare the cropped banner.')), 'image/webp', 0.9));
       if (currentUserId.current !== userId) return;
       const path = userId + '/kingdom-flag-' + Date.now() + '.webp';
       const { error: uploadError } = await supabase.storage.from('lumen-avatars').upload(path, blob, { contentType: 'image/webp', upsert: true, cacheControl: '3600' });
@@ -129,7 +151,8 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
       const url = supabase.storage.from('lumen-avatars').getPublicUrl(path).data.publicUrl;
       const { data, error: updateError } = await supabase.from('profiles').update({ kingdom_flag_url: url }).eq('id', userId).select('*').single();
       if (updateError) throw updateError;
-      onSaved(data as Profile); setKingdomFlagPreview(url); setNotice('Kingdom flag uploaded! It will appear on your kingdom hover card and rankings.');
+      onSaved(data as Profile); setKingdomFlagPreview(url); setNotice('Cropped 16:9 kingdom banner saved and synced to the Atlas hover card and Player Profile.');
+      setPendingFlagFile(null); if (pendingFlagUrl) URL.revokeObjectURL(pendingFlagUrl); setPendingFlagUrl('');
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Could not upload your kingdom flag.');
     } finally { setFlagBusy(false); }
@@ -221,9 +244,10 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
     </form>
     <section className="kingdom-flag-settings">
       <div className="kingdom-flag-preview">{kingdomFlagPreview ? <img src={kingdomFlagPreview} alt="Kingdom flag preview"/> : <Flag size={26}/>}</div>
-      <div className="kingdom-flag-copy"><span className="eyebrow">CONQUEST ATLAS · KINGDOM IDENTITY</span><h3>Your kingdom flag</h3><p>Upload a banner for your kingdom. It appears on territory hover cards and in Kingdom Rankings. Wide images work best.</p><div className="kingdom-flag-actions"><label className="settings-upload"><Upload size={14}/>{flagBusy?'Saving flag…':kingdomFlagPreview?'Change flag':'Upload flag'}<input type="file" accept="image/png,image/jpeg,image/webp,image/avif" onChange={event=>void saveKingdomFlag(event)} disabled={flagBusy}/></label>{kingdomFlagPreview&&<button type="button" className="cursor-action" onClick={()=>void removeKingdomFlag()} disabled={flagBusy}>Remove flag</button>}</div></div>
+      <div className="kingdom-flag-copy"><span className="eyebrow">CONQUEST ATLAS · KINGDOM IDENTITY</span><h3>Your kingdom flag</h3><p>Upload a banner for your kingdom. It appears on territory hover cards and in Kingdom Rankings. Wide images work best.</p><div className="kingdom-flag-actions"><label className="settings-upload"><Upload size={14}/>{kingdomFlagPreview?'Change flag':'Upload flag'}<input type="file" accept="image/png,image/jpeg,image/webp,image/avif" onChange={chooseKingdomFlag} disabled={flagBusy}/></label>{kingdomFlagPreview&&<button type="button" className="cursor-action" onClick={()=>void removeKingdomFlag()} disabled={flagBusy}>Remove flag</button>}</div></div>
     </section>
     
+    {pendingFlagFile && pendingFlagUrl && <div className="kingdom-crop-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget&&!flagBusy){setPendingFlagFile(null);URL.revokeObjectURL(pendingFlagUrl);setPendingFlagUrl('');}}}><section className="kingdom-crop-modal" role="dialog" aria-modal="true" aria-label="Crop kingdom banner"><header><div><span className="eyebrow">KINGDOM IDENTITY · IMAGE STUDIO</span><h3>Crop your banner</h3><p>16:9 wide banner · exactly what you see here is saved.</p></div><button type="button" onClick={()=>{setPendingFlagFile(null);URL.revokeObjectURL(pendingFlagUrl);setPendingFlagUrl('');}} disabled={flagBusy} aria-label="Cancel crop">×</button></header><div className="kingdom-crop-stage"><img src={pendingFlagUrl} alt="Banner crop preview" style={{width:(Math.max(100,100*flagCropZoom))+'%',height:'auto',maxWidth:'none',maxHeight:'none',left:'50%',top:'50%',transform:`translate(calc(-50% + ${flagCropX*.45}%),calc(-50% + ${flagCropY*.45}%))`}}/><span>16:9 PREVIEW</span></div><label className="kingdom-crop-control">Zoom <b>{flagCropZoom.toFixed(1)}×</b><input type="range" min="1" max="2.5" step=".1" value={flagCropZoom} onChange={e=>setFlagCropZoom(Number(e.target.value))}/></label><label className="kingdom-crop-control">Horizontal position <b>{flagCropX}</b><input type="range" min="-100" max="100" value={flagCropX} onChange={e=>setFlagCropX(Number(e.target.value))}/></label><label className="kingdom-crop-control">Vertical position <b>{flagCropY}</b><input type="range" min="-100" max="100" value={flagCropY} onChange={e=>setFlagCropY(Number(e.target.value))}/></label><footer><button type="button" className="cursor-action" disabled={flagBusy} onClick={()=>{setPendingFlagFile(null);URL.revokeObjectURL(pendingFlagUrl);setPendingFlagUrl('');}}>Cancel</button><button type="button" className="primary-btn" disabled={flagBusy} onClick={()=>void saveKingdomFlag()}><Upload size={15}/>{flagBusy?'Saving cropped banner…':'Save cropped banner'}</button></footer></section></div>}
     <section className="cursor-size-settings" style={{ marginTop: 22, padding: 18, border: '1px solid rgba(148,163,184,.18)', borderRadius: 16, background: 'linear-gradient(135deg, rgba(30,41,59,.32), rgba(15,23,42,.16))' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
         <span style={{ width: 40, height: 40, display: 'grid', placeItems: 'center', borderRadius: 12, color: '#93c5fd', background: 'rgba(59,130,246,.14)', border: '1px solid rgba(96,165,250,.24)' }}><MousePointer2 size={20}/></span>
