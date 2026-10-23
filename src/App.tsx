@@ -18,7 +18,8 @@ import NotificationsPanel from './NotificationsPanel';
 import HelpCenterPanel from './HelpCenterPanel';
 import PlayerCardPanel from './PlayerCardPanel';
 import MarketplacePanel from './MarketplacePanel';
-import { Activity, ArrowUpRight, Bell, BookOpen, ChartNoAxesColumn, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, ShieldAlert, LockKeyhole, Award, Sparkles, ShoppingBag, Swords, Target, Trophy, Wallet, Users, X, MessageSquareText } from 'lucide-react';
+import MarketplacePanel from './MarketplacePanel';
+import { Activity, ArrowUpRight, Bell, BookOpen, ChartNoAxesColumn, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, ShieldAlert, LockKeyhole, Award, Sparkles, ShoppingBag, Swords, Target, Trophy, Wallet, Users, X, MessageSquareText, ShoppingBag } from 'lucide-react';
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
@@ -45,6 +46,7 @@ const nav = [
   {label:'Notifications',icon:Bell},
   {label:'Help center',icon:CircleHelp},
   {label:'Contact Operator',icon:MessageSquareText},
+  {label:'Marketplace',icon:ShoppingBag},
   {label:'Marketplace',icon:ShoppingBag},
   {label:'Player Card',icon:Sparkles},
 ];
@@ -558,6 +560,7 @@ function App() {
         {activeNav==='Contact Operator'&&<ContactOperatorPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
         {activeNav==='Notifications'&&<NotificationsPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
         {activeNav==='Help center'&&<HelpCenterPanel onNavigate={navigate}/>}
+        {activeNav==='Marketplace'&&<MarketplacePanel supabase={supabase} userId={session.user.id} profile={profile} setNotice={setNotice}/>}
         {activeNav==='Marketplace'&&<MarketplacePanel supabase={supabase} userId={session.user.id} profile={profile} setNotice={setNotice}/>}
         {activeNav==='Player Card'&&<PlayerCardPanel supabase={supabase} userId={session.user.id} profile={profile} email={session.user.email}/>} 
         <footer className="footer"><span>◈ ASCEND OS <i>STUDY OS</i></span><span>BUILT FOR THE LONG GAME <span className="footer-dot">●</span></span></footer>
