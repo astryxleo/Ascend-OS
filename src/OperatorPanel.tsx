@@ -313,6 +313,8 @@ export default function OperatorPanel({
     return [row.reason, row.source, row.currency, row.user_id, row.username ?? '', row.full_name ?? ''].join(' ').toLowerCase().includes(walletAuditQuery.toLowerCase());
   });
 
+  useEffect(()=>{if(tab==='Marketplace discounts')void loadCosmetics();},[tab,supabase]);
+
   const tabs = ['Overview', 'Users', 'Daily activity', 'Wallet', 'Gift terminal', 'Marketplace discounts', 'Warnings', 'Wallet audit', 'Broadcasts', 'Contact requests', 'Notifications'];
 
   return (
@@ -363,7 +365,7 @@ export default function OperatorPanel({
             <button onClick={() => setTab('Users')}><Users /><b>User inspector</b><span>Progress & readiness</span></button>
             <button onClick={() => setTab('Wallet')}><Wallet /><b>Reward terminal</b><span>Audited wallet changes</span></button>
             <button onClick={() => setTab('Wallet audit')}><Activity /><b>Wallet audit log</b><span>Latest currency ledger entries</span></button>
-            <button onClick={() => setTab('Gift terminal')}><Gift /><b>Reward & gift terminal</b><span>Coins, souls, XP + live message</span></button>
+            <button onClick={() => setTab('Gift terminal')}><Gift /><b>Reward & gift terminal</b><span>Coins, souls, XP + live message</span></button><button onClick={() => setTab('Marketplace discounts')}><Percent/><b>Marketplace pricing</b><span>Discount or restore item prices</span></button><button onClick={() => setTab('Warnings')}><AlertTriangle/><b>Warning terminal</b><span>Private conduct notices</span></button><button onClick={() => setTab('Daily activity')}><CalendarDays/><b>Daily activity</b><span>Focus & tasks per player</span></button>
             <button onClick={() => setTab('Broadcasts')}><Activity /><b>Global broadcast</b><span>System-wide alerts</span></button>
           </div>
         </>
