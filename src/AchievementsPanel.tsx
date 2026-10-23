@@ -35,7 +35,6 @@ export default function AchievementsPanel({supabase,userId}:Props){
  useEffect(()=>{if(!supabase||!userId)return;const ch=supabase.channel('achievements-focus-'+userId).on('postgres_changes',{event:'*',schema:'public',table:'focus_sessions',filter:'user_id=eq.'+userId},()=>void load()).subscribe();return()=>{void supabase.removeChannel(ch);};},[supabase,userId,load]);
  const totalMinutes=rows.reduce((s,r)=>s+Math.max(0,r.duration_minutes||0),0);
  const totalXp=rows.reduce((s,r)=>s+Math.max(0,r.xp_earned||0),0);
- const subjects=new Set(rows.map(r=>r.subject).filter(Boolean)).size;
  const dates=[...new Set(rows.map(r=>new Date(r.ended_at).toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'})))].sort().reverse();
  let streak=0;
  if(dates.length){const now=new Date();const today=new Date(now.toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'})+'T00:00:00+05:30');const first=new Date(dates[0]+'T00:00:00+05:30');if((today.getTime()-first.getTime())/86400000<=1){let expected=first.getTime();for(const day of dates){const value=new Date(day+'T00:00:00+05:30').getTime();if(value===expected){streak++;expected-=86400000;}else if(value<expected)break;}}}
