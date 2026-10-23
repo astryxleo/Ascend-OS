@@ -53,7 +53,6 @@ export default function SettingsPanel({ supabase, profile, userId, onSaved, setN
   const [flagBusy, setFlagBusy] = useState(false);
   const [pendingFlagUrl, setPendingFlagUrl] = useState('');
   const [pendingFlagFile, setPendingFlagFile] = useState<File | null>(null);
-  const [pendingFlagUrl, setPendingFlagUrl] = useState('');
   const [flagCropZoom, setFlagCropZoom] = useState(1);
   const [flagCropX, setFlagCropX] = useState(0);
   const [flagCropY, setFlagCropY] = useState(0);
