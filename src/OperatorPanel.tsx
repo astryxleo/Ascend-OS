@@ -371,6 +371,7 @@ export default function OperatorPanel({
 
       {tab === 'Users' && (
         <>
+          <div className="operator-user-count"><Users size={16}/><b>{Number(stats.users??users.length).toLocaleString('en-IN')} users</b><span>Click any username to open their full dossier.</span></div>
           <form className="operator-search" onSubmit={searchUsers}>
             <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search username, name or email…" />
             <button disabled={searchingUsers}><Search size={14} /> {searchingUsers ? 'Searching…' : 'Search'}</button>
