@@ -38,7 +38,7 @@ export default function ConquestMapPanel({supabase,setNotice}:Props){
  const territoryCanvasRef=useRef<HTMLCanvasElement|null>(null);
  const dragRef=useRef<{x:number;y:number;px:number;py:number;cx:number;cy:number}|null>(null);
  const initializedView=useRef(false);
- const regionLoader=useRef<()=>void>(()=>{});
+ const regionLoader=useRef<()=>void>(()=>{});const regionRequest=useRef(0);
  const regionTimer=useRef<number|null>(null);
  const zoomAt=(delta:number)=>{setZoom(v=>Math.max(.35,Math.min(3.2,Number((v+delta).toFixed(2)))));if(regionTimer.current!==null)window.clearTimeout(regionTimer.current);regionTimer.current=window.setTimeout(()=>regionLoader.current(),240);};
  const onMapPointerDown=(e:React.PointerEvent<HTMLDivElement>)=>{if((e.target as HTMLElement).closest('button'))return;dragRef.current={x:e.clientX,y:e.clientY,cx:e.clientX,cy:e.clientY,px:pan.x,py:pan.y};setDragging(true);try{e.currentTarget.setPointerCapture(e.pointerId);}catch{}};
@@ -67,7 +67,9 @@ export default function ConquestMapPanel({supabase,setNotice}:Props){
    const cy=Math.max(0,Math.min(399,Math.round((4800-pan.y/zoom)/20.78460969)));
    const cx=Math.max(0,Math.min(499,Math.round((6000-pan.x/zoom-(cy%2)*12)/24)));
    const radius=Math.max(12,Math.min(38,Math.ceil(Math.max(el.clientWidth,el.clientHeight)/(24*zoom))+4));
+   const requestId=++regionRequest.current;
    const {data:region,error}=await supabase.rpc('get_conquest_map_region',{p_center_x:cx,p_center_y:cy,p_radius:radius});
+   if(requestId!==regionRequest.current)return;
    if(error){setNotice('Unable to chart this map region. Try syncing the map.');return;}
    if(Array.isArray(region)){
      setData(current=>current?{...current,territories:region as Territory[]}:current);
