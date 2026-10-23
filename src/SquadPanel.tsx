@@ -20,6 +20,7 @@ export default function SquadPanel({supabase,userId,setNotice}:Props){
  const [name,setName]=useState(''),[description,setDescription]=useState(''),[invite,setInvite]=useState('');
  const [flagBusy,setFlagBusy]=useState(false),[pendingSquadFlagUrl,setPendingSquadFlagUrl]=useState(''),[flagZoom,setFlagZoom]=useState(1),[flagX,setFlagX]=useState(0),[flagY,setFlagY]=useState(0);
  const [challengeTitle,setChallengeTitle]=useState(''),[challengeDescription,setChallengeDescription]=useState(''),[goalType,setGoalType]=useState<'focus_minutes'|'tasks_completed'>('focus_minutes'),[target,setTarget]=useState('600'),[duration,setDuration]=useState('7');
+ useEffect(()=>{if(!pendingSquadFlagUrl)return;const oldOverflow=document.body.style.overflow;const oldOverscroll=document.documentElement.style.overscrollBehavior;document.body.style.overflow='hidden';document.documentElement.style.overscrollBehavior='none';return()=>{document.body.style.overflow=oldOverflow;document.documentElement.style.overscrollBehavior=oldOverscroll}},[pendingSquadFlagUrl]);
  const selected=squads.find(s=>s.id===selectedId)||squads[0];
  const load=useCallback(async()=>{
   if(!supabase||!userId){setSquads([]);setLoading(false);return;}
