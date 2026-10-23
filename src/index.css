@@ -1333,3 +1333,30 @@ body:after{background:
   .operator-mode-toggle { max-width: 42px; overflow: hidden; padding-inline: 10px !important; font-size: 0 !important; }
   .operator-mode-toggle svg { flex: 0 0 auto; }
 }
+
+
+/* Equipped marketplace cosmetics: player card, profile border and frame */
+.pc-card-preview[data-profile-border="ember"] { border-color:#ff7043!important; box-shadow:0 0 0 2px #ff704355,0 0 28px #ff704322; }
+.pc-card-preview[data-profile-border="tideglass"] { border-color:#54d8e8!important; box-shadow:0 0 0 2px #54d8e855,0 0 28px #54d8e822; }
+.pc-card-preview[data-profile-border="aurora"] { border-color:#a78bfa!important; box-shadow:0 0 0 2px #a78bfa66,0 0 30px #a78bfa33; }
+.pc-card-preview[data-profile-border="voidforge"] { border-color:#d946ef!important; box-shadow:0 0 0 2px #d946ef66,0 0 30px #d946ef33; }
+.pc-card-preview[data-profile-border="celestial"] { border-color:#f8d878!important; box-shadow:0 0 0 2px #f8d87866,0 0 30px #f8d87833; }
+.pc-card-preview[data-profile-border="dragonfire"] { border-color:#ef4444!important; box-shadow:0 0 0 2px #ef444466,0 0 30px #ef444433; }
+.pc-card-preview[data-profile-frame="iron"] { outline:3px solid #94a3b8; outline-offset:3px; }
+.pc-card-preview[data-profile-frame="royal"] { outline:3px double #f4ce78; outline-offset:3px; box-shadow:0 0 22px #f4ce7840; }
+.pc-card-preview[data-profile-frame="rift"] { outline:3px solid #a78bfa; outline-offset:3px; box-shadow:0 0 22px #a78bfa44; }
+.pc-card-preview[data-profile-frame="abyss"] { outline:3px solid #38bdf8; outline-offset:3px; box-shadow:0 0 22px #38bdf844; }
+.pc-card-preview[data-profile-frame="divine"] { outline:4px double #fff1a8; outline-offset:3px; box-shadow:0 0 25px #fff1a855; }
+.pc-card-preview[data-profile-frame="dragon"] { outline:3px solid #fb7185; outline-offset:3px; box-shadow:0 0 25px #fb718544; }
+.pc-card-preview[data-atlas-skin="wood"] { background-image:linear-gradient(135deg,#203d32,#101d1a 55%,#5b4a2b)!important; }
+.pc-card-preview[data-atlas-skin="iron"] { background-image:linear-gradient(135deg,#596575,#151a22 55%,#a6b3c5)!important; }
+.pc-card-preview[data-atlas-skin="copper"] { background-image:linear-gradient(135deg,#854d35,#211513 55%,#d88a55)!important; }
+.pc-card-preview[data-atlas-skin="silver"] { background-image:linear-gradient(135deg,#aebbc8,#222b36 55%,#e1e8ef)!important; }
+.pc-card-preview[data-atlas-skin="gold"] { background-image:linear-gradient(135deg,#b88624,#211a0a 55%,#ffe7a0)!important; }
+.pc-card-preview[data-atlas-skin="ruby"] { background-image:linear-gradient(135deg,#a7193d,#230a16 55%,#ff718b)!important; }
+.pc-card-preview[data-atlas-skin="sapphire"] { background-image:linear-gradient(135deg,#1554a5,#081329 55%,#66c8ff)!important; }
+.pc-card-preview[data-atlas-skin="emerald"] { background-image:linear-gradient(135deg,#16754a,#071b14 55%,#6effb0)!important; }
+.pc-card-preview[data-atlas-skin="amethyst"] { background-image:linear-gradient(135deg,#713caa,#1c0d2d 55%,#d6a1ff)!important; }
+.pc-card-preview[data-atlas-skin="diamond"] { background-image:linear-gradient(135deg,#9ce7f2,#162d40 55%,#ffffff)!important; }
+.pc-card-preview[data-atlas-skin="obsidian"] { background-image:linear-gradient(135deg,#464657,#050509 55%,#a7a7bf)!important; }
+.pc-card-preview[data-atlas-skin="celestial"] { background-image:linear-gradient(135deg,#fff0ad,#272044 55%,#77e9ff)!important; }
