@@ -13,3 +13,27 @@
 
 
 .op-contact-reward-note{display:grid;grid-template-columns:22px minmax(0,1fr);gap:11px;align-items:start;margin:18px 0 16px;padding:15px 16px;border:1px solid rgba(218,184,105,.3);border-radius:14px;background:linear-gradient(120deg,rgba(129,93,35,.19),rgba(17,24,38,.68));box-shadow:inset 0 1px rgba(255,255,255,.035)}.op-contact-reward-note>svg{color:#e6c878;margin-top:2px}.op-contact-reward-note>div{display:grid;gap:6px}.op-contact-reward-note b{color:#f3dfaa;font-size:13px;letter-spacing:.01em}.op-contact-reward-note span{color:#c0c4d0;font-size:12px;line-height:1.65}.op-contact-reward-note+ .op-contact-pills{margin-top:0}
+
+
+/* Expandable request cards: concise overview first, full thread on demand */
+.op-contact-request{display:block}
+.op-contact-request-summary{display:block;list-style:none;cursor:pointer}
+.op-contact-request-summary::-webkit-details-marker{display:none}
+.op-contact-request-summary:after{content:"";display:block;clear:both}
+.op-contact-request-summary h4{margin:12px 0 8px;line-height:1.35;overflow-wrap:anywhere}
+.op-contact-request-summary-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.op-contact-request-summary-foot>span,.operator-contact-open-hint{display:inline-flex;align-items:center;gap:6px;color:#e7c879;font-size:11px;font-weight:800}
+.op-contact-request-detail{padding-top:16px;margin-top:15px;border-top:1px solid #ffffff12;overflow-wrap:anywhere}
+.op-contact-detail-label{display:block;margin-bottom:9px;color:#9c9eb3;font-size:9px;letter-spacing:.14em}
+.op-contact-request-detail>p{line-height:1.7}
+.op-contact-request[open],.operator-contact-card[open]{border-color:#d9b86755}
+.op-contact-request[open] .op-contact-request-summary-foot>span:after{content:""}
+.operator-contact-card{display:block}
+.operator-contact-card-summary{display:block;cursor:pointer;list-style:none}
+.operator-contact-card-summary::-webkit-details-marker{display:none}
+.operator-contact-open-hint{margin-top:12px}
+.operator-contact-card-details{margin-top:17px;padding-top:17px;border-top:1px solid #ffffff12;min-width:0}
+.operator-contact-card-details .operator-contact-message{overflow-wrap:anywhere;line-height:1.7}
+.operator-contact-card-details textarea{max-width:100%;box-sizing:border-box}
+.operator-contact-card[open]{box-shadow:0 12px 36px #0003,inset 0 1px #ffffff08}
+@media(max-width:600px){.op-contact-request-summary-foot{align-items:flex-start}.op-contact-request-summary-foot>span{width:100%}.operator-contact-meta{flex-wrap:wrap;overflow-wrap:anywhere}.operator-contact-card-details{overflow-wrap:anywhere}}
