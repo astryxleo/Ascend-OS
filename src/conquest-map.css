@@ -197,3 +197,5 @@
 .cq-chunk-loading>i:after{content:"";position:absolute;inset:0 auto 0 -40%;width:40%;border-radius:inherit;background:linear-gradient(90deg,#8a7445,#f4d68d,#fff0bf);animation:cq-chunk-progress 1.1s ease-in-out infinite}
 @keyframes cq-chunk-fade-in{from{opacity:0}to{opacity:1}}@keyframes cq-chunk-orbit{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-5px) rotate(3deg)}}@keyframes cq-chunk-progress{to{left:110%}}
 @media(prefers-reduced-motion:reduce){.cq-chunk-loader-orb,.cq-chunk-loading>i:after{animation:none!important}}
+
+.cq-report-casualties{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.cq-report-casualties>div{display:grid;gap:6px;padding:10px;border:1px solid rgba(244,118,118,.22);border-radius:10px;background:linear-gradient(140deg,rgba(118,39,48,.14),rgba(255,255,255,.02))}.cq-report-casualties span{font:800 8px 'DM Mono',monospace;letter-spacing:.08em;color:#a6a9b7}.cq-report-casualties b{font-size:12px;color:#ffaaa9}.cq-report-casualties>div:last-child b{color:#8fe0c1}@media(max-width:420px){.cq-report-casualties{grid-template-columns:1fr}}
