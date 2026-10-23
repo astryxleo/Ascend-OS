@@ -1257,3 +1257,11 @@ body:after{background:
 .focus-command-room .focus-live-badge{box-shadow:inset 0 1px #ffffff0a,0 0 22px #6de7b91a}
 @keyframes focus-aurora-sweep{0%,100%{background-position:150% 0}50%{background-position:-30% 0}}
 @media(prefers-reduced-motion:reduce){.ascend-squad-banner:before,.focus-command-room:before,.achievement-unlock-toast:after{animation:none!important}}
+
+
+/* Atlas-friendly collapsible desktop navigation */
+@media (min-width: 901px) {
+  .app-shell.nav-collapsed > .sidebar { display: none !important; }
+  .app-shell.nav-collapsed > .main-area { width: 100%; min-width: 0; margin-left: 0; }
+  .app-shell.nav-collapsed .menu-toggle { color: var(--accent, #e8bd63); }
+}
