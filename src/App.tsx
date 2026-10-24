@@ -116,6 +116,10 @@ function App() {
   const [operatorBroadcast,setOperatorBroadcast] = useState<{id:string;title:string;message:string;kind:string;created_at:string;shown_at:string}|null>(null);
   const [broadcastClock,setBroadcastClock] = useState(Date.now());
   const [tasks,setTasks] = useState<Task[]>([]);
+  const [isOnline,setIsOnline] = useState(() => typeof navigator === 'undefined' ? true : navigator.onLine);
+  const plannerCacheKey = (userId:string, day:string) => `ascend-offline-planner:${userId}:${day}`;
+  const savePlannerCache = (userId:string, day:string, rows:Task[]) => { try { localStorage.setItem(plannerCacheKey(userId,day),JSON.stringify(rows)); } catch {} };
+  const readPlannerCache = (userId:string, day:string):Task[] => { try { const value=localStorage.getItem(plannerCacheKey(userId,day)); return value ? JSON.parse(value) as Task[] : []; } catch { return []; } };
   const [plannerDay,setPlannerDay] = useState(studyDay());
   const activePlannerDayRef = useRef(plannerDay);
   activePlannerDayRef.current = plannerDay;
@@ -123,6 +127,7 @@ function App() {
   const [taskSubject,setTaskSubject] = useState(subjects[0]);
   const [taskPriority,setTaskPriority] = useState<'P1'|'P2'|'P3'>('P2');
   const [activeNav,setActiveNav] = useState(() => labelFromPath(window.location.pathname));
+  useEffect(()=>{const online=()=>setIsOnline(true);const offline=()=>setIsOnline(false);window.addEventListener('online',online);window.addEventListener('offline',offline);return()=>{window.removeEventListener('online',online);window.removeEventListener('offline',offline);};},[]);
   const navigate = (label: string) => {
     const path = routeByLabel[label] || '/';
     if (window.location.pathname !== path) window.history.pushState({ page: label }, '', path);
@@ -329,7 +334,8 @@ function App() {
     })().catch(() => { if (!cancelled) { setNotice('Could not load your workspace because of a network error. Please reload and try again.'); setProfileLoaded(true); } });
     return () => { cancelled = true; };
   },[session?.user?.id]);
-  useEffect(()=>{if(!supabase||!session?.user.id){setTasks([]);return;}let alive=true;setTasks([]);(async()=>{try{const {data,error}=await supabase.from('planner_tasks').select('*').eq('user_id',session.user.id).eq('study_day',plannerDay).order('created_at');if(!alive)return;if(error){setNotice('Could not load planner history: '+error.message);return;}setTasks((data??[]) as Task[]);}catch{if(alive)setNotice('Could not load planner history because of a network error. Please retry by changing the study day.');}})();return()=>{alive=false};},[session?.user?.id,plannerDay]);
+  useEffect(()=>{if(!session?.user.id){setTasks([]);return;}let alive=true;const actorId=session.user.id;setTasks(readPlannerCache(actorId,plannerDay));if(!supabase||!navigator.onLine)return()=>{alive=false};(async()=>{try{const {data,error}=await supabase.from('planner_tasks').select('*').eq('user_id',actorId).eq('study_day',plannerDay).order('created_at');if(!alive)return;if(error){setNotice('Offline mode: showing your saved planner.');return;}const serverRows=(data??[]) as Task[];const localRows=readPlannerCache(actorId,plannerDay);const serverIds=new Set(serverRows.map(t=>t.id));const merged=[...serverRows,...localRows.filter(t=>!serverIds.has(t.id))];setTasks(merged);savePlannerCache(actorId,plannerDay,merged);}catch{if(alive)setNotice('Offline mode: showing your saved planner.');}})();return()=>{alive=false};},[session?.user?.id,plannerDay]);
+  useEffect(()=>{if(!isOnline||!supabase||!session?.user.id)return;const actorId=session.user.id;let cancelled=false;(async()=>{try{for(let i=0;i<14;i++){const day=shiftStudyDay(studyDay(),-i);const localRows=readPlannerCache(actorId,day);if(!localRows.length)continue;const {error}=await supabase.from('planner_tasks').upsert(localRows.map(({id,title,subject,priority,estimated_minutes,completed,study_day})=>({id,user_id:actorId,title,subject,priority,estimated_minutes,completed,study_day,completed_at:completed?new Date().toISOString():null})),{onConflict:'id'});if(error)continue;}if(!cancelled&&activePlannerDayRef.current===plannerDay){const {data,error}=await supabase.from('planner_tasks').select('*').eq('user_id',actorId).eq('study_day',plannerDay).order('created_at');if(!error&&data&&activeUserIdRef.current===actorId){setTasks(data as Task[]);savePlannerCache(actorId,plannerDay,data as Task[]);}}}catch{}})();return()=>{cancelled=true};},[isOnline,session?.user.id]);
   useEffect(() => {
     if (!focusRunning) return;
     const id = window.setInterval(() => setFocusSeconds(s => {
@@ -374,8 +380,8 @@ function App() {
   }
   async function addTask(e:FormEvent) {
     e.preventDefault(); if (!taskTitle.trim()) return;
-    const row = {user_id:session!.user.id,title:taskTitle.trim(),subject:taskSubject,priority:taskPriority,estimated_minutes:25,study_day:plannerDay,completed:false};
-    if (!supabase) { setNotice('Supabase is not configured yet.'); return; }
+    const row = {id:crypto.randomUUID(),user_id:session!.user.id,title:taskTitle.trim(),subject:taskSubject,priority:taskPriority,estimated_minutes:25,study_day:plannerDay,completed:false} as Task & {user_id:string};
+    if (!supabase || !navigator.onLine) { const next=[...readPlannerCache(row.user_id,row.study_day),row];savePlannerCache(row.user_id,row.study_day,next);setTasks(next);setTaskTitle('');setNewTaskOpen(false);setNotice('Saved offline on this device. It will sync when you reconnect.');return; }
     try {
       const {data,error} = await supabase.from('planner_tasks').insert(row).select('*').single();
       if (activeUserIdRef.current !== row.user_id || activePlannerDayRef.current !== row.study_day) return;
@@ -386,9 +392,10 @@ function App() {
     }
   }
   async function toggleTask(task:Task) {
-    if (!supabase || !session?.user.id) return;
+    if (!session?.user.id) return;
     const actorId = session.user.id;
     const completed = !task.completed;
+    if(!supabase||!navigator.onLine){const next=tasks.map(t=>t.id===task.id?{...t,completed}:t);savePlannerCache(actorId,task.study_day,next);setTasks(next);setNotice('Planner change saved offline. It will sync when you reconnect.');return;}
     try {
       const {error} = await supabase.from('planner_tasks').update({completed,completed_at:completed?new Date().toISOString():null}).eq('id',task.id).eq('user_id',actorId);
       if (activeUserIdRef.current !== actorId || activePlannerDayRef.current !== task.study_day) return;
@@ -552,7 +559,7 @@ function App() {
     </aside>
     {mobileNav&&<button className="scrim" onClick={()=>setMobileNav(false)} aria-label="Close menu"/>}
     <main className="main-area">
-      <header className="topbar"><div className="top-left"><button type="button" className="icon-btn menu-toggle nav-toggle-button" onClick={()=>{if(window.matchMedia('(max-width: 900px)').matches){setMobileNav(true);}else{setNavHidden(v=>!v);}}} aria-label={navHidden?'Show navigation':'Hide navigation'} title={navHidden?'Show navigation':'Hide navigation'}><Menu size={18}/><span>{navHidden?'Show nav':'Hide nav'}</span></button><div className="breadcrumb">Workspace <span>/</span> <b>{activeNav}</b></div></div><div className="top-actions"><div className="status-pill"><span/> SYSTEM ONLINE</div><div className="coin-pill"><span>◈</span>{coins.toLocaleString()} <small>ASCEND</small></div>{canToggleOperator&&<button type="button" className="secondary-btn operator-mode-toggle" aria-pressed={operatorMode} onClick={()=>{const nextMode=!operatorMode;setOperatorMode(nextMode);navigate(nextMode?'Control center':'Overview');setNotice(nextMode?'Operator Mode enabled.':'Student Mode restored.');}} style={{display:'inline-flex',alignItems:'center',justifyContent:'center',gap:7,whiteSpace:'nowrap',padding:'9px 12px',fontSize:12}}>{operatorMode?<GraduationCap size={15}/>:<ShieldCheck size={15}/>} {operatorMode?'Student Mode':'Operator Mode'}</button>}<button className="icon-btn help-trigger" title="Open the Ascend OS tutorial" aria-label="Help and tutorial" onClick={()=>navigate('Help center')}><CircleHelp size={17}/></button></div></header>
+      <header className="topbar"><div className="top-left"><button type="button" className="icon-btn menu-toggle nav-toggle-button" onClick={()=>{if(window.matchMedia('(max-width: 900px)').matches){setMobileNav(true);}else{setNavHidden(v=>!v);}}} aria-label={navHidden?'Show navigation':'Hide navigation'} title={navHidden?'Show navigation':'Hide navigation'}><Menu size={18}/><span>{navHidden?'Show nav':'Hide nav'}</span></button><div className="breadcrumb">Workspace <span>/</span> <b>{activeNav}</b></div></div><div className="top-actions"><div className={"status-pill "+(isOnline?"":"offline-status-pill")} title={isOnline?"Connected — cloud sync available":"Offline — cached interface and local planner are available"}><span/> {isOnline?"SYSTEM ONLINE":"OFFLINE MODE"}</div><div className="coin-pill"><span>◈</span>{coins.toLocaleString()} <small>ASCEND</small></div>{canToggleOperator&&<button type="button" className="secondary-btn operator-mode-toggle" aria-pressed={operatorMode} onClick={()=>{const nextMode=!operatorMode;setOperatorMode(nextMode);navigate(nextMode?'Control center':'Overview');setNotice(nextMode?'Operator Mode enabled.':'Student Mode restored.');}} style={{display:'inline-flex',alignItems:'center',justifyContent:'center',gap:7,whiteSpace:'nowrap',padding:'9px 12px',fontSize:12}}>{operatorMode?<GraduationCap size={15}/>:<ShieldCheck size={15}/>} {operatorMode?'Student Mode':'Operator Mode'}</button>}<button className="icon-btn help-trigger" title="Open the Ascend OS tutorial" aria-label="Help and tutorial" onClick={()=>navigate('Help center')}><CircleHelp size={17}/></button></div></header>
       <div className="content">
         <div className="welcome-row"><div><div className="eyebrow"><span className="eyebrow-line"/> YOUR PERSONAL COMMAND DECK</div><h1>{greeting}, <em>{(profile?.full_name||session.user.user_metadata?.full_name||'Scholar').split(' ')[0]}.</em></h1><p>Your ambition, measured in focused minutes.</p></div><div className="date-chip"><div className="date-dot"/>{new Date().toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div></div>
       {activeNav==='Overview'&&warningBanner&&Date.now()-new Date(warningBanner.created_at).getTime()<12*60*60*1000&&<section className="ascend-operator-warning-banner"><div className="ascend-warning-icon"><ShieldAlert size={19}/></div><div><span>OPERATOR WARNING · {Math.max(1,Math.ceil((12*60*60*1000-(Date.now()-new Date(warningBanner.created_at).getTime()))/3600000))}H VISIBILITY</span><h3>{warningBanner.title.replace(/^⚠️ Operator Warning:\s*/i,'')}</h3><p>{warningBanner.message}</p></div></section>}
