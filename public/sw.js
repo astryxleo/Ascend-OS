@@ -2,7 +2,7 @@
    The interface and already-downloaded assets work offline; Supabase-backed
    sign-in, sync, marketplace purchases and other server actions need internet. */
 const CACHE_PREFIX = 'ascend-os-';
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 const APP_SHELL = '/';
 const MANIFEST = '/manifest.webmanifest';
