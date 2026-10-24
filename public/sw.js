@@ -2,7 +2,7 @@
    The interface and already-downloaded assets work offline; Supabase-backed
    sign-in, sync, marketplace purchases and other server actions need internet. */
 const CACHE_PREFIX = 'ascend-os-';
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 const APP_SHELL = '/';
 const MANIFEST = '/manifest.webmanifest';
@@ -68,8 +68,11 @@ self.addEventListener('fetch', event => {
         if (response.ok) {
           const cache = await caches.open(CACHE_NAME);
           await cache.put(APP_SHELL, response.clone());
+          return response;
         }
-        return response;
+        // If the host returns an error while offline/captive, prefer the saved app.
+        const saved = (await caches.match(request)) || (await caches.match(APP_SHELL));
+        return saved || response;
       } catch {
         return (await caches.match(request)) ||
           (await caches.match(APP_SHELL)) ||
