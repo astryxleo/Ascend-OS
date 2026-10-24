@@ -1436,3 +1436,11 @@ body:after{background:
 /* Clear connection state for the offline-first workspace. */
 .status-pill.offline-status-pill{border-color:rgba(245,185,92,.3);background:rgba(245,185,92,.08);color:#f2cb86;}
 .status-pill.offline-status-pill span{background:#f2b65d;box-shadow:0 0 10px rgba(242,182,93,.45);}
+
+
+/* Creator attribution, shown consistently on the workspace and sign-in screen. */
+.footer .footer-credit{display:inline-flex;align-items:center;gap:5px;color:#777483;letter-spacing:.09em;white-space:nowrap}
+.footer .footer-credit b,.auth-creator-credit b{color:#e3cb91;font-weight:700;letter-spacing:.015em}
+.auth-shell{position:relative;min-height:100vh;padding-bottom:54px}
+.auth-creator-credit{position:absolute;left:16px;right:16px;bottom:20px;display:flex;justify-content:center;align-items:center;gap:7px;color:#777483;font:9px 'DM Mono',monospace;letter-spacing:.12em;text-align:center}
+@media(max-width:520px){.footer{gap:12px;flex-wrap:wrap}.footer .footer-credit{font-size:7px}.auth-creator-credit{font-size:8px;bottom:14px}}
