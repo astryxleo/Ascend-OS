@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type Dispatch, type FormEvent, ty
 import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js';
 import { createPortal } from 'react-dom';
 import Onboarding from './Onboarding';
-import ascendLogo from '../ascend.png';
+import ascendLogo from '../ascend_new.png';
 import OperatorPanel from './OperatorPanel';
 import SettingsPanel from './SettingsPanel';
 import UpdatesPanel from './UpdatesPanel';
