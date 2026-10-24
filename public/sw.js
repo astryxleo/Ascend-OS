@@ -2,7 +2,7 @@
    The interface and already-downloaded assets work offline; Supabase-backed
    sign-in, sync, marketplace purchases and other server actions need internet. */
 const CACHE_PREFIX = 'ascend-os-';
-const CACHE_VERSION = 'v5';
+const CACHE_VERSION = 'v6';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 const APP_SHELL = '/';
 const MANIFEST = '/manifest.webmanifest';
@@ -58,6 +58,10 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+
+  // Never cache authentication, database, server-function, or API responses.
+  // These must remain live and must not be replayed as stale private data.
+  if (/\/(?:auth|rest|functions)\/v1\//.test(url.pathname) || url.pathname.startsWith('/api/')) return;
 
   // Always serve the cached app shell when navigation cannot reach the network,
   // including deep links such as /inventory or /squads.
