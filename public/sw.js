@@ -1,31 +1,43 @@
-/* Ascend OS offline app shell. Supabase-backed actions still require a connection. */
+/* Ascend OS offline-first app shell.
+   The interface and already-downloaded assets work offline; Supabase-backed
+   sign-in, sync, marketplace purchases and other server actions need internet. */
 const CACHE_PREFIX = 'ascend-os-';
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
-const SHELL_URLS = ['/', '/manifest.webmanifest'];
+const APP_SHELL = '/';
+const MANIFEST = '/manifest.webmanifest';
 
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
-    // Cache the app entry point and manifest first; then cache its built JS/CSS assets.
-    const shellResponse = await fetch('/', { cache: 'reload' });
-    if (!shellResponse.ok) throw new Error('Unable to cache the Ascend OS app shell');
-    await cache.put('/', shellResponse.clone());
-    const html = await shellResponse.clone().text();
-    const assetUrls = new Set(SHELL_URLS.slice(1));
-    for (const match of html.matchAll(/(?:src|href)=["']([^"']+)["']/g)) {
+    // Cache the main page first so a first successful visit can reopen offline.
+    const response = await fetch(APP_SHELL, { cache: 'reload' });
+    if (!response.ok) throw new Error('Could not cache Ascend OS app shell');
+    await cache.put(APP_SHELL, response.clone());
+
+    // Pre-cache every same-origin asset referenced by the built Vite HTML.
+    const html = await response.text();
+    const assets = new Set([MANIFEST]);
+    const attributePattern = /(?:src|href)\s*=\s*["']([^"']+)["']/gi;
+    for (const match of html.matchAll(attributePattern)) {
       try {
         const url = new URL(match[1], self.location.origin);
-        if (url.origin === self.location.origin && (url.pathname.startsWith('/assets/') || url.pathname === '/manifest.webmanifest' || /\\.(?:js|css|woff2?|svg|png|webp|ico)$/i.test(url.pathname))) {
-          assetUrls.add(url.pathname + url.search);
-        }
+        if (url.origin !== self.location.origin) continue;
+        if (
+          url.pathname.startsWith('/assets/') ||
+          url.pathname === MANIFEST ||
+          /\.(?:js|mjs|css|woff2?|svg|png|webp|jpe?g|ico|avif)$/i.test(url.pathname)
+        ) assets.add(url.pathname + url.search);
       } catch {}
     }
-    await Promise.all([...assetUrls].map(async url => {
+
+    await Promise.all([...assets].map(async path => {
       try {
-        const response = await fetch(url, { cache: 'reload' });
-        if (response.ok) await cache.put(url, response);
-      } catch {}
+        const asset = await fetch(path, { cache: 'reload' });
+        if (asset.ok) await cache.put(path, asset);
+      } catch {
+        // Optional asset failure must not prevent the app shell from installing.
+      }
     }));
     await self.skipWaiting();
   })());
@@ -34,44 +46,73 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME).map(key => caches.delete(key)));
+    await Promise.all(keys
+      .filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+      .map(key => caches.delete(key)));
     await self.clients.claim();
   })());
 });
 
 self.addEventListener('fetch', event => {
   const request = event.request;
+  if (request.method !== 'GET') return;
   const url = new URL(request.url);
-  if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+  if (url.origin !== self.location.origin) return;
 
-  // Navigations use the latest server page when online, with the cached app shell as fallback.
+  // Always serve the cached app shell when navigation cannot reach the network,
+  // including deep links such as /inventory or /squads.
   if (request.mode === 'navigate') {
     event.respondWith((async () => {
       try {
         const response = await fetch(request);
         if (response.ok) {
           const cache = await caches.open(CACHE_NAME);
-          await cache.put('/', response.clone());
+          await cache.put(APP_SHELL, response.clone());
         }
         return response;
       } catch {
-        return (await caches.match(request)) || (await caches.match('/'));
+        return (await caches.match(request)) ||
+          (await caches.match(APP_SHELL)) ||
+          new Response('Ascend OS is not cached yet. Connect to the internet once, then reopen the app.', {
+            status: 503,
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+          });
       }
     })());
     return;
   }
 
-  // Prefer fresh content while connected; fall back to the cached app assets offline.
+  // Hashed build assets are cache-first for instant offline reloads.
+  if (url.pathname.startsWith('/assets/') ||
+      /\.(?:js|mjs|css|woff2?|svg|png|webp|jpe?g|ico|avif)$/i.test(url.pathname) ||
+      url.pathname === MANIFEST) {
+    event.respondWith((async () => {
+      const cached = await caches.match(request);
+      if (cached) {
+        fetch(request).then(async response => {
+          if (response.ok) (await caches.open(CACHE_NAME)).put(request, response);
+        }).catch(() => {});
+        return cached;
+      }
+      try {
+        const response = await fetch(request);
+        if (response.ok) (await caches.open(CACHE_NAME)).put(request, response.clone()).catch(() => {});
+        return response;
+      } catch {
+        return Response.error();
+      }
+    })());
+    return;
+  }
+
+  // Other same-origin GET requests use network-first and update the offline cache.
   event.respondWith((async () => {
     try {
       const response = await fetch(request);
-      if (response.ok) {
-        const cache = await caches.open(CACHE_NAME);
-        cache.put(request, response.clone()).catch(() => {});
-      }
+      if (response.ok) (await caches.open(CACHE_NAME)).put(request, response.clone()).catch(() => {});
       return response;
     } catch {
-      return await caches.match(request) || Response.error();
+      return (await caches.match(request)) || Response.error();
     }
   })());
 });
