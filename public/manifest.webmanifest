@@ -10,13 +10,13 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/ascend.png",
+      "src": "https://raw.githubusercontent.com/astryxleo/Ascend-OS/main/ascend.png?v=20261024",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/ascend.png",
+      "src": "https://raw.githubusercontent.com/astryxleo/Ascend-OS/main/ascend.png?v=20261024",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
