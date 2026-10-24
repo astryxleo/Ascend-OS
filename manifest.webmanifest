@@ -1,0 +1,25 @@
+{
+  "id": "/",
+  "name": "Ascend OS — Study OS",
+  "short_name": "Ascend OS",
+  "description": "Your personal study operating system.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#070709",
+  "theme_color": "#070709",
+  "icons": [
+    {
+      "src": "/ascend.png?v=20261024-2",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ascend.png?v=20261024-2",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
