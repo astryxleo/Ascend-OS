@@ -10,13 +10,13 @@
   "theme_color": "#070709",
   "icons": [
     {
-      "src": "/ascend.png?v=20261024-2",
+      "src": "/ascend.png?v=20261024-3",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/ascend.png?v=20261024-2",
+      "src": "/ascend.png?v=20261024-3",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
