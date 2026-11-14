@@ -28,28 +28,24 @@ const ascendBootVideo = new URL('../AscendBoot.mp4', import.meta.url).href;
 
 type Task = { id: string; title: string; subject: string | null; priority: 'P1'|'P2'|'P3'; estimated_minutes: number; completed: boolean; study_day: string };
 const subjects = ['Mathematics','Physics','Chemistry','English Core','Computer Science','Yoga'];
-const nav = [
-  {label:'Overview',icon:LayoutDashboard},
-  {label:'Syllabus',icon:BookOpen},
-  {label:'Focus room',icon:Focus},
-  {label:'Planner',icon:Target},
-  {label:'Exams & marks',icon:GraduationCap},
-  {label:'Updates',icon:Bell},
-  {label:'Leaderboard',icon:Trophy},
-  {label:'Combat Arena',icon:Swords},
-  {label:'1v1 Arena',icon:Swords},
-  {label:'Duels',icon:Swords},
-  {label:'Squads',icon:Users},
-  {label:'Squad Wars',icon:Swords},
-  {label:'Achievements',icon:Award},
-  {label:'Analytics',icon:ChartNoAxesColumn},
-  {label:'Notifications',icon:Bell},
-  {label:'Help center',icon:CircleHelp},
-  {label:'Contact Operator',icon:MessageSquareText},
-  {label:'Marketplace',icon:ShoppingBag},
-  {label:'Inventory',icon:PackageOpen},
-  {label:'Player Card',icon:Sparkles},
-];
+const navGroups = [
+  {id:'study',label:'Study',tag:'LEARN',icon:BookOpen,items:[
+    {label:'Overview',icon:LayoutDashboard},{label:'Syllabus',icon:BookOpen},{label:'Focus room',icon:Focus},{label:'Planner',icon:Target},{label:'Exams & marks',icon:GraduationCap},
+  ]},
+  {id:'progression',label:'Progression',tag:'EVOLVE',icon:ChartNoAxesColumn,items:[
+    {label:'Leaderboard',icon:Trophy},{label:'Achievements',icon:Award},{label:'Analytics',icon:ChartNoAxesColumn},
+  ]},
+  {id:'compete',label:'Compete',tag:'CONQUER',icon:Swords,items:[
+    {label:'Combat Arena',icon:Swords},{label:'1v1 Arena',icon:Swords},{label:'Duels',icon:Zap},{label:'Squads',icon:Users},{label:'Squad Wars',icon:Swords},
+  ]},
+  {id:'personalize',label:'Personalize',tag:'IDENTITY',icon:Sparkles,items:[
+    {label:'Marketplace',icon:ShoppingBag},{label:'Inventory',icon:PackageOpen},{label:'Player Card',icon:Sparkles},
+  ]},
+  {id:'support',label:'Support',tag:'ASSIST',icon:CircleHelp,items:[
+    {label:'Notifications',icon:Bell},{label:'Updates',icon:Activity},{label:'Help center',icon:CircleHelp},{label:'Contact Operator',icon:MessageSquareText},
+  ]},
+] as const;
+const groupForLabel = (label:string) => navGroups.find(group=>group.items.some(item=>item.label===label))?.id ?? 'study';
 
 const routeByLabel: Record<string, string> = {
   'Overview': '/', 'Syllabus': '/syllabus', 'Focus room': '/focus',
@@ -127,7 +123,9 @@ function App() {
   const [taskSubject,setTaskSubject] = useState(subjects[0]);
   const [taskPriority,setTaskPriority] = useState<'P1'|'P2'|'P3'>('P2');
   const [activeNav,setActiveNav] = useState(() => labelFromPath(window.location.pathname));
+  const [openNavGroup,setOpenNavGroup] = useState(() => groupForLabel(labelFromPath(window.location.pathname)));
   useEffect(()=>{const online=()=>setIsOnline(true);const offline=()=>setIsOnline(false);window.addEventListener('online',online);window.addEventListener('offline',offline);return()=>{window.removeEventListener('online',online);window.removeEventListener('offline',offline);};},[]);
+  useEffect(()=>{setOpenNavGroup(groupForLabel(activeNav));},[activeNav]);
   const navigate = (label: string) => {
     const path = routeByLabel[label] || '/';
     if (window.location.pathname !== path) window.history.pushState({ page: label }, '', path);
@@ -551,9 +549,14 @@ function App() {
     <aside className={`sidebar ${mobileNav?'sidebar-open':''}`}>
       <div className="brand"><div className="brand-mark"><img className="ascend-logo-image" src={ascendLogo} alt="Ascend OS logo" /></div><div><strong>ASCEND OS</strong><span>STUDY OPERATING SYSTEM</span></div><button className="icon-btn mobile-close" onClick={()=>setMobileNav(false)} aria-label="Close navigation"><X size={17}/></button></div>
       <div className="sidebar-navigation">
-        <div className="workspace-label">WORKSPACE <ChevronDown size={12}/></div>
-        <div className="nav-list">{nav.map(item=><button key={item.label} className={`nav-item ${activeNav===item.label?'active':''}`} onClick={()=>{navigate(item.label);setMobileNav(false);}}><item.icon size={17}/><span>{item.label}</span>{item.label==='Focus room'&&<span className="nav-dot"/>}</button>)}</div>
-        {isOperator&&<><div className="workspace-label operator-label">OPERATOR</div><button className={`nav-item ${activeNav==='Control center'?'active':''}`} onClick={()=>{navigate('Control center');setMobileNav(false);}}><ShieldCheck size={17}/><span>Control center</span><span className="operator-chip">ROOT</span></button></>}
+        <div className="workspace-label"><span>COMMAND DECK</span><span className="workspace-live"><i/> LIVE</span></div>
+        <div className="nav-groups">{navGroups.map((group,index)=>{const expanded=openNavGroup===group.id;return <section className={`nav-group ${expanded?'is-expanded':'is-collapsed'}`} key={group.id} style={{'--group-index':index} as React.CSSProperties}>
+          <button type="button" className="nav-group-trigger" aria-expanded={expanded} aria-controls={`nav-group-${group.id}`} onClick={()=>setOpenNavGroup(current=>current===group.id?'':group.id)}>
+            <span className="nav-group-icon"><group.icon size={15}/></span><span className="nav-group-title">{group.label}</span><span className="nav-group-tag">{group.tag}</span><ChevronDown className="nav-group-chevron" size={14}/>
+          </button>
+          <div className="nav-group-content" id={`nav-group-${group.id}`} aria-hidden={!expanded}><div className="nav-group-items">{group.items.map(item=><button type="button" key={item.label} tabIndex={expanded?0:-1} className={`nav-item ${activeNav===item.label?'active':''}`} onClick={()=>{navigate(item.label);setMobileNav(false);}}><item.icon size={17}/><span>{item.label}</span>{item.label==='Focus room'&&<span className="nav-dot"/>}</button>)}</div></div>
+        </section>})}</div>
+        {isOperator&&<section className="operator-nav-section"><div className="workspace-label operator-label">OPERATOR ACCESS</div><button type="button" className={`nav-item operator-nav-item ${activeNav==='Control center'?'active':''}`} onClick={()=>{navigate('Control center');setMobileNav(false);}}><ShieldCheck size={17}/><span>Control center</span><span className="operator-chip">ROOT</span></button></section>}
       </div>
       <div className="sidebar-bottom"><div className="streak-card"><div className="streak-icon"><Flame size={17}/></div><div><b>Build your streak</b><span>One session at a time.</span></div><ArrowUpRight size={15}/></div><button className="nav-item" onClick={()=>navigate('Settings')}><Settings2 size={17}/><span>Settings</span></button><div className="user-card"><div className="avatar">{profile?.avatar_url?<img src={profile.avatar_url} alt="" />:(profile?.full_name||session.user.email||'L').slice(0,1).toUpperCase()}</div><div className="user-meta"><b>{profile?.full_name||session.user.user_metadata?.full_name||'Student'}</b><span>{isOperator?'OPERATOR ACCESS':'CLASS XII · STUDENT'}</span></div><button className="icon-btn" title="Sign out" onClick={signOut}><LogOut size={16}/></button></div></div>
     </aside>
