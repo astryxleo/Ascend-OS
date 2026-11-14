@@ -1,4 +1,4 @@
-name: Lumen CI
+name: Ascend OS CI
 on:
   push:
     branches: [main]
