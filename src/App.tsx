@@ -271,7 +271,7 @@ function App() {
       if (table === 'profiles' && row.id === actorId) void supabase.from('profiles').select('*').eq('id',actorId).maybeSingle()
         .then(({data,error})=>{if(!error&&activeUserIdRef.current===actorId&&data)setProfile(data)});
     };
-    const realtimeTables = ['activity_events','broadcasts','chapter_progress','combat_cosmetic_catalog','combat_cosmetic_owned','combat_customizations','combat_fighters','combat_matches','combat_weapon_skill_catalog','exams','focus_session_runs','focus_sessions','planner_tasks','profiles','study_duels','study_squad_challenges','study_squad_members','study_squads','syllabus_steps','wallet_transactions','wallets'];
+    const realtimeTables = ['activity_events','broadcasts','chapter_progress','combat_cosmetic_catalog','combat_cosmetic_owned','combat_customizations','combat_fighters','combat_matches','combat_weapon_skill_catalog','exams','focus_session_runs','focus_sessions','operator_contact_requests','planner_tasks','profiles','study_duels','study_squad_challenges','study_squad_members','study_squads','syllabus_steps','wallet_transactions','wallets'];
     let channel = supabase.channel('ascend-live-workspace-' + actorId);
     for (const table of realtimeTables) {
       channel = channel.on('postgres_changes', { event: '*', schema: 'public', table }, onDatabaseChange);

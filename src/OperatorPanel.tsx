@@ -131,7 +131,7 @@ export default function OperatorPanel({
   useEffect(() => {
     const onRealtime = (event: Event) => {
       const table = (event as CustomEvent<any>).detail?.table;
-      if (['profiles','wallets','wallet_transactions','broadcasts','activity_events','combat_matches','study_duels','study_squads','study_squad_members'].includes(table)) void refresh();
+      if (['profiles','wallets','wallet_transactions','broadcasts','activity_events','combat_matches','study_duels','study_squads','study_squad_members','focus_sessions','focus_session_runs','exams','chapter_progress','planner_tasks','combat_fighters','combat_cosmetic_catalog','operator_contact_requests'].includes(table)) void refresh();
     };
     window.addEventListener('ascend:realtime', onRealtime);
     return () => window.removeEventListener('ascend:realtime', onRealtime);
