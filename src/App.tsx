@@ -36,7 +36,7 @@ const navGroups = [
     {label:'Leaderboard',icon:Trophy},{label:'Achievements',icon:Award},{label:'Analytics',icon:ChartNoAxesColumn},
   ]},
   {id:'compete',label:'Compete',tag:'CONQUER',icon:Swords,items:[
-    {label:'Combat Arena',icon:Swords},{label:'1v1 Arena',icon:Swords},{label:'Duels',icon:Zap},{label:'Squads',icon:Users},{label:'Squad Wars',icon:Swords},
+    {label:'Ascend Army',icon:Swords},{label:'1v1 Arena',icon:Swords},{label:'Duels',icon:Zap},{label:'Squads',icon:Users},{label:'Squad Wars',icon:Swords},
   ]},
   {id:'personalize',label:'Personalize',tag:'IDENTITY',icon:Sparkles,items:[
     {label:'Marketplace',icon:ShoppingBag},{label:'Inventory',icon:PackageOpen},{label:'Player Card',icon:Sparkles},
@@ -50,7 +50,7 @@ const groupForLabel = (label:string) => navGroups.find(group=>group.items.some(i
 const routeByLabel: Record<string, string> = {
   'Overview': '/', 'Syllabus': '/syllabus', 'Focus room': '/focus',
   'Planner': '/planner', 'Exams & marks': '/exams', 'Updates': '/updates',
-  'Leaderboard': '/leaderboard', 'Combat Arena': '/combat', '1v1 Arena': '/1v1', 'Duels': '/duels',
+  'Leaderboard': '/leaderboard', 'Ascend Army': '/combat', '1v1 Arena': '/1v1', 'Duels': '/duels',
   'Squads': '/squads', 'Squad Wars': '/squad-wars', 'Achievements': '/achievements', 'Analytics': '/analytics',
   'Control center': '/operator', 'Settings': '/settings', 'Notifications':'/notifications', 'Contact Operator':'/contact-operator', 'Help center':'/help', 'Marketplace':'/marketplace', 'Inventory':'/inventory', 'Player Card':'/player-card',
 };
@@ -575,7 +575,7 @@ function App() {
         {activeNav==='Exams & marks'&&<ExamCommand supabase={supabase} userId={session?.user.id??null} setNotice={setNotice}/>}
         {activeNav==='Updates'&&<UpdatesPanel supabase={supabase}/>}
         {activeNav==='Leaderboard'&&<LeaderboardPanel supabase={supabase} userId={session?.user.id??''}/>}
-        {activeNav==='Combat Arena'&&<CombatPanel supabase={supabase} userId={session.user.id} setNotice={setNotice} onNavigate={navigate}/>}
+        {activeNav==='Ascend Army'&&<CombatPanel supabase={supabase} userId={session.user.id} setNotice={setNotice} onNavigate={navigate}/>}
         {activeNav==='1v1 Arena'&&<IndividualDuelsPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
         {activeNav==='Duels'&&<AnalyticsPanel supabase={supabase} userId={session.user.id} initialTab="duels"/>}
         {activeNav==='Squads'&&<SquadPanel supabase={supabase} userId={session.user.id} setNotice={setNotice}/>}
