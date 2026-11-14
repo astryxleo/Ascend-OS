@@ -19,7 +19,7 @@ import HelpCenterPanel from './HelpCenterPanel';
 import PlayerCardPanel from './PlayerCardPanel';
 import MarketplacePanel from './MarketplacePanel';
 import InventoryPanel from './InventoryPanel';
-import { Activity, ArrowUpRight, Bell, BookOpen, ChartNoAxesColumn, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, ShieldAlert, LockKeyhole, Award, Sparkles, ShoppingBag, PackageOpen, Swords, Target, Trophy, Wallet, Users, X, MessageSquareText } from 'lucide-react';
+import { Activity, ArrowUpRight, Bell, BookOpen, ChartNoAxesColumn, Check, ChevronDown, CircleHelp, Clock3, Flame, Focus, Gauge, GraduationCap, LayoutDashboard, LogOut, Menu, Plus, Settings2, ShieldCheck, ShieldAlert, LockKeyhole, Award, Sparkles, ShoppingBag, PackageOpen, Swords, Target, Trophy, Wallet, Users, X, MessageSquareText, Zap } from 'lucide-react';
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
