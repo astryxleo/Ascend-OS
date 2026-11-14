@@ -123,7 +123,7 @@ function App() {
   const [taskSubject,setTaskSubject] = useState(subjects[0]);
   const [taskPriority,setTaskPriority] = useState<'P1'|'P2'|'P3'>('P2');
   const [activeNav,setActiveNav] = useState(() => labelFromPath(window.location.pathname));
-  const [openNavGroup,setOpenNavGroup] = useState(() => groupForLabel(labelFromPath(window.location.pathname)));
+  const [openNavGroup,setOpenNavGroup] = useState<string|null>(() => groupForLabel(labelFromPath(window.location.pathname)));
   useEffect(()=>{const online=()=>setIsOnline(true);const offline=()=>setIsOnline(false);window.addEventListener('online',online);window.addEventListener('offline',offline);return()=>{window.removeEventListener('online',online);window.removeEventListener('offline',offline);};},[]);
   useEffect(()=>{setOpenNavGroup(groupForLabel(activeNav));},[activeNav]);
   const navigate = (label: string) => {
@@ -551,7 +551,7 @@ function App() {
       <div className="sidebar-navigation">
         <div className="workspace-label"><span>COMMAND DECK</span><span className="workspace-live"><i/> LIVE</span></div>
         <div className="nav-groups">{navGroups.map((group,index)=>{const expanded=openNavGroup===group.id;return <section className={`nav-group ${expanded?'is-expanded':'is-collapsed'}`} key={group.id} style={{'--group-index':index} as React.CSSProperties}>
-          <button type="button" className="nav-group-trigger" aria-expanded={expanded} aria-controls={`nav-group-${group.id}`} onClick={()=>setOpenNavGroup(current=>current===group.id?'':group.id)}>
+          <button type="button" className="nav-group-trigger" aria-expanded={expanded} aria-controls={`nav-group-${group.id}`} onClick={()=>setOpenNavGroup(current=>current===group.id?null:group.id)}>
             <span className="nav-group-icon"><group.icon size={15}/></span><span className="nav-group-title">{group.label}</span><span className="nav-group-tag">{group.tag}</span><ChevronDown className="nav-group-chevron" size={14}/>
           </button>
           <div className="nav-group-content" id={`nav-group-${group.id}`} aria-hidden={!expanded}><div className="nav-group-items">{group.items.map(item=><button type="button" key={item.label} tabIndex={expanded?0:-1} className={`nav-item ${activeNav===item.label?'active':''}`} onClick={()=>{navigate(item.label);setMobileNav(false);}}><item.icon size={17}/><span>{item.label}</span>{item.label==='Focus room'&&<span className="nav-dot"/>}</button>)}</div></div>
