@@ -1513,3 +1513,15 @@ body:after{background:
 @media(max-width:900px){.sidebar{box-shadow:22px 0 80px rgba(0,0,0,.48)!important}.nav-collapsed .sidebar{width:244px;padding-left:14px;padding-right:14px}.nav-collapsed .main-area{margin-left:0;width:100%}.nav-collapsed .nav-group-title,.nav-collapsed .nav-group-tag,.nav-collapsed .nav-group-chevron,.nav-collapsed .nav-group-content,.nav-collapsed .workspace-label,.nav-collapsed .brand>div:nth-child(2),.nav-collapsed .streak-card,.nav-collapsed .user-meta,.nav-collapsed .user-card>.icon-btn{display:initial!important}.nav-collapsed .nav-group-content{display:grid!important}.nav-collapsed .nav-group-title{display:inline!important}.nav-collapsed .nav-group-tag{display:inline-flex!important}.nav-collapsed .nav-group-chevron{display:block!important}.nav-collapsed .workspace-label{display:flex!important}.nav-collapsed .brand>div:nth-child(2){display:block!important}.nav-collapsed .streak-card{display:flex!important}.nav-collapsed .user-meta{display:block!important}.nav-collapsed .user-card>.icon-btn{display:grid!important}.nav-collapsed .nav-group{padding:5px;border-color:rgba(133,164,208,.09);background:linear-gradient(145deg,rgba(255,255,255,.025),rgba(255,255,255,.008))}.nav-collapsed .nav-group-trigger{justify-content:flex-start}.nav-collapsed .nav-group-icon{width:25px;height:25px}.nav-collapsed .nav-group.is-expanded .nav-group-content{grid-template-rows:1fr}.nav-collapsed .nav-group.is-collapsed .nav-group-content{grid-template-rows:0fr}.nav-collapsed .nav-groups{gap:7px}.nav-collapsed .operator-nav-item{justify-content:flex-start;padding:8px 9px}}
 @media(max-width:600px){.nav-group{border-radius:11px}.nav-group-trigger{min-height:36px}.nav-group .nav-item{min-height:36px;font-size:10px}.sidebar{padding-top:18px;padding-bottom:12px}}
 @media(prefers-reduced-motion:reduce){.sidebar:before,.workspace-live i{animation:none!important}.nav-group,.nav-group:before,.nav-group-trigger,.nav-group-icon,.nav-group-chevron,.nav-group-content,.nav-group .nav-item,.nav-group .nav-item>svg{transition:none!important;animation:none!important}.nav-group.is-expanded .nav-item{opacity:1;transform:none}}
+
+/* Navigation accessibility and collapsed-rail finishing pass */
+.nav-collapsed .nav-group.is-expanded .nav-group-content{display:grid!important;grid-template-rows:1fr!important;opacity:1!important}
+.nav-collapsed .nav-group.is-expanded .nav-group-items{padding-top:5px}
+.nav-collapsed .nav-group .nav-item{justify-content:center;gap:0;padding:8px 4px}
+.nav-collapsed .nav-group .nav-item>span{display:none!important}
+.nav-collapsed .nav-group .nav-item>svg{width:17px;height:17px}
+.nav-collapsed .nav-group .nav-item.active{transform:none}
+.content{transform-origin:top center}
+@keyframes asc-page-enter{from{opacity:0;transform:translate3d(0,10px,0) scale(.995);filter:blur(5px)}to{opacity:1;transform:translate3d(0,0,0) scale(1);filter:blur(0)}}
+.content{animation:asc-page-enter .42s cubic-bezier(.2,.8,.2,1) both}
+@media(prefers-reduced-motion:reduce){.content{animation:none!important}}
