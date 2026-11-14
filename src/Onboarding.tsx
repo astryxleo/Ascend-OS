@@ -104,7 +104,7 @@ export default function Onboarding({ supabase, profile, userId, onSaved }: Props
   }
 
   return <div className="auth-shell"><div className="auth-ambient ambient-one" /><div className="auth-card onboarding-card">
-    <div className="brand auth-brand"><div className="brand-mark">L</div><div><strong>LUMEN</strong><span>STUDY OPERATING SYSTEM</span></div></div>
+    <div className="brand auth-brand"><div className="brand-mark">A</div><div><strong>ASCEND OS</strong><span>STUDY OPERATING SYSTEM</span></div></div>
     <div className="auth-kicker"><span /> PERSONALIZE YOUR WORKSPACE</div>
     <h1>Set your<br /><em>coordinates.</em></h1>
     <p className="auth-copy">A few details help shape your academic command deck.</p>
